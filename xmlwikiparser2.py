@@ -2,6 +2,8 @@ import time
 from pprint import pprint as pp
 from collections import Counter
 
+from logger import writeToFile
+
 global atLine
 
 class InfoBox(object):
@@ -220,16 +222,6 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
             infoBoxList = []
     
     print "Succesfully finished parsing the entire wikipedia!"
-        
-def writeToFile(s, fileName="log.txt"):
-    """Appends a string to a file...
-    """
-    try:
-        fileName = fileName
-        with open(fileName, "a") as logFile:
-            logFile.write(s)
-    except:
-        print "Error saving to logfile"
         
 def handleInfoBoxes(ibList):
     for ib in ibList:

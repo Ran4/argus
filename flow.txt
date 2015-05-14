@@ -1,0 +1,9 @@
+1. Run xmlwikiparser2
+    File "infobox_output_raw.json" is generated with ALL InfoBoxes (filesize ~??? MiB)
+    File "attribute_keys_raw.txt" is generated from all InfoBox keys (filesize ~??? MiB)
+
+2. Run attribute_cleaner.py
+    File infobox_output_cleaned.json" is generated (filesize ~??? MiB)
+    File "attribute_keys_cleaned.txt" is generated (filesize ~??? MiB)
+
+3. ???
