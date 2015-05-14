@@ -5,3 +5,11 @@
 
 #Parses ("Pagelist") from "{{Pagelist|X1|X2|X3|X4|X5}}"
 pattern = "\{\{([^|]+)\|"
+
+#Parses the Wiki templates of "br separated entries" and "space separated entries" on one line or several
+
+(?:\{\{(?:.*?))\||\|(.*?)(?:\}*)(?:\n)|(.*?)(?:\||\}\})
+
+#Parses the Wiki template of bulleted list (removes parameters, and parses either one or multiple entries per row)
+
+(?:\{\{(?:.*?))(?:\||\n)|(?:\|*)class=(?:.*?)(?:\||\n)|(?:\|*)list_style=(?:.*?)(?:\||\n)|(?:\|*)style=(?:.*?)\||(?:\|*)item(?:\d*)_style=(?:.*?)(?:\||\n)|\|(.*?)(?:\||\}\})|(.*?)\n
