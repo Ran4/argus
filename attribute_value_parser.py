@@ -36,20 +36,19 @@ def parseAttributeValue(value, verbose=False, logFileName=None):
     return match.groups()
 
 
-
-def parseInfoBox(ib):
-    for key, value in attributes:
-        parsedValue = parseAttributeValue(value)
-        writeToFile(json.dumps({key: parsedValue, indent=4), "output.txt")
-        
-    """    
-    example:
-
-    {{infobox scientist
-    | residence = germany, switzerland, united states
-
-    didriksregex("residence") == ("germany", "switzerland", "united states")
-    """
+#~ def parseInfoBox(ib):
+#~     for key, value in attributes:
+#~         parsedValue = parseAttributeValue(value)
+#~         writeToFile(json.dumps({key: parsedValue}, indent=4), "output.txt")
+#~         
+#~     """    
+#~     example:
+#~ 
+#~     {{infobox scientist
+#~     | residence = germany, switzerland, united states
+#~ 
+#~     didriksregex("residence") == ("germany", "switzerland", "united states")
+#~     """
         
 def main():
     pass

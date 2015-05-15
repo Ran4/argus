@@ -17,7 +17,7 @@ def clean(inputFileName, keysFileName,
     #Get attribute keys
     with open(keysFileName) as keysFile:
         keys = keysFile.read().split("\n")
-        keyCounter = colletions.Counter(keys)
+        keyCounter = collections.Counter(keys)
         if verbose: print "Successfully loaded attribute keys from JSON"
     
     #Get infoboxes 
@@ -71,14 +71,14 @@ def clean(inputFileName, keysFileName,
 
 def main():
     if len(sys.argv) != 4+1: #The right number of arguments wasn't given
-        inputFileName = "infobox_output_raw.json"
+        inputFileName = "ibs_person_raw_150515_60M.json"
         keysFileName = "attribute_keys_raw.txt"
         outputFileName = "infobox_output_cleaned.json"
         outputKeysFileName = "attribute_keys_cleaned.txt"
         print "Usage:"
         print "attribute_cleaner {} {} {} {}".format(inputFileName,
                 keysFileName, outputFileName, outputKeysFileName)
-        response = raw_input("Use default values (Y/N)? "
+        response = raw_input("Use default values (Y/N)? ")
         
         if response.lower() not in ("y", "yes"):
             return
@@ -88,8 +88,8 @@ def main():
         outputFileName  = sys.argv[3]
         outputKeysFileName  = sys.argv[4]
     
-    clean(inputFileName, attributeKeysFileName,
-        outputFileName, outputKeysFilename)
+    clean(inputFileName, keysFileName,
+        outputFileName, outputKeysFileName)
 
 if __name__ == "__main__":
     main()
