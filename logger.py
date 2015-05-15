@@ -1,7 +1,6 @@
+defaultFileName = "log.log"
 
-
-
-def writeToFile(s, fileName="log.txt"):
+def writeToFile(s, fileName=defaultFileName):
     """Appends a string to a file...
     """
     try:

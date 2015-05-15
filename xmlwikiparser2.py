@@ -1,8 +1,10 @@
+import sys
 import time
 from pprint import pprint as pp
 from collections import Counter
 import json
 
+import logger
 from logger import writeToFile
 
 global atLine
@@ -24,6 +26,16 @@ class InfoBox(object):
         self.countInArticle = countInArticle
         
         self.isInArticleWithPersonBox = False
+        
+        """
+        if "lincoln" in articleTitle.lower() and "abraham" in articleTitle.lower():
+            print "in InfoBox.__init__ of title=%s" % articleTitle
+            print "infoBoxStringList:", self.infoBoxStringList
+            
+            print "JSON:"
+            print self.getJSON()
+            print "\n"*2
+        """    
         
         if len(self.infoBoxType) > 30:
             #there might be a problem since the type string is so long!
@@ -55,7 +67,7 @@ class InfoBox(object):
             
         return s
         
-    def getPropertiesDict(self):
+    def getPropertiesDict(self, verbose=False):
         """Returns a dictionary of properties of the infobox
         """
         propertiesDict = {}
@@ -65,18 +77,27 @@ class InfoBox(object):
                 key, value = keyValue
                 propertiesDict[key] = value
                 
+            if verbose:
+                print "Parsed attribute: %s -> %s" % (line.strip(), keyValue)
+                
         return propertiesDict
         
     def _parseKeyValue(self, line):
         """Gets the key and value from an infobox line,
         as lowercase characters
+        Examples:
         '| NAME                  = Lee Aaker ' -> ("name", "lee aaker")
+        '|NAME                  = Lee Aaker ' -> ("name", "lee aaker")
         """
-        if not line.startswith("| ") or "=" not in line:
+        
+        if not line.startswith("|") or "=" not in line:
             return None
             
         eqSplit = line.split("=")
-        key = eqSplit[0][len("| "):].strip().lower()
+        if line[1] == " ": #attribute started with '| '
+            key = eqSplit[0][len("| "):].strip().lower()
+        else: #attribute started with '|'
+            key = eqSplit[0][len("|"):].strip().lower()
         value = "".join(eqSplit[1:]).strip().lower()
         
         return (key, value)
@@ -96,7 +117,7 @@ class InfoBox(object):
         if self.isInArticleWithPersonBox and self.countInArticle == 0:
             d["isFirstInArticleWithPersonBox"] = "1"
         else:
-            d["isFirstInArticleWithPersonBo"] = "0"
+            d["isFirstInArticleWithPersonBox"] = "0"
             
         if indent is None:
             return json.dumps(d, indent=4)
@@ -179,18 +200,6 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
         
         if line.startswith("{{Persondata"):
             isInArticleWithPersonBox = True
-            """
-            if infoBoxType == "officeholder":
-                print "\n"*2
-                print "Found:", infoBoxType
-                page = "".join(recordList)
-                title = page[page.find("<title>") + len("<title>"):
-                    page.find("</title>")]
-                print "title:", title
-                
-                if "lincoln" in title.lower():
-                    exit()
-                    """
         
         if line.startswith("{{Infobox"):
             recordInfoBox = True
@@ -212,10 +221,6 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
                         infoBoxNumber)
                 infoBoxList.append(ib)
                 
-                if "lincoln" in ib.articleTitle.lower():
-                    print ib.articleTitle, "at line", atLine
-                    exit()
-                
                 recordInfoBoxList = []
                 infoBoxNumber += 1
             
@@ -236,9 +241,6 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
             if isInArticleWithPersonBox:
                 for ib in infoBoxList:
                     ib.isInArticleWithPersonBox = isInArticleWithPersonBox
-                    
-                    if "lincoln" in ib.articleTitle.lower():
-                        print ib.getJSON()
                 
             yield infoBoxList
             
@@ -247,16 +249,17 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
     
     print "Succesfully finished parsing the entire wikipedia!"
         
-def handleInfoBoxes(ibList):
+def handleInfoBoxes(ibList, outputFileName):
     for ib in ibList:
         #infoBoxTypeCounter[ib.infoBoxType.lower()] += 1
         
         if (ib.isInArticleWithPersonBox and ib.countInArticle == 0) or\
             "person" in ib.infoBoxType:
-            writeToFile(ib.getJSON(indent=2)+"\n", "ibs_person_raw.json")
+            writeToFile(ib.getJSON(indent=2)+"\n", outputFileName)
             #print "Got articleInfoBox:"
             #print ib.getJSON()
             #print "\n"*2
+        
         
         """
         if "person" in ib.infoBoxType:
@@ -272,13 +275,19 @@ def handleInfoBoxes(ibList):
         #~ print "\n"*3
 
 def main():
-    fileName = "enwiki-20150304-pages-articles-multistream.xml"
-    filePath = "C:\\ovrigt\\ovrigt\\wp\\" + fileName
+    if len(sys.argv) > 1:
+        filePath = sys.argv[1]
+    else:
+        fileName = "enwiki-20150304-pages-articles-multistream.xml"
+        filePath = "C:\\ovrigt\\ovrigt\\wp\\" + fileName
+        
     f = open(filePath)
     
-    with open("log.txt", "w") as logFile: #reset file
+    outputFileName = "ibs_person_raw.json"
+    
+    with open(logger.defaultFileName, "w") as logFile: #reset file
         logFile.write("")
-    with open("output.tsv", "w") as logFile: #reset file
+    with open(outputFileName, "w") as logFile: #reset file
         logFile.write("")
         
     infoBoxTypeCounter = Counter()
@@ -286,9 +295,9 @@ def main():
     #ibGenerator = getInfoBoxGenerator(f)
     ibGenerator = getInfoBoxGenerator(f, requestedNumberOfInfoBoxes=80000)
     
-    print "Parsing is started..."
-    
-    writeToFile("[\n", "ibs_person_raw.json")
+    print "Parsing from file '%s' is started..." % filePath
+    writeToFile("[\n", outputFileName)
+    print "Output file: '%s'" % outputFileName
     
     ibsGotten = 0
     articlesGotten = 0
@@ -297,14 +306,14 @@ def main():
         try:
             ibList = ibGenerator.next()
             
-            handleInfoBoxes(ibList)
+            handleInfoBoxes(ibList, outputFileName)
             
             ibsGotten += len(ibList)
             articlesGotten += 1 
                 
             #Continously write some information about our efforts
             
-            if articlesGotten % 5000 == 0:
+            if articlesGotten % 50 == 0:
                 dt = time.time() - startTime
                 
                 #percent of wikipedia read
@@ -318,7 +327,9 @@ def main():
                 s += "line=%s (%.1fprc,left=%dm), " % (atLine, prc, left/60)
                 s += "%.1f ib's/s" % (ibsGotten/dt)
                 
-                writeToFile(s+"\n")
+                dateStr = time.strftime("%y%m%d_%H:%M.%S ")
+                
+                writeToFile(dateStr + s + "\n")
                 print(s)
             
             
@@ -343,7 +354,7 @@ def main():
             s += " at an average of %.1f articles per second" % \
                 (ibsGotten/dt)
                 
-            writeToFile("]", "ibs_person_raw.json")
+            writeToFile("]", outputFileName)
                 
             writeToFile(s, "log.txt")
             print(s)
