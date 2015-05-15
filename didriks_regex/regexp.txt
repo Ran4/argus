@@ -1,10 +1,10 @@
 #TODO: What if an attribute value begins with a picture or plaintext, and only afterwards has a list, or these are otherwise mixed in some fashion.
 
-#TODO: List attributes ight not be correctly removed if they are located at the end of the list, before }}. Double-check this.
+#TODO: List attributes might not be correctly removed if they are located at the end of the list, before }}. Double-check this.
 
 #TODO: Regexes can be shortened by removing accounting for different list separators and different attributes.
 
-# Fixes output from comma-separated and <br>-separated lists, plus links to articles with double brackets
+#Fixes output from comma-separated and <br />-separated lists, plus links to articles with double brackets
 
 (?:(?:(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|(.+?))\<br \/\>|(?:(?:\[\[(?:[^,\]]+?)\|([^,]+?)\]\])|(?:\[\[([^,]+?)\]\])|([^,]+?))\n)|(?:(?:(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|(.+?)), |(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|(.+?)\n|(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|(.+?)\n)
 

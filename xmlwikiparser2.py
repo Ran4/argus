@@ -50,16 +50,21 @@ class InfoBox(object):
                 self.infoBoxType[:30],
             print "(%s characters omitted)'" % (len(self.infoBoxType) - 30)
         
+		#If there's a pipe in the infoBoxType, store what can be found before the pipe
         if "|" in self.infoBoxType:
             self.infoBoxType = self.infoBoxType.split("|")[0].strip()
+		#If there's a "<" sign, this means we have discovered a comment. Store what can be found before the comment.
         if "&lt;" in self.infoBoxType:
             self.infoBoxType = self.infoBoxType.split("&lt;")[0].strip()
-            
+        
+		#TODO: Will this always be displayed if verbose, even if nothing has been cut off?
         if verbose:
             print "Cutoff after first '|' or '&lt;' gives new infoBoxType: '%s'"%\
                 self.infoBoxType
             
     def __str__(self):
+		"""Returns a representation of the infobox as a string.
+        """
         s = "<infobox object. Article'=%s', Type='%s'. %s lines of content>" % \
             (self.articleTitle,
             self.infoBoxType,
@@ -68,7 +73,7 @@ class InfoBox(object):
         return s
         
     def getPropertiesDict(self, verbose=False):
-        """Returns a dictionary of properties of the infobox
+        """Returns a dictionary of properties of the infobox.
         """
         propertiesDict = {}
         for line in self.infoBoxStringList:
@@ -105,7 +110,7 @@ class InfoBox(object):
     def getJSON(self, indent=None):
         """Gets the attribute key/values plus the wikipedia url,
         isoCode, and if it's the first infobox in an article that has a 
-        personbox as a JSON string
+        personbox as a JSON string.
         """
         wikiUrl = 'http://en.wikipedia.org/wiki/' + \
             self.articleTitle.replace(" ", "_")
@@ -178,6 +183,7 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
         line = f.readline()
         atLine += 1
         
+		#TODO: What is mediawiki??????
         if line == "</mediawiki>":
             print "</mediawiki> found at line %s (tell=%s), filereading stops"\
                 % (atLine, f.tell())
@@ -209,6 +215,7 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
             recordInfoBoxList.append(line)
             
             #~ print "in recordInfoBox, line: '%s'" % line
+			#TODO: Lines must only end in these formats. These might not be separate lines.
             if line == "}}\n" or line == "|}}\n": #Found end of InfoBox
                 recordInfoBox = False
                 
@@ -247,7 +254,7 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
             isInArticleWithPersonBox = False
             infoBoxList = []
     
-    print "Succesfully finished parsing the entire wikipedia!"
+    print "Successfully finished parsing the entire Wikipedia!"
         
 def handleInfoBoxes(ibList, outputFileName):
     for ib in ibList:
@@ -311,14 +318,14 @@ def main():
             ibsGotten += len(ibList)
             articlesGotten += 1 
                 
-            #Continously write some information about our efforts
+            #Continuously write some information about our efforts...
             
             if articlesGotten % 50 == 0:
                 dt = time.time() - startTime
                 
-                #percent of wikipedia read
+                #Percent of wikipedia read
                 prc = 100.0 * float(atLine) / 810000000
-                est = (dt/(prc/100)) #estimated time remaining in seconds
+                est = (dt/(prc/100)) #Estimated time remaining in seconds
                 left = est - dt
                 
                 #~ s = "%s infoBoxes generated in %.1f minutes, " % \

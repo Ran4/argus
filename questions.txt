@@ -1,0 +1,39 @@
+Questions on the code:
+	How many infoBoxTypes are too long?
+	In _parseKeyValue: very specific approach. Why not run all lines through some regex or something so there won't be a problem with where there are whitespaces (for example)
+	In getInfoBoxGenerator: Lines must only end in "}}" to end infobox. This must not be a separate line.
+
+TODO list for Ansin:
+
+The following Wiki markup text causes a bug:
+
+	| native_lang1_name1 ={{plainlist |
+	* Μέγας Ἀλέξανδρος{{cref|iii}} (Mégas Aléxandros, Great Alexander)
+	* Ἀλέξανδρος ὁ Μέγας (Aléxandros ho Mégas, Alexander the Great)
+	}}
+
+Attributes are typically given as Wiki lists in several rows.
+
+Why do we get no attributes for Alfred Korzybski? Infobox is:
+
+	{{Infobox person
+	 | name             = Alfred Korzybski
+	 | image            = Alfred Korzybski.jpg
+	 | image_size       = 191x238px
+	 | birth_date       = {{birth date|1879|7|3|mf=y}}
+	 | birth_place      = [[Warsaw]], [[Vistula Country]], [[Russian Empire]]
+	 | death_date       = {{death date and age|1950|3|1|1879|7|3|mf=y}}
+	 | death_place      = [[Lakeville, Connecticut]], U.S.
+	 | occupation       = [[Engineer]], [[philosopher]], [[mathematician]]
+	 | spouse           = 
+	}}
+
+TODO list for Didrik:
+
+The below attribute value should be parsed correctly:
+
+	[[Basileus]] of [[Macedon]], [[Hegemony|Hegemon]] of the [[League of Corinth|Hellenic League]], [[Shahanshah]] of [[Persia]], [[Pharaoh]] of [[Ancient Egypt|Egypt]], [[Lord of Asia]]
+
+The below attribute value should be parsed correctly (curly brackets inside lists):
+
+{{plainlist |* Μέγας Ἀλέξανδρος{{cref|iii}} (Mégas Aléxandros, Great Alexander)* Ἀλέξανδρος ὁ Μέγας (Aléxandros ho Mégas, Alexander the Great)}}
