@@ -1,15 +1,44 @@
+#TODO: What if an attribute value begins with a picture or plaintext, and only afterwards has a list, or these are otherwise mixed in some fashion.
+
+#TODO: List attributes ight not be correctly removed if they are located at the end of the list, before }}. Double-check this.
+
+#TODO: Regexes can be shortened by removing accounting for different list separators and different attributes.
+
 # Fixes output from comma-separated and <br>-separated lists, plus links to articles with double brackets
 
 (?:(?:(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|(.+?))\<br \/\>|(?:(?:\[\[(?:[^,\]]+?)\|([^,]+?)\]\])|(?:\[\[([^,]+?)\]\])|([^,]+?))\n)|(?:(?:(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|(.+?)), |(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|(.+?)\n|(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|(.+?)\n)
 
-
-#Parses ("Pagelist") from "{{Pagelist|X1|X2|X3|X4|X5}}"
+#Parses ("Pagelist") from "{{Pagelist|X1|X2|X3|X4|X5}}" (gets the list name)
 pattern = "\{\{([^|]+)\|"
 
 #Parses the Wiki templates of "br separated entries" and "space separated entries" on one line or several
 
 (?:\{\{(?:.*?))\||\|(.*?)(?:\}*)(?:\n)|(.*?)(?:\||\}\})
 
-#Parses the Wiki template of bulleted list (removes parameters, and parses either one or multiple entries per row)
+#Parses the Wiki template of "bulleted list" (removes parameters, and parses either one or multiple entries per row)
 
 (?:\{\{(?:.*?))(?:\||\n)|(?:\|*)class=(?:.*?)(?:\||\n)|(?:\|*)list_style=(?:.*?)(?:\||\n)|(?:\|*)style=(?:.*?)\||(?:\|*)item(?:\d*)_style=(?:.*?)(?:\||\n)|\|(.*?)(?:\||\}\})|(.*?)\n
+
+#Parses *- and #-separated Wiki lists ("flatlist", "plainlist" and "flowlist"). Also removes list attributes like "class=", "style=" and so on. Also fixes links to articles with double brackets. This one is gud.
+
+(?:\{\{(?:.*?))\||(?:\|*)(?:[ ]*)class=(?:.*?)\||(?:\|*)(?:[ ]*)list_style=(?:.*?)\||(?:\|*)(?:[ ]*)style=(?:.*?)\||(?:\|*)(?:[ ]*)indent=(?:.*?)\||(?:\|*)(?:[ ]*)item(?:\d*)_style=(?:.*?)\||(?:\*|\#)(?:[ ]*)(?:(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\]))|(?:(?:\}\})+)
+
+#Parses "unbulleted list" and "hlist", removes list attributes and double brackets.
+
+(?:\{\{(?:.*?))(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\|)|(?:(?:\||\*|\#)*)(?:[ ]*)(?:(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\]))|(?:(?:\||\*|\#)+)(?:[ ]*)(?:(?:\[\[(?:[^\[\|]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|([^\|]*))\}\}|(?:(?<=\|)(.+?)(?=\||\}\}))
+
+#Parses "Pagelist", removes list attributes and double brackets.
+
+(?:\{\{(?:.*?))(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)nspace(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)delim(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:(?:\||\*|\#)*)(?:[ ]*)(?:(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\]))|(?:(?:\||\*|\#)+)(?:[ ]*)(?:(?:\[\[(?:[^\[\|]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|([^\|]*))\}\}|(?:(?<=\|)(.+?)(?=\||\}\}))
+
+#Parses "ordered list", removes list attributes and double brackets.
+
+(?:\{\{(?:.*?))(?=\|)|(?:\|*)(?:[ ]*)list_style_type(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_value(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)start(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:(?:\||\*|\#)*)(?:[ ]*)(?:(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\]))|(?:(?:\||\*|\#)+)(?:[ ]*)(?:(?:\[\[(?:[^\[\|]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|([^\|]*))\}\}|(?:(?<=\|)(.+?)(?=\||\}\}))
+
+#Parses "toolbar", removes list attributes and double brackets.
+
+(?:\{\{(?:.*?))(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)separator(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:(?:\||\*|\#)*)(?:[ ]*)(?:(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\]))|(?:(?:\||\*|\#)+)(?:[ ]*)(?:(?:\[\[(?:[^\[\|]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|([^\|]*))\}\}|(?:(?<=\|)(.+?)(?=\||\}\}))
+
+#Parses "startflatlist", "endplainlist" and "endflowlist" Wiki list formats, does not remove any list attributes as there appear to not be any, and double brackets.
+
+(?:\{\{(?:.*?))\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)(?:(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|([^\*\{]*))|(?:(?:\||\*|\#)+)(?:[ ]*)(?:(?:\[\[(?:[^\[\|]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\]))\{\{(?:.*?)\}\}
