@@ -1,14 +1,12 @@
 #TODO: What if an attribute value begins with a picture or plaintext, and only afterwards has a list, or these are otherwise mixed in some fashion.
 
-#TODO: List attributes might not be correctly removed if they are located at the end of the list, before }}. Double-check this.
-
 #TODO: Regexes can be shortened by removing accounting for different list separators and different attributes.
 
 #Fixes output from comma-separated and <br />-separated lists (returns the elements separated by these):
 
 (?:[ ]*)(.*?)(?:\,|\<br \/\>)|(?:[ ]*)(.+)$
 
-#For every group captured with the above method, run this regex and merge the resulting captures. ALWAYS run this shit. Even after captures from Wikilists.
+#For every group captured with the above method, FIRST run this regex and replace the resulting captures. ALWAYS run this shit. What you are supposed to do is to use re.sub()
 
 \[\[(?:[^\[]*?)\|(.*?)\]\]|\[\[(.*?)\]\]|([^\[]+)
 
@@ -42,8 +40,8 @@
 
 #Parses "toolbar", removes list attributes and double brackets.
 
-(?:\{\{(?:.*?))(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)separator(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:(?:\||\*|\#)*)(?:[ ]*)(?:(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\]))|(?:(?:\||\*|\#)+)(?:[ ]*)(?:(?:\[\[(?:[^\[\|]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|([^\|]*))\}\}|(?:(?<=\|)(.+?)(?=\||\}\}))
+(?:\{\{(?:.*?))(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)separator(?:[ ]*)=(?:.*?)(?:\}\}|\|)|\|(.*?)(?=\|)|\|([^\|]*?)\}\}$
 
 #Parses "startflatlist", "endplainlist" and "endflowlist" Wiki list formats, does not remove any list attributes as there appear to not be any, and double brackets.
 
-(?:\{\{(?:.*?))\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)(?:(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|([^\*\{]*))|(?:(?:\||\*|\#)+)(?:[ ]*)(?:(?:\[\[(?:[^\[\|]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\]))\{\{(?:.*?)\}\}
+^\{\{(?:.*?)\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+)(?=\*)|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+)\{\{(?:.*?)\}\}$
