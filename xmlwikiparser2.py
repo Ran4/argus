@@ -404,8 +404,8 @@ def main():
         
     infoBoxTypeCounter = Counter()
     
-    #ibGenerator = getInfoBoxGenerator(f)
-    ibGenerator = getInfoBoxGenerator(f, requestedNumberOfInfoBoxes=80000)
+    ibGenerator = getInfoBoxGenerator(f)
+    #ibGenerator = getInfoBoxGenerator(f, requestedNumberOfInfoBoxes=80000)
     
     print "Parsing from file '%s' is started..." % filePath
     writeToFile("[\n", outputFileName)
