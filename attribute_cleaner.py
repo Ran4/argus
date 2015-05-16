@@ -49,6 +49,7 @@ def cleanInfoBoxList(attributeKeyParser, infoBoxList, verbose):
             "total_attributes":0,
             })
     cleanedKeysCounter = collections.Counter()
+    attributeValueParser = attribute_value_parser.AttributeValueParser()
     for ib in infoBoxList:
         attributeDict = {}
         #ib is a dictionary, where the keys are attribute keys
@@ -66,7 +67,7 @@ def cleanInfoBoxList(attributeKeyParser, infoBoxList, verbose):
                 continue
             
             #Handle values
-            newValue = attribute_value_parser.parseAttributeValue(ib[key])
+            newValue = attributeValueParser.parseAttributeValue(ib[key])
             #~ if verbose: print "V: {} -> {}".format(ib[key], newValue)
             if not newValue:
                 counter["ignored_new_values"] += 1
