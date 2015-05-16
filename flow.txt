@@ -3,6 +3,7 @@
     File "attribute_keys_raw.txt" is generated from all InfoBox keys (filesize ~??? MiB)
 
 2. Run attribute_cleaner.py
+    Calls attribute_key_parser.py and attribute_value_parser.py
     File infobox_output_cleaned.json" is generated (filesize ~??? MiB)
     File "debug/attribute_keys_cleaned.txt" is generated (filesize ~??? MiB)
 
