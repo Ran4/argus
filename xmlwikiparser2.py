@@ -373,11 +373,8 @@ def handleInfoBoxes(ibList, outputFileName):
         
         if (ib.isInArticleWithPersonBox and ib.countInArticle == 0) or\
                 "person" in ib.infoBoxType:
-            print "Trying to write to file %s..." % outputFileName
             writeToFile(ib.getJSON(indent=2)+"\n", outputFileName,
-                    verbose=True)
-            
-            print "After writeToFile"
+                    verbose=False)
             
             #print "Got articleInfoBox:"
             #print ib.getJSON()
@@ -436,8 +433,6 @@ def main():
                 est = (dt/(prc/100)) #Estimated time remaining in seconds
                 left = est - dt
                 
-                #~ s = "%s infoBoxes generated in %.1f minutes, " % \
-                    #~ (ibsGotten, dt/60.0)
                 s = "%sk generated infoBoxes. " % (ibsGotten/1000)
                 s += "line=%s (%.1fprc,left=%dm), " % (atLine, prc, left/60)
                 s += "%.1f ib's/s" % (ibsGotten/dt)
@@ -463,11 +458,12 @@ def main():
         except StopIteration:
             print "StopIteration reached!"
             dt = time.time() - startTime
-            s = "Done generating."
+            s = "Done generating. "
             s += "Generated %s infoboxes, taking %d seconds (=%.1f minutes)" % \
                 (ibsGotten, dt, dt/60.0)
             s += " at an average of %.1f articles per second" % \
                 (ibsGotten/dt)
+            s += "\nJSON saved to file %s" % outputFileName
                 
             writeToFile("]", outputFileName) #finish the JSON string
             writeToFile(s)
