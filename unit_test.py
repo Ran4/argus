@@ -4,12 +4,22 @@ def performUnitTests():
     print "UNIT TESTING STARTED"
     print "#"*79
     
-    import xmlwikiparser2
-    xmlwikiparser2.test(verbose=False)
+    
+    WARNING = '\033[93m'
+    #use termcolor module instead!
+    
+    try:
+        import xmlwikiparser2
+        xmlwikiparser2.test(verbose=False)
+    except:
+        print WARNING + "Problem with unittest!"
     print "#"*39
     
-    import attribute_value_parser
-    attribute_value_parser.test(verbose=False)
+    try:
+        import attribute_value_parser
+        attribute_value_parser.test(verbose=False)
+    except:
+        print WARNING + "Problem with unittest!"
     print "#"*39
 
     import attribute_key_parser
