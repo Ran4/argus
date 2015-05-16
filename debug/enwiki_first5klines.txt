@@ -4998,3 +4998,4 @@ Aristotle, in contrast to earlier philosophers, but in accordance with the Egypt
 Aristotle's successor at the [[Lyceum (Classical)|Lyceum]], [[Theophrastus]], wrote a series of books on botany—the ''History of Plants''—which survived as the most important contribution of antiquity to botany, even into the [[Middle Ages]]. Many of Theophrastus' names survive into modern times, such as ''carpos'' for fruit, and ''pericarpion'' for seed vessel.
 
 Rather than focus on formal causes, as Aristotle did, Theophrastus suggested a mechanistic scheme, drawing analogies between natural and artificial processes, and relying on Aristotle's concept of the [[efficient cause]]. Theophrastus also recognized the role of sex in the reproduction of some higher plants, though this last discovery was lost in later ages.&lt;ref&gt;Mayr, ''The Growth of Biological Thought'', pp 90–91; Mason, ''A History of the Sciences'', p 46&lt;/ref&gt;
+</mediawiki>
