@@ -47,6 +47,9 @@ def test(verbose=False):
 
     attributeValueParser = AttributeValueParser()
     
+    print "Testing",
+    print "attribute_value_parser.AttributeValueParser.parseAttributeValue()"
+    
     for inValue, outValue in testValues:
         parsedValue = attributeValueParser.parseAttributeValue(inValue)
         if verbose: print "%s -> %s" % (inValue, parsedValue)
