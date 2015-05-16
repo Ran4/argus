@@ -19,7 +19,7 @@ class InfoBox(object):
     countInArticle - the n'th InfoBox found in an article
     """
     def __init__(self, articleTitle, infoBoxType, infoBoxStringList,
-            countInArticle, verbose=True):
+            countInArticle, verbose=False):
         self.articleTitle = articleTitle
         self.infoBoxType = infoBoxType
         
@@ -30,7 +30,8 @@ class InfoBox(object):
             print
         
         #don't add the first element since it is '{{Infobox infoboxType'
-        self.infoBoxStringList = self.fixWikiLists(infoBoxStringList[1:], verbose=True)
+        self.infoBoxStringList = self.fixWikiLists(infoBoxStringList[1:],
+                verbose=verbose)
         
         if verbose: 
             print "infoBoxStringList after fixWikiLists:"
@@ -123,7 +124,7 @@ class InfoBox(object):
                 #If we are currently inside a list environment:
                 #   Check if the current line starts with a separator character 
                 if isInWikiList:
-                    if line[0] == "*" OR line[0] == "|" OR line[0] == "#":
+                    if any(map(line.startswith, "*|#")):
                         #If it does, it is a list entry and we add it to tempStringList
                         tempStringList.append(line)
                     else:
@@ -132,7 +133,8 @@ class InfoBox(object):
                         newInfoBoxStringList.append(line)
 
                         #Plus, we perform the operations needed to close a Wikilist environment
-                        newInfoBoxStringList.append(joinedStringList)
+                        joinedLinesString = "".join(tempStringList)
+                        newInfoBoxStringList.append(joinedLinesString)
                         tempStringList = []
                         isInWikiList = not isInWikiList
 
@@ -267,10 +269,12 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
     numCurlyBrackets = 0 
     while True:
         line = f.readline()
+        #~ print "line {}: {}".format(atLine, line)
         atLine += 1
         
         #TODO: What is mediawiki??????
-        if line == "</mediawiki>":
+        #if line == "</mediawiki>":
+        if line.strip().startswith("</mediawiki>"):
             print "</mediawiki> found at line %s (tell=%s), filereading stops"\
                 % (atLine, f.tell())
             break
@@ -298,7 +302,7 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
             infoBoxType = line[len("{{Infobox")+1:-1]
             numCurlyBrackets = 0 
             
-            print "found infoboxline"
+            #~ print "found infoboxline"
 
         if recordInfoBox: #We are currently inside of an infobox
             recordInfoBoxList.append(line.strip().lower())
@@ -336,6 +340,10 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
         ####################
         
         if "</page>" in line: #end of an article
+            
+            #~ print "#"*50 + "\nFound </page> at line %s\n" % atLine,
+            #~ print "#"*50
+            
             record = False
             numArticlesFound += 1
             infoBoxNumber = 0 
@@ -358,12 +366,19 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
     print "Successfully finished parsing the entire Wikipedia!"
         
 def handleInfoBoxes(ibList, outputFileName):
+    #~ print "#"*50 + "\nIn handleInfoBoxes\n" + "#"*50
+    
     for ib in ibList:
         #infoBoxTypeCounter[ib.infoBoxType] += 1
         
         if (ib.isInArticleWithPersonBox and ib.countInArticle == 0) or\
-            "person" in ib.infoBoxType:
-            writeToFile(ib.getJSON(indent=2)+"\n", outputFileName)
+                "person" in ib.infoBoxType:
+            print "Trying to write to file %s..." % outputFileName
+            writeToFile(ib.getJSON(indent=2)+"\n", outputFileName,
+                    verbose=True)
+            
+            print "After writeToFile"
+            
             #print "Got articleInfoBox:"
             #print ib.getJSON()
             #print "\n"*2
@@ -373,14 +388,6 @@ def handleInfoBoxes(ibList, outputFileName):
         if "person" in ib.infoBoxType:
             writeToFile("\n".join(ib.getTSVLines()), "output.tsv")
         """
-            
-        ##debug stuff
-        #~ if infoBoxTypeCounter[ib.infoBoxType] == 1:
-            #found new one!
-            #~ print ib.infoBoxType
-        
-        #~ print "".join(ib.infoBoxStringList)
-        #~ print "\n"*3
 
 def main():
     if len(sys.argv) > 1:
@@ -462,15 +469,10 @@ def main():
             s += " at an average of %.1f articles per second" % \
                 (ibsGotten/dt)
                 
-            writeToFile("]", outputFileName)
-                
-            writeToFile(s, "log.txt")
+            writeToFile("]", outputFileName) #finish the JSON string
+            writeToFile(s)
             print(s)
-            
-            
-            
             break
-            
     
 
 if __name__ == "__main__":
