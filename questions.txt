@@ -6,7 +6,8 @@ Questions on the code:
 TODO list for Ansin:
 
 The following Wiki markup text causes a bug:
-
+        {{Infobox president
+        | name = obama
 	| native_lang1_name1 ={{plainlist |
 	* Μέγας Ἀλέξανδρος{{cref|iii}} (Mégas Aléxandros, Great Alexander)
 	* Ἀλέξανδρος ὁ Μέγας (Aléxandros ho Mégas, Alexander the Great)
