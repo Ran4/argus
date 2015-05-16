@@ -19,16 +19,28 @@ class InfoBox(object):
     countInArticle - the n'th InfoBox found in an article
     """
     def __init__(self, articleTitle, infoBoxType, infoBoxStringList,
-            countInArticle):
+            countInArticle, verbose=True):
         self.articleTitle = articleTitle
         self.infoBoxType = infoBoxType
-        self.infoBoxStringList = infoBoxStringList
+        
+        if verbose: 
+            print "Is in InfoBox.__init__ of article %s" % articleTitle
+            print "infoBoxStringList before fixWikiLists:"
+            print infoBoxStringList
+        
+        self.infoBoxStringList = self.fixWikiLists(infoBoxStringList, verbose=True)
+        
+        if verbose: 
+            print "infoBoxStringList after fixWikiLists:"
+            print infoBoxStringList
+            print
+        
         self.countInArticle = countInArticle
         
         self.isInArticleWithPersonBox = False
         
         """
-        if "lincoln" in articleTitle.lower() and "abraham" in articleTitle.lower():
+        if "lincoln" in articleTitle and "abraham" in articleTitle:
             print "in InfoBox.__init__ of title=%s" % articleTitle
             print "infoBoxStringList:", self.infoBoxStringList
             
@@ -37,9 +49,47 @@ class InfoBox(object):
             print "\n"*2
         """    
         
+        
         if len(self.infoBoxType) > 30:
             #There might be a problem since the type string is so long!
             self.handleLongInfoBoxType(verbose=False)
+            
+    def fixWikiLists(self, infoBoxStringList, verbose=False):
+        if verbose: print "in fixWikiLists"
+        
+        newInfoBoxStringList = []
+        tempStringList = []
+        isInWikiList = False
+        for i, line in enumerate(infoBoxStringList):
+            
+            #~ if verbose:
+                #~ print i, line
+            
+            numCurlyBracesInLine = line.count("{{") + line.count("}}") 
+
+            """if i is the last position and numCurlyBracesInLine is even OR
+            if is is NOT in the last position and numCurlyBracesInLine is uneven
+
+            numCurlyBracesInLine % 2 != (i == len(infoBoxStringList)-1 )
+            """
+            
+            if numCurlyBracesInLine % 2 != (i == len(infoBoxStringList)-1):
+                #Odd number of curlybraces, so it's probably a wikilist?
+                tempStringList.append(line.strip())
+                if isInWikiList:
+                    joinedLinesString = "".join(tempStringList)
+                    if verbose:
+                        print "joinedLinesString:", joinedLinesString
+                    newInfoBoxStringList.append(joinedLinesString)
+                    tempStringList = []
+                isInWikiList = not isInWikiList
+            else:
+                if isInWikiList:
+                    tempStringList.append(line)
+                else:
+                    newInfoBoxStringList.append(line)
+                    
+        return newInfoBoxStringList
     
     def handleLongInfoBoxType(self, verbose=True):
         """If the infoBoxType string is really long, chances are
@@ -75,6 +125,26 @@ class InfoBox(object):
             
         return s
         
+    def _parseKeyValue(self, line):
+        """Gets the key and value from an infobox line,
+        as lowercase characters
+        Examples:
+        '| NAME                  = Lee Aaker ' -> ("name", "lee aaker")
+        '|NAME                  = Lee Aaker ' -> ("name", "lee aaker")
+        """
+        
+        if not line.startswith("|") or "=" not in line:
+            return None
+            
+        eqSplit = line.split("=")
+        if line[1] == " ": #attribute started with '| '
+            key = eqSplit[0][len("| "):].strip()
+        else: #attribute started with '|'
+            key = eqSplit[0][len("|"):].strip()
+        value = "".join(eqSplit[1:]).strip()
+        
+        return (key, value)
+    
     def getPropertiesDict(self, verbose=False):
         """Returns a dictionary of properties of the infobox.
         """
@@ -90,25 +160,6 @@ class InfoBox(object):
                 
         return propertiesDict
         
-    def _parseKeyValue(self, line):
-        """Gets the key and value from an infobox line,
-        as lowercase characters
-        Examples:
-        '| NAME                  = Lee Aaker ' -> ("name", "lee aaker")
-        '|NAME                  = Lee Aaker ' -> ("name", "lee aaker")
-        """
-        
-        if not line.startswith("|") or "=" not in line:
-            return None
-            
-        eqSplit = line.split("=")
-        if line[1] == " ": #attribute started with '| '
-            key = eqSplit[0][len("| "):].strip().lower()
-        else: #attribute started with '|'
-            key = eqSplit[0][len("|"):].strip().lower()
-        value = "".join(eqSplit[1:]).strip().lower()
-        
-        return (key, value)
         
     def getJSON(self, indent=None):
         """Gets the attribute key/values plus the wikipedia url,
@@ -161,11 +212,12 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
     numInfoBoxesFound = 0
     isInArticleWithPersonBox = False
     infoBoxNumber = 0
+    numCurlyBrackets = 0 
     while True:
         line = f.readline()
         atLine += 1
         
-		#TODO: What is mediawiki??????
+        #TODO: What is mediawiki??????
         if line == "</mediawiki>":
             print "</mediawiki> found at line %s (tell=%s), filereading stops"\
                 % (atLine, f.tell())
@@ -184,7 +236,7 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
         if not record:
             continue
             
-        recordList.append(line)
+        recordList.append(line.strip().lower())
         
         if line.startswith("{{Persondata"):
             isInArticleWithPersonBox = True
@@ -192,13 +244,20 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
         if line.startswith("{{Infobox"):
             recordInfoBox = True
             infoBoxType = line[len("{{Infobox")+1:-1]
+            numCurlyBrackets = 0 
             
+            print "found infoboxline"
+
         if recordInfoBox: #We are currently inside of an infobox
-            recordInfoBoxList.append(line)
+            recordInfoBoxList.append(line.strip().lower())
+            numCurlyBrackets += line.count("{{") - line.count("}}")
+           
+            #~ print "%s %s" % (numCurlyBrackets, line.strip().lower())
             
-            #~ print "in recordInfoBox, line: '%s'" % line
+            #~ print "in recordInfoBox, line: '%s'" % line.strip()
 			#TODO: Lines must only end in these formats. These might not be separate lines.
-            if line == "}}\n" or line == "|}}\n": #Found end of InfoBox
+            #if line == "}}\n" or line == "|}}\n": #Found end of InfoBox
+            if numCurlyBrackets == 0:
                 recordInfoBox = False
                 
                 page = "".join(recordList)
@@ -209,6 +268,14 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
                 ib = InfoBox(title, infoBoxType, recordInfoBoxList,
                         infoBoxNumber)
                 infoBoxList.append(ib)
+                
+                #~ if "lincoln" in title:
+                #~     print "infoBoxList:"
+                #~     #print recordInfoBoxList
+                #~     print
+                #~     print "JSON:"
+                #~     #print ib.getJSON(indent=4)
+                #~     exit()
                 
                 recordInfoBoxList = []
                 infoBoxNumber += 1
@@ -240,7 +307,7 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
         
 def handleInfoBoxes(ibList, outputFileName):
     for ib in ibList:
-        #infoBoxTypeCounter[ib.infoBoxType.lower()] += 1
+        #infoBoxTypeCounter[ib.infoBoxType] += 1
         
         if (ib.isInArticleWithPersonBox and ib.countInArticle == 0) or\
             "person" in ib.infoBoxType:
@@ -256,7 +323,7 @@ def handleInfoBoxes(ibList, outputFileName):
         """
             
         ##debug stuff
-        #~ if infoBoxTypeCounter[ib.infoBoxType.lower()] == 1:
+        #~ if infoBoxTypeCounter[ib.infoBoxType] == 1:
             #found new one!
             #~ print ib.infoBoxType
         
