@@ -3,13 +3,17 @@ import re
 class AttributeKeyParser:
     """Class that is used to clean keys
     """
-    def __init__(self, keyList):
+    def __init__(self, keyCounter):
         """Parses a list of keys and tries to find patterns to be used to
         clean keys.
         
         keyList is a raw list of attribute keys (including e.g. duplicates)
+        keyCounter is a collections.Counter object, where the keys
+        (keyCounter.keys()) are the attribute keys and the values
+        (e.g. keyCounter["name"]) are the total number of occurances of
+        that attribute key.
         """
-        self.keyList = keyList
+        self.keyCounter = keyCounter
 
         ##DO STUFF HERE
         
@@ -21,12 +25,13 @@ class AttributeKeyParser:
         """
         newKey = key
         
+        #~  key = key.replace("_", "-").replace(" ", "-")
+        #~  
+        #~  match = re.match("(.+)-of-(.+)", key)
+        #~  if match and len(match.groups()) == 2:
+        #~      newKey = match.groups(2) + match.groups(1)
         
-        key = key.replace("_", "-").replace(" ", "-")
-        
-        match = re.match("(.+)-of-(.+)", key)
-        if match and len(match.groups()) == 2:
-            newKey = match.groups(2) + match.groups(1)
+        assert(isinstance(newKey, unicode) or isinstance(newKey, str))
         
         return newKey
     

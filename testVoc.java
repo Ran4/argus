@@ -3,9 +3,46 @@ import java.util.*;
 import java.util.regex.*;
 
 public class testVoc{
-	public static void main(String[] args){
+	
+	/*
+	Input: String a, Length of a, String b, Length of b
+	returns the distance between 2 strings*/
+	public int distance(String a,int al,String b,int bl){
+		
+		if(al == 0){
+			return bl;
+		}
+		if(bl == 0){
+			return al;
+		}
+		
+		int cost;
+		
+		if(a.charAt(al-1)==b.charAt(bl-1)){
+			cost = 0;
+		}
+		else{
+			cost = 1;
+		}
+		
+		return min(distance(a,al-1,b,bl)+1,distance(a,al,b,bl-1)+1,distance(a,al-1,b,bl-1)+cost);
+	}
+	
+	public int min(int a,int b,int c){
+		int min = a;
+		if(b < min){
+			min = b;
+		}
+		if(c < min){
+			min = c;
+		}
+		return min;
+	}
+	
+	public void run(){
+		//String infile = "fil.txt";//"attributelist.txt";
 		String infile = "attributelist.txt";
-		String outfile = "out.txt";
+		String outfile = "out2.txt";
 		System.out.println("Start serching vocabulary");
 		
 		String line = null;
@@ -13,6 +50,7 @@ public class testVoc{
 		
 		int wordNum = 0;
 		String voc[] = null;
+		String orgVoc[] = null;
 		
 		try{
 			FileReader fr = new FileReader(infile);
@@ -28,9 +66,11 @@ public class testVoc{
 			wordNum = vocabulary.size();
 			
 			voc = new String[wordNum];
+			orgVoc = new String[wordNum];
 			
 			for(int i = 0;i < wordNum;i++){
 				String att = vocabulary.getFirst();
+				orgVoc[i] = att;
 				// to lower case
 				att = att.toLowerCase();
 				//remove special char
@@ -45,24 +85,24 @@ public class testVoc{
 				
 				Pattern p = Pattern.compile("(.+) of (.+)");
 				
-					Matcher m = p.matcher(att);
-					if(m.find()){
-						System.out.println(att);
-						String tmp[] = att.split("\\s+");
-						for(int j = 0;j < tmp.length;j++){
-							if(j>0 && tmp[j].equals("of") && (j+1) < tmp.length){
-								String t = tmp[j-1];
-								tmp[j-1] = tmp[j+1];
-								tmp[j+1] = t;
-								tmp[j] = "";
-							}
+				Matcher m = p.matcher(att);
+				if(m.find()){
+					System.out.println(att);
+					String tmp[] = att.split("\\s+");
+					for(int j = 0;j < tmp.length;j++){
+						if(j>0 && tmp[j].equals("of") && (j+1) < tmp.length){
+							String tmpo = tmp[j-1];
+							tmp[j-1] = tmp[j+1];
+							tmp[j+1] = tmpo;
+							tmp[j] = "";
 						}
-						att="";
-						for(int j=0;j<tmp.length;j++){
-							att+=tmp[j];
-						}
-						System.out.println(voc[i]);
 					}
+					att="";
+					for(int j=0;j<tmp.length;j++){
+						att+=tmp[j];
+					}
+					System.out.println(voc[i]);
+				}
 				
 				/*String mult[] = att.split("\\s+");
 				if(mult.length > 1){
@@ -169,6 +209,92 @@ public class testVoc{
 			}
 		}
 		
+		HashMap<String, Integer> common = new HashMap<String, Integer>();
+		ValueMap vm = new ValueMap(common);
+		TreeMap<String, Integer> sortedCommon = new TreeMap<String, Integer>(vm);
+		
+		//count the variables
+		for(int i=0;i<wordNum;i++){
+			String att = voc[i];
+			if(common.containsKey(att)){
+				int value = common.get(att);
+				value++;
+				common.put(att,value);
+			}
+			else{
+				common.put(att,1);
+			}
+		}
+		
+		//System.out.println("map:"+common);
+		
+		sortedCommon.putAll(common);
+		
+		System.out.println(sortedCommon);
+		
+		common.clear();
+		common.putAll(sortedCommon);
+		
+		int cn=0;
+		//remove singles
+		for(int i=0;i<wordNum;i++){
+			String att = voc[i];
+			if(common.containsKey(att)){
+				//System.out.println(att);
+				int value = common.get(att);
+				if(value==1){
+					System.out.println(att);
+					cn++;
+				}
+			}
+		}
+		System.out.println(cn);
+		//System.out.println(sortedCommon.firstKey());
+		
+		HashMap<String, String> translate = new HashMap<String, String>();
+		
+		int uniqWords = sortedCommon.size();
+		
+		LinkedList<String> sortedWords = new LinkedList<String>(sortedCommon.keySet());
+		//System.out.println(sortedWords);
+		int c=0;
+		//check for similar terms
+		/*for(int i=0;i<uniqWords;i++){
+			String att = sortedWords.getFirst();
+			sortedWords.removeFirst();
+			//System.out.println(rem);
+			if(!translate.containsKey(att)){
+				translate.put(att,att);
+			}
+			if(att.length()<10){
+			for(int j=0;j<wordNum;j++){
+				String check = voc[j];
+				if(check.length()-2 < att.length() && att.length() < check.length()+2){
+				if(!att.equals(check) && !translate.containsKey(check)){
+					int diff = distance(att,att.length(),check,check.length());
+					if(diff < 2){
+						translate.put(check,att);
+						//System.out.println("shit");
+					}
+				}
+				}
+			}
+			}
+			c++;
+			System.out.println(c+"/"+wordNum+" translate: "+translate.size()+" #uniq "+sortedCommon.size());
+			//System.out.println(att);
+			//System.out.println(sortedCommon);
+		}/**/
+		
+		//System.out.println(translate);
+		
+		// correct spelling
+		for(int i=0;i<wordNum;i++){
+			String att = voc[i];
+			if(translate.containsKey(voc[i])){
+				voc[i]=translate.get(voc[i]);
+			}
+		}
 		
 		try{
 			FileWriter fw = new FileWriter(outfile);
@@ -181,6 +307,30 @@ public class testVoc{
 		}
 		catch(Exception e){
 			System.err.println(e);
+		}
+	}
+	
+	public static void main(String[] args){
+		testVoc t = new testVoc();
+		t.run();
+	}
+}
+
+/* Used to sort a map on the for <String, Integer> since this is quite bad praxis*/
+class ValueMap implements Comparator<String>{
+	
+	Map<String,Integer> map;
+	
+	public ValueMap(Map<String,Integer> m){
+		this.map = m;
+	}
+	
+	public int compare(String a,String b){
+		if(map.get(a)<=map.get(b)){
+			return 1;
+		}
+		else{
+			return -1;
 		}
 	}
 }
