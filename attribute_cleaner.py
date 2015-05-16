@@ -6,36 +6,40 @@ import attribute_value_parser
 
 import json
 
-def clean(inputFileName, outputFileName, outputKeysFileName,
-        verbose=False):
-    """Cleans InfoBox data read from a file, and writes the cleaned
-        data back to another file.
-    Also saves the new key outputs as a new file 
+def saveFiles(cleanedKeysCounter, cleanedInfoBoxList,
+        outputFileName, outputKeysFileName, verbose):
+    #Dump a list of key values that we used 
+    if verbose: print "Trying to save cleaned attribute keys to file..."
+    keyAndCount = sorted(cleanedKeysCounter.items(),
+        key=lambda x: x[1], reverse=True)
+    keyAndCountToStringFunction = lambda x: str(x[1]) + " " + x[0].encode("utf-8")
+    keyCountString = "\n".join(map(keyAndCountToStringFunction, keyAndCount))
+    try:
+        with open(outputKeysFileName, "w") as f:
+            f.write(keyCountString)
+    except IOError as e:
+        print "Problem saving cleaned attribute keys to file {}".format(
+                outputKeysFileName)
+    if verbose:
+        print "Successfully wrote cleaned attribute keys to file {}".format(
+                outputKeysFileName)
+       
         
-    The first input filename is for the InfoBoxJSON
-    The output filenames is for the cleaned JSON output and the cleaned
-    key output, respectively
-    """
-    
-    #Get infoboxes 
-    with open(inputFileName) as inputFile:
-        #~ infoBoxList = json.load(inputFile)
-        infoBoxList = json.load(inputFile, encoding="latin-1")
-        assert isinstance(infoBoxList, list)
-        if verbose:
-            print "Successfully loaded infoBoxList from JSON",
-            print "({} infoboxes loaded)".format(len(infoBoxList))
-            
-            
-    #Alt: get attribute keys directly from loaded JSON
-    keyCounter = collections.Counter()
-    for ib in infoBoxList:
-        for key in ib:
-            keyCounter[key] += 1
-            
-    attributeKeyParser = attribute_key_parser.AttributeKeyParser(keyCounter)
-    
-    #Clean up infobox data
+    #Dump our new, cleaned InfoBoxList to a new JSON 
+    newJSONString = json.dumps(cleanedInfoBoxList, indent=2)
+    try:
+        with open(outputFileName, "w") as f:
+            f.write(newJSONString)
+    except IOError as e:
+        print "Problem saving cleaned JSON to file {}, quitting...".format(
+                outputFileName)
+        exit()
+
+    if verbose:
+        print "Successfully wrote cleaned data to file {}".format(
+                outputFileName)
+        
+def cleanInfoBoxList(attributeKeyParser, infoBoxList, verbose):
     if verbose: print "Starts cleaning up InfoBox data..."
     cleanedInfoBoxList = []
     counter = collections.Counter({
@@ -83,43 +87,46 @@ def clean(inputFileName, outputFileName, outputKeysFileName,
         print "Changed {} infoboxes, will now write {} infoboxes".format(
                 counter["changed_infoboxes"], len(cleanedInfoBoxList))
         
-        
-    #Dump a list of key values that we used 
-    if verbose: print "Trying to save cleaned attribute keys to file..."
-    keyAndCount = sorted(cleanedKeysCounter.items(),
-        key=lambda x: x[1], reverse=True)
-    #keyCountString = "\n".join(map(lambda x: repr("%s %s" % x), keyAndCount))
-    keyAndCountToStringFunction = lambda x: str(x[1]) + " " + x[0].encode("utf-8")
-    keyCountString = "\n".join(map(keyAndCountToStringFunction, keyAndCount))
-    #~ print "keyCountString:"
-    #~ print keyCountString
-    #~ print "\n"*3
-    try:
-        with open(outputKeysFileName, "w") as f:
-            f.write(keyCountString)
-    except IOError as e:
-        print "Problem saving cleaned attribute keys to file {}".format(
-                outputKeysFileName)
-    if verbose:
-        print "Successfully wrote cleaned attribute keys to file {}".format(
-                outputKeysFileName)
-       
-        
-    #Dump our new, cleaned InfoBoxList to a new JSON 
-    newJSONString = json.dumps(cleanedInfoBoxList, indent=4)
-    try:
-        with open(outputFileName, "w") as f:
-            f.write(newJSONString)
-    except IOError as e:
-        print "Problem saving cleaned JSON to file {}, quitting...".format(
-                outputFileName)
-        exit()
+    return cleanedInfoBoxList, cleanedKeysCounter
 
-    if verbose:
-        print "Successfully wrote cleaned data to file {}".format(
-                outputFileName)
+def loadInfoBoxList(inputFileName, verbose):
+    with open(inputFileName) as inputFile:
+        #~ infoBoxList = json.load(inputFile)
+        infoBoxList = json.load(inputFile, encoding="latin-1")
+        assert isinstance(infoBoxList, list)
+        if verbose:
+            print "Successfully loaded infoBoxList from JSON",
+            print "({} infoboxes loaded)".format(len(infoBoxList))
+            
+    return infoBoxList
+
+def getKeyCounter(infoBoxList):
+    keyCounter = collections.Counter()
+    for ib in infoBoxList:
+        for key in ib:
+            keyCounter[key] += 1
+
+    return keyCounter
+
+def clean(inputFileName, outputFileName, outputKeysFileName,
+        verbose=False):
+    """Cleans InfoBox data read from a file, and writes the cleaned
+        data back to another file.
+    Also saves the new key outputs as a new file 
+        
+    The first input filename is for the InfoBoxJSON
+    The output filenames is for the cleaned JSON output and the cleaned
+    key output, respectively
+    """
     
-
+    infoBoxList = loadInfoBoxList(inputFileName, verbose)
+    keyCounter = getKeyCounter(infoBoxList)
+    attributeKeyParser = attribute_key_parser.AttributeKeyParser(keyCounter)
+    cleanedInfoBoxList, cleanedKeysCounter = cleanInfoBoxList(
+            attributeKeyParser, infoBoxList, verbose)
+    saveFiles(cleanedKeysCounter, cleanedInfoBoxList,
+                    outputFileName, outputKeysFileName, verbose)
+    
 def main():
     if len(sys.argv) != 3+1: #The right number of arguments wasn't given
         inputFileName = "ibs_person_raw_76M.json"
