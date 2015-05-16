@@ -4,12 +4,17 @@
 
 #TODO: Regexes can be shortened by removing accounting for different list separators and different attributes.
 
-#Fixes output from comma-separated and <br />-separated lists, plus links to articles with double brackets
+#Fixes output from comma-separated and <br />-separated lists (returns the elements separated by these):
 
-(?:(?:(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|(.+?))\<br \/\>|(?:(?:\[\[(?:[^,\]]+?)\|([^,]+?)\]\])|(?:\[\[([^,]+?)\]\])|([^,]+?))\n)|(?:(?:(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|(.+?)), |(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|(.+?)\n|(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|(.+?)\n)
+(?:[ ]*)(.*?)(?:\,|\<br \/\>)|(?:[ ]*)(.+)$
+
+#For every group captured with the above method, run this regex and merge the resulting captures. ALWAYS run this shit. Even after captures from Wikilists.
+
+\[\[(?:[^\[]*?)\|(.*?)\]\]|\[\[(.*?)\]\]|([^\[]+)
 
 #Parses ("Pagelist") from "{{Pagelist|X1|X2|X3|X4|X5}}" (gets the list name)
-pattern = "\{\{([^|]+)\|"
+#Note that this does not work for begin-tag or end-tag lists...
+\{\{([^|]+)\|
 
 #Parses the Wiki templates of "br separated entries" and "space separated entries" on one line or several
 
@@ -17,23 +22,23 @@ pattern = "\{\{([^|]+)\|"
 
 #Parses the Wiki template of "bulleted list" (removes parameters, and parses either one or multiple entries per row)
 
-(?:\{\{(?:.*?))(?:\||\n)|(?:\|*)class=(?:.*?)(?:\||\n)|(?:\|*)list_style=(?:.*?)(?:\||\n)|(?:\|*)style=(?:.*?)\||(?:\|*)item(?:\d*)_style=(?:.*?)(?:\||\n)|\|(.*?)(?:\||\}\})|(.*?)\n
+^(?:\{\{(?:.*?))(?=\|)|(?:\|*)class=(?:.*?)\||(?:\|*)list_style=(?:.*?)\||(?:\|*)style=(?:.*?)\||(?:\|*)item(?:\d*)_style=(?:.*?)\||\|(.*?)(?=\|)|\|([^\|]*?)\}\}$
 
-#Parses *- and #-separated Wiki lists ("flatlist", "plainlist" and "flowlist"). Also removes list attributes like "class=", "style=" and so on. Also fixes links to articles with double brackets. This one is gud.
+#Parses *- and #-separated Wiki lists ("flatlist", "plainlist" and "flowlist"). Also removes list attributes like "class=", "style=" and so on.
 
-(?:\{\{(?:.*?))\||(?:\|*)(?:[ ]*)class=(?:.*?)\||(?:\|*)(?:[ ]*)list_style=(?:.*?)\||(?:\|*)(?:[ ]*)style=(?:.*?)\||(?:\|*)(?:[ ]*)indent=(?:.*?)\||(?:\|*)(?:[ ]*)item(?:\d*)_style=(?:.*?)\||(?:\*|\#)(?:[ ]*)(?:(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\]))|(?:(?:\}\})+)
+^(?:\{\{(?:.*?))\||(?:\|*)(?:[ ]*)class=(?:.*?)\||(?:\|*)(?:[ ]*)list_style=(?:.*?)\||(?:\|*)(?:[ ]*)style=(?:.*?)\||(?:\|*)(?:[ ]*)indent=(?:.*?)\||(?:\|*)(?:[ ]*)item(?:\d*)_style=(?:.*?)\||(?:\*|\#)(?:[ ]*)([^\*\#]+)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)([^\*\#\}]*?)\}\}$
 
-#Parses "unbulleted list" and "hlist", removes list attributes and double brackets.
+#Parses "unbulleted list" and "hlist" and removes list attributes.
 
-(?:\{\{(?:.*?))(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\|)|(?:(?:\||\*|\#)*)(?:[ ]*)(?:(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\]))|(?:(?:\||\*|\#)+)(?:[ ]*)(?:(?:\[\[(?:[^\[\|]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|([^\|]*))\}\}|(?:(?<=\|)(.+?)(?=\||\}\}))
+^\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\|)|(?:\||\*|\#)*(?:[ ]*)([^\|\*\#]+)(?=(?:\||\#|\*))|(?:\||\*|\#)*(?:[ ]*)([^\|\*\#]+)\}\}$
 
 #Parses "Pagelist", removes list attributes and double brackets.
 
-(?:\{\{(?:.*?))(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)nspace(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)delim(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:(?:\||\*|\#)*)(?:[ ]*)(?:(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\]))|(?:(?:\||\*|\#)+)(?:[ ]*)(?:(?:\[\[(?:[^\[\|]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|([^\|]*))\}\}|(?:(?<=\|)(.+?)(?=\||\}\}))
+^\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)nspace(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)delim(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:(?:\||\*|\#)+)(?:[ ]*)(.*?)(?=\||\*|\#)|(?:(?:\||\*|\#)+)(?:[ ]*)(.*?)\}\}$
 
-#Parses "ordered list", removes list attributes and double brackets.
+#Parses "ordered list" and removes list attributes.
 
-(?:\{\{(?:.*?))(?=\|)|(?:\|*)(?:[ ]*)list_style_type(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_value(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)start(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:(?:\||\*|\#)*)(?:[ ]*)(?:(?:\[\[(?:[^\[]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\]))|(?:(?:\||\*|\#)+)(?:[ ]*)(?:(?:\[\[(?:[^\[\|]+?)\|(.+?)\]\])|(?:\[\[(.+?)\]\])|([^\|]*))\}\}|(?:(?<=\|)(.+?)(?=\||\}\}))
+^\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)list_style_type(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_value(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)start(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:(?:\||\*|\#)+)(?:[ ]*)(.*?)(?=\|)|(?:(?:\||\*|\#)+)(?:[ ]*)(.*?)\}\}$
 
 #Parses "toolbar", removes list attributes and double brackets.
 
