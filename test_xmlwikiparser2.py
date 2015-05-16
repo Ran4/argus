@@ -5,8 +5,10 @@ def testFixWikiLists(inValues, correctValues):
     ib = xmlwikiparser2.InfoBox("","",[],0, verbose=False)
     for inValue, correctValue in zip(inValues, correctValues):
         retValue = ib.fixWikiLists(inValue, verbose=True)
-        print "retInfoBoxStringList:"
+        print inValue
+        print "->"
         print retValue
+        print
         assert(retValue == correctValue)
     
     print "Successfully tested fixWikiLists"
@@ -17,7 +19,8 @@ if __name__ == "__main__":
         ["| citizenships = {{unbulleted list | germany | switzerland}}}}"],
         ["| citizenships = {{unbulleted list | germany | switzerland}}", "}}"],
         ["| citizenships = {{unbulleted list | ger", "many | switzerland}}", "}}"],
-        ["{{flowlist |", "* [[cat]]", "* [[dog]]", "* [[horse]]", "* [[cow]]", "* [[sheep]]", "* [[pig]]", "}}", "}}"]
+        ["{{flowlist |", "* [[cat]]", "* [[dog]]", "* [[horse]]", "* [[cow]]", "* [[sheep]]", "* [[pig]]", "}}", "}}"],
+        ["{{flowlist}}", "* [[cat]]", "* [[dog]]", "* [[horse]]", "* [[cow]]", "* [[sheep]]", "* [[pig]]", "{{endflowlist}}", "}}"],
     ]
 
     outValues = [
@@ -25,7 +28,8 @@ if __name__ == "__main__":
         ["| citizenships = {{unbulleted list | germany | switzerland}}}}"],
         ["| citizenships = {{unbulleted list | germany | switzerland}}", "}}"],
         ["| citizenships = {{unbulleted list | germany | switzerland}}", "}}"],
-        ["{{flowlist |* [[cat]]* [[dog]]* [[horse]]* [[cow]]* [[sheep]]* [[pig]]}}", "}}"]
+        ["{{flowlist |* [[cat]]* [[dog]]* [[horse]]* [[cow]]* [[sheep]]* [[pig]]}}", "}}"],
+        ["{{flowlist}}* [[cat]]* [[dog]]* [[horse]]* [[cow]]* [[sheep]]* [[pig]]{{endflowlist}}", "}}"],
     ]
     
     testFixWikiLists(inValues, outValues)

@@ -26,13 +26,15 @@ class InfoBox(object):
         if verbose: 
             print "Is in InfoBox.__init__ of article %s" % articleTitle
             print "infoBoxStringList before fixWikiLists:"
-            print infoBoxStringList
+            print pp(infoBoxStringList)
+            print
         
-        self.infoBoxStringList = self.fixWikiLists(infoBoxStringList, verbose=True)
+        #don't add the first element since it is '{{Infobox infoboxType'
+        self.infoBoxStringList = self.fixWikiLists(infoBoxStringList[1:], verbose=True)
         
         if verbose: 
             print "infoBoxStringList after fixWikiLists:"
-            print infoBoxStringList
+            print pp(self.infoBoxStringList)
             print
         
         self.countInArticle = countInArticle
@@ -72,23 +74,73 @@ class InfoBox(object):
 
             numCurlyBracesInLine % 2 != (i == len(infoBoxStringList)-1 )
             """
+            #TODO: These variables keep track if the current line ends or begins one of these Wikilist environments.
+            #       We might need to have booleans tracking if we are inside such an enviroment, if it turns out that
+            #       ordinary list environment-lines often begin with non-separator characters.
+            isBeginSpecialWikiList = "{{plainlist}}" in line \
+                or "{{flowlist}}" in line \
+                or "{{startflatlist}}" in line
+                
+            isEndSpecialWikiList = "{{endplainlist}}" in line \
+                or "{{endflowlist}}" in line \
+                or "{{endflatlist}}" in line
             
-            if numCurlyBracesInLine % 2 != (i == len(infoBoxStringList)-1):
-                #Odd number of curlybraces, so it's probably a wikilist?
+            #The below case occurs if: 
+            #   The number of curly braces on a row is unbalanced which means:
+            #       We begin a Wikilist
+            #       We end a Wikilist
+            #   One of the following is true:
+            #       We begin a begin-taged Wikilist (isBeginSpecialWikiList is true)
+            #       We end a end-tagged Wikilist (isEndSpecialWikiList is true)
+            if numCurlyBracesInLine % 2 != (i == len(infoBoxStringList)-1) \
+                    or (isBeginSpecialWikiList ^ isEndSpecialWikiList):
+                
+                #We start appending to a temporary list, since we are in a list environment
                 tempStringList.append(line.strip())
+
+                #If we are already inside a Wikilist environment:
                 if isInWikiList:
+
+                    #Join all the lines in our temporary string list
                     joinedLinesString = "".join(tempStringList)
                     if verbose:
-                        print "joinedLinesString:", joinedLinesString
+                        print "Joined string: '%s'" % joinedLinesString
+
+                    #Add the result of the above to the Infobox string list
                     newInfoBoxStringList.append(joinedLinesString)
+                    
+                    #Empty the temporary list
                     tempStringList = []
+                
+                #Flip the parity of isInWikiList, since we have just entered or left a list environment
                 isInWikiList = not isInWikiList
+            
+            #This case occurs in every other case, which means:
+            #   Every non-begin and non-end line inside a Wikilist environment
+            #   Every ordinary line
             else:
+            
+                #If we are currently inside a list environment:
+                #   Check if the current line starts with a separator character 
                 if isInWikiList:
-                    tempStringList.append(line)
+                    if line[0] == "*" OR line[0] == "|" OR line[0] == "#":
+                        #If it does, it is a list entry and we add it to tempStringList
+                        tempStringList.append(line)
+                    else:
+                        #If it does not, we have reached the end of a begin-tag end-tag list f.ex. {{flowlist}}
+                        #So we append the current line to the Infobox string list
+                        newInfoBoxStringList.append(line)
+
+                        #Plus, we perform the operations needed to close a Wikilist environment
+                        newInfoBoxStringList.append(joinedStringList)
+                        tempStringList = []
+                        isInWikiList = not isInWikiList
+
+                #Otherwise, we are not inside a list environment, just keep appending lines to the Infobox string list
                 else:
                     newInfoBoxStringList.append(line)
-                    
+        
+        #Return the Infobox string list
         return newInfoBoxStringList
     
     def handleLongInfoBoxType(self, verbose=True):

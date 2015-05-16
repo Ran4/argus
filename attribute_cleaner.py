@@ -16,9 +16,11 @@ def clean(inputFileName, keysFileName,
     """
     #Get attribute keys
     with open(keysFileName) as keysFile:
-        keys = keysFile.read().split("\n")
-        keyCounter = collections.Counter(keys)
+        keyList = keysFile.read().split("\n")
+        keyCounter = collections.Counter(keyList)
         if verbose: print "Successfully loaded attribute keys from JSON"
+        
+    attributeKeyParser = attribute_key_parser.AttributeKeyParser(keyList)
     
     #Get infoboxes 
     with open(inputFileName) as inputFile:
@@ -37,7 +39,8 @@ def clean(inputFileName, keysFileName,
         attributeDict = {}
         for key in ib:
             #Handle keys
-            newKey = attribute_key_parser.findNewKey(keyList, key)
+            #newKey = attribute_key_parser.findNewKey(keyList, key)
+            newKey = attributeKeyParser.findNewKey(key)
             if verbose: print "K: {} -> {}".format(key, newKey)
             if not newKey:
                 counter["ignored_new_keys"] += 1
