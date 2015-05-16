@@ -4,6 +4,6 @@
 
 2. Run attribute_cleaner.py
     File infobox_output_cleaned.json" is generated (filesize ~??? MiB)
-    File "attribute_keys_cleaned.txt" is generated (filesize ~??? MiB)
+    File "debug/attribute_keys_cleaned.txt" is generated (filesize ~??? MiB)
 
 3. ???

@@ -27,13 +27,15 @@ def parseAttributeValue(value, verbose=False, logFileName=None):
     if any([value.endswith(fileExt) for fileExt in (".svg")]):
         return ""
     
-    pattern = "" #Insert overly complicated pattern here
-    match = re.find(pattern, value)
-    
-    if not match:
-        return "" 
+    #~ pattern = "" #Insert overly complicated pattern here
+    #~ match = re.match(pattern, value)
+    #~ 
+    #~ if not match:
+    #~     return "" 
 
-    return match.groups()
+    #return match.groups()
+    
+    return value
 
 
 #~ def parseInfoBox(ib):
