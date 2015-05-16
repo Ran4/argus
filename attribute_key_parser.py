@@ -40,6 +40,7 @@ def test(verbose=False):
     print "Testing AttributeKeyParser.findNewKey"
     
     keyList = ["date of birth", "date_of_birth", "birthdate", "birthdate"]
+    import attribute_cleaner
     inputFileName = attribute_cleaner.defaultInputFileName
     infoBoxList = attribute_cleaner.loadInfoBoxList(inputFileName,
             verbose=False)

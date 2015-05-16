@@ -5,7 +5,7 @@ def performUnitTests():
     print "#"*79
     
     import xmlwikiparser2
-    xmlwikiparser2.test(verbose=True)
+    xmlwikiparser2.test(verbose=False)
     print "#"*39
     
     import attribute_value_parser
