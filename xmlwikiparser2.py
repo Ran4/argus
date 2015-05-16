@@ -425,7 +425,7 @@ def main():
                 
             #Continuously write some information about our efforts...
             
-            if articlesGotten % 50 == 0:
+            if articlesGotten % 50000 == 0:
                 dt = time.time() - startTime
                 
                 #Percent of wikipedia read
