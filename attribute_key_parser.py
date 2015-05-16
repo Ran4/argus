@@ -36,13 +36,15 @@ class AttributeKeyParser:
         return newKey
     
    
-def test():
-    print "Testing AttributeKeyParser..."
+def test(verbose=False):
+    print "Testing AttributeKeyParser.findNewKey"
     
     keyList = ["date of birth", "date_of_birth", "birthdate", "birthdate"]
-    attributeKeyParser = AttributeKeyParser(keyList)
-    
-    f = attributeKeyParser.findNewKey
+    inputFileName = attribute_cleaner.defaultInputFileName
+    infoBoxList = attribute_cleaner.loadInfoBoxList(inputFileName,
+            verbose=False)
+    keyCounter = attribute_cleaner.getKeyCounter(infoBoxList)
+    attributeKeyParser = AttributeKeyParser(keyCounter)
     
     inValues = ["dateofbirth",
             "date of birth",
@@ -59,15 +61,15 @@ def test():
             ]
    
     for inValue, outValue in zip(inValues, outValues):
-        print inValue
-        print "->"
-        print outValue
-        print
-        assert(f(inValue) == outValue)
+        if verbose:
+            print inValue
+            print "->"
+            print outValue
+            print
+        assert(attributeKeyParser.findNewKey(inValue) == outValue)
     
-    print "#"*20
-    print "SUCCESSFULLY TESTED AttributeKeyParser"
-    print "#" * 20
+    
+    print "Successfully tested AttributeKeyParser.findNewKey"
     
 if __name__ == "__main__":
     test()

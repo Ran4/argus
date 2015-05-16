@@ -470,6 +470,41 @@ def main():
             print(s)
             break
     
+def test(verbose=False):
+    testFixWikiLists(verbose)
+
+def testFixWikiLists(verbose=False):
+    inValues = [
+        ["| name = albert}}"],
+        ["| citizenships = {{unbulleted list | germany | switzerland}}}}"],
+        ["| citizenships = {{unbulleted list | germany | switzerland}}", "}}"],
+        ["| citizenships = {{unbulleted list | ger", "many | switzerland}}", "}}"],
+        ["{{flowlist |", "* [[cat]]", "* [[dog]]", "* [[horse]]", "* [[cow]]", "* [[sheep]]", "* [[pig]]", "}}", "}}"],
+        ["{{flowlist}}", "* [[cat]]", "* [[dog]]", "* [[horse]]", "* [[cow]]", "* [[sheep]]", "* [[pig]]", "{{endflowlist}}", "}}"],
+    ]
+
+    outValues = [
+        ["| name = albert}}"],
+        ["| citizenships = {{unbulleted list | germany | switzerland}}}}"],
+        ["| citizenships = {{unbulleted list | germany | switzerland}}", "}}"],
+        ["| citizenships = {{unbulleted list | germany | switzerland}}", "}}"],
+        ["{{flowlist |* [[cat]]* [[dog]]* [[horse]]* [[cow]]* [[sheep]]* [[pig]]}}", "}}"],
+        ["{{flowlist}}* [[cat]]* [[dog]]* [[horse]]* [[cow]]* [[sheep]]* [[pig]]{{endflowlist}}", "}}"],
+   ] 
+        
+    print "Testing xmlwikiparser2.InfoBox.fixWikiLists()"
+    
+    ib = InfoBox("","",[],0, verbose=False)
+    for inValue, outValue in zip(inValues, outValues):
+        retValue = ib.fixWikiLists(inValue, verbose=verbose)
+        if verbose:
+            print inValue
+            print "->"
+            print retValue
+            print
+        assert(retValue == outValue)
+    
+    print "Successfully tested xmlwikiparser2.InfoBox.fixWikiLists()"
 
 if __name__ == "__main__":
     main()

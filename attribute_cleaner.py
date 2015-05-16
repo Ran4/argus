@@ -128,11 +128,15 @@ def clean(inputFileName, outputFileName, outputKeysFileName,
     saveFiles(cleanedKeysCounter, cleanedInfoBoxList,
                     outputFileName, outputKeysFileName, verbose)
     
+defaultInputFileName = "ibs_person_raw_76M.json"
+defaultOutputFileName = "infobox_output_cleaned.json"
+defaultOutputKeysFileName = "debug/attribute_keys_cleaned.txt"
+    
 def main():
     if len(sys.argv) != 3+1: #The right number of arguments wasn't given
-        inputFileName = "ibs_person_raw_76M.json"
-        outputFileName = "infobox_output_cleaned.json"
-        outputKeysFileName = "debug/attribute_keys_cleaned.txt"
+        inputFileName = defaultInputFileName
+        outputFileName = defaultOutputFileName
+        outputKeysFileName = defaultOutputKeysFileName
         print "Usage:"
         print "attribute_cleaner inputFileName outputFileName outputKeysFileName"
         print "Default values:"
