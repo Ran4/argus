@@ -3,9 +3,9 @@ import java.util.*;
 import java.util.regex.*;
 
 
-//run format: java attribute_key_cleaner "inputFile" "outputFile"
+//run format: java java_key_cleaner "inputFile" "outputFile"
 //
-public class attribute_key_cleaner{
+public class java_key_cleaner{
 	
 	public static int number_of_char = 10; //number of chars in string to check for similartys
 	public static int ignore_occurance = 100; //number of attributes with less than this occurances will be ignored
@@ -294,25 +294,25 @@ public class attribute_key_cleaner{
 		
 	}
 	
-	public attribute_key_cleaner(){
+	public java_key_cleaner(){
 
 	}
 	
-	public attribute_key_cleaner(String in,String out){
+	public java_key_cleaner(String in,String out){
 		infile = in;
 		outfile = out;
 	}
 	
 	public static void main(String[] args){
-		attribute_key_cleaner a;
+		java_key_cleaner a;
 		if(args.length == 2){
 			//System.out.println("got arguments");
-			a = new attribute_key_cleaner(args[0],args[1]);
+			a = new java_key_cleaner(args[0],args[1]);
 			//infile = args[0];
 			//outfile = args[1];
 		}
 		else{
-			a = new attribute_key_cleaner();
+			a = new java_key_cleaner();
 		}
 		a.run();
 	}
