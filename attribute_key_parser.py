@@ -12,11 +12,14 @@ class AttributeKeyParser:
         """Parses a list of keys and tries to find patterns to be used to
         clean keys.
         """
+        
+        #print colored("WARNING! KEY CLEANING IGNORED!", "magenta")
+        #return
 
         #Calls Java code
         cleanedKeysFileName = "attribute_keys_cleaned.txt"
         try:
-            cmd = "java attribute_key_cleaner %s %s" % \
+            cmd = "java java_key_cleaner %s %s" % \
                     (keyTranslationFileName, cleanedKeysFileName)
             if verbose: print "Trying to run command '%s'" % cmd
             ret = os.system(cmd)
