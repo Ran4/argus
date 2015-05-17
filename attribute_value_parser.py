@@ -9,14 +9,21 @@ class AttributeValueParser:
         #Pattern for removing cref and contents
         self.patternCref = re.compile(r"\{\{cref[^\}]*?(?:\}\}\}\}\}|\}\}(?!\}))")
         
+        #Pattern for removing the "small" environment and replacing a <br />
+        #directly before it, if there is one.
+        self.patternSmallEnv = re.compile("(?:<br(?:[ ]*)\/>)*\{\{(?:[ ]*)small(?:[ ]*)\|(.*?)\}\}")
+        
         #Pattern for removing comments
         self.patternComment = re.compile(r"<!--(?:.*?)-->")
         
         #Pattern for removing references
         self.patternReference = re.compile(r"<ref>(?:.*?)<\/ref>")
         
-        #Pattern for replacing <br /> and nbsp with whitespaces
-        self.patternBr = re.compile(r"\<br[ ]*\/\>|&nbsp;|nbsp;")
+        #Pattern for replacing nbsp with whitespaces
+        self.patternNbsp = re.compile(r"&nbsp;|nbsp;")
+        
+        #Pattern for replacing <br />
+        self.patternBr = re.compile("\<br[ ]*\/\>")
 		
         #Pattern for getting b from [[a|b]]
         self.patternPipeLink = re.compile(r"\[\[(?:[ ]*)(?:[^\]]*?)(?:[ ]*)\|(?:[ ]*)(.*?)(?:[ ]*)\]\]")
@@ -30,7 +37,8 @@ class AttributeValueParser:
         #Pattern for getting list name from {{list name| or {{list name}}
         self.patternList = re.compile(r'\{\{([^|]+?)(?:[ ]*)(?:\||\})')
         
-		#TODO: Do lists starting with a {{tag}} have list attributes similar to other lists? In which format?
+		#TODO: Do lists starting with a {{tag}} have list attributes similar to
+		#other lists? In which format?
         
         #Pattern for getting entries from a "bulleted list"
         self.patternBulletedList = re.compile("^(?:\{\{(?:.*?))(?=\|)|\|(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)(.*?)(?:[ ]*)(?=\|)|\|(?:[ ]*)([^\|]*?)(?:[ ]*)\}\}$")
@@ -99,7 +107,7 @@ class AttributeValueParser:
 			
 		#TODO: Remove all linked images (Ex: [[File:Andrei Tarkovsky.jpg|240px]])
 			
-        #The whole entry could be an image: ignore these before trying to parse it
+        #The whole entry could be an image: ignore these before trying to parse
         #TODO: Might better be contains, not endswith???
         if any([value.endswith(fileExt) for fileExt in (".svg")]):
             if verbose:
@@ -111,14 +119,37 @@ class AttributeValueParser:
         
         #TODO: birthdate environment (Ex: {{birth date|1809|2|12}})
         #TODO: death date and age environment (Ex: {{death date and age|1865|4|15|1809|2|12}})
-        #		Output should be in format:  	29 December 1986 (aged 54)
+        #		Output should be in format: 29 December 1986 (aged 54)
         
-        #Replace all <br /> and similar with whitespaces
-        #TODO: We probably should return all values separated by <br /> as a list...
+		#Remove all "cref" environments
         if verbose:
-		    print "Entering removal of line breaks and nbsps."
+		    print "Entering removal of cref environment and contents."
 		    print "    Value before was: '%s'" % str(value)
-        value = self.patternBr.sub(r" ", value)
+        value = self.patternCref.sub(r"", value)
+        
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
+            
+		#Remove all "small" environments (Ex: {{small|(April 21, 1832 – July 10, 1832)}})
+		#Plus, if these are preceeded by a <br />, this means that we should
+		#remove that break before creating a list out of break-separated values.
+        if verbose:
+		    print "Entering removal of 'small' environment, checking for preceding br-tags and replacing them with whitespace."
+		    print "    Value before was: '%s'" % str(value)
+        value = self.patternSmallEnv.sub(r" \g<1>", value)
+        
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
+        
+        #Replace all remaining <br /> and similar with whitespaces
+        #TODO: We probably should return all remaining values separated by
+        #<br /> or <br/> as a list...
+        
+        #Removes all nbsps
+        if verbose:
+		    print "Entering removal of nbsps."
+		    print "    Value before was: '%s'" % str(value)
+        value = self.patternNbsp.sub(r" ", value)
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
@@ -146,15 +177,6 @@ class AttributeValueParser:
 		    print "Entering removal of references."
 		    print "    Value before was: '%s'" % str(value)
         value = self.patternReference.sub(r"", value)
-        
-        if verbose:
-            print "    Value after became: '%s'" % str(value)
-            
-		#Remove all "cref" environments
-        if verbose:
-		    print "Entering removal of cref environment and contents."
-		    print "    Value before was: '%s'" % str(value)
-        value = self.patternCref.sub(r"", value)
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
@@ -186,7 +208,8 @@ class AttributeValueParser:
         if verbose:
             print "    Value after became: '%s'" % str(value)
         
-        #Now that we're done with that, we want to check if the attribute value is a list.
+        #Now that we're done with that, we want to check if the attribute value
+        #is a list.
         #TODO: "plain list" on wikipedia might redirect to "plainlist". Fix this?
         if verbose:
                 print "Checking if attribute value is a list..."
@@ -197,6 +220,17 @@ class AttributeValueParser:
             listType = match.group(1)
             if verbose:
                 print "    List type:", listType
+                
+            #Since we are in a list, we want to replace the <br />s with
+            #whitespaces.
+			if verbose:
+				print "    Entering removal of <br />s, since we have discovered a list."
+				print "        Value before was: '%s'" % str(value)
+			value = self.patternBr.sub(r" ", value)
+			
+			if verbose:
+				print "        Value after became: '%s'" % str(value)
+            
             #Now that we have obtained the list type, we want to do different things depending on which list type it is.
             if listType == "bulleted list":
                 if verbose:
@@ -281,7 +315,7 @@ class AttributeValueParser:
                 returnList = filter(None, list(itertools.chain.from_iterable(self.patternToolbar.findall(value))))
             else:
 				if verbose:
-					print '    list of unknown type found.'
+					print '    ERROR: List of unknown type found.'
                     
 				returnList = ""
                 
@@ -290,10 +324,19 @@ class AttributeValueParser:
             return returnList
                 
         else:
-            #No list was found...
-            if verbose:
-                    print 'No list was found.'
-                    print "Returning '%s'" % str(value)
+            #No list was found... Check if the attribute value is
+            #<br />-separated. If that is the case, split it using that as a
+            #separator. Otherwise, return the value as it is.
+
+            if "<br />" in value:
+				if verbose:
+					print 'Attribute value is a list separated by <br />.'
+					print "Returning '%s'" % str(value)
+				value = filter(None, self.patternBr.split(value))
+            else:
+				if verbose:
+						print 'No list was found in attribute value.'
+						print "Returning '%s'" % str(value)
             return value
         
         
@@ -305,7 +348,7 @@ def test(verbose=False):
         #Links:
         ('[[germany]]','germany'),
         ('[[confusingLink|germany]]','germany'),
-        ('[[confusingLink|germany]] ister','germany ister'),
+        ('[[confusingLink|germany]] sister','germany sister'),
         #Multiple links:
         ('[[You should not see this|   Aber ]] [[confusingLink | Germany  ]] ist [[ geil    ]], [[da]]','Aber Germany ist geil, da'),
         #Longitem environment:
@@ -323,12 +366,11 @@ def test(verbose=False):
 		('{{pagelist|nspace= |delim=''|sean connery   |    roger moore|   george lazenby   }}', ['sean connery', 'roger moore', 'george lazenby']),
 		('{{ordered list |item1_value=value1 |item2_value=value2|start=start|   alan turing |claude shannon    |item1_style=CSS1 |item2_style=CSS2 }}', ['alan turing', 'claude shannon']),
 		('{{toolbar|separator=comma |bethany    |     ambrose}}', ['bethany', 'ambrose']),
-		
 		#Stuff from real Wikipedia (starting with article about aristotle):
 		('{{unbulleted list |[[peripatetic school]] |[[aristotelianism]]}}', ['peripatetic school', 'aristotelianism']),
 		('{{unbulleted list |[[golden mean (philosophy)|golden mean]] |[[aristotelian logic]] |[[syllogism]] |[[hexis]] |[[hylomorphism]] |[[on the soul|theory of the soul]]}}', ['golden mean', 'aristotelian logic', 'syllogism', 'hexis', 'hylomorphism', 'theory of the soul']),
 		('{{hlist |[[parmenides]] |[[socrates]] |[[plato]] |[[heraclitus]] |[[democritus]]}}', ['parmenides', 'socrates', 'plato', 'heraclitus', 'democritus']),
-		#NESTED LISTS DANGER WILL ROBINSON DANGER
+		#NESTED AND/OR MULTIPLE LISTS: DANGER WILL ROBINSON DANGER
 		#('{{hlist|[[biology]]|[[zoology]]}} {{hlist|[[physics]]|[[metaphysics]]}}', ['biology', 'zoology', 'physics', 'metaphysics']),
     ]
 
