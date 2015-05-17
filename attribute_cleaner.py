@@ -71,7 +71,7 @@ def cleanInfoBoxList(attributeKeyParser, infoBoxList, verbose):
             
             #Handle values
             newValue = attributeValueParser.parseAttributeValue(ib[key],
-                    verbose)
+                    verbose=False)
             #~ if verbose: print "V: {} -> {}".format(ib[key], newValue)
             if not newValue:
                 counter["ignored_new_values"] += 1
