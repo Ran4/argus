@@ -1,3 +1,4 @@
+#!/usr/bin/env python2
 import sys
 import collections
 
@@ -6,24 +7,26 @@ import attribute_value_parser
 
 import json
 
-def saveFiles(cleanedKeysCounter, cleanedInfoBoxList,
-        outputFileName, outputKeysFileName, verbose):
-    #Dump a list of key values that we used 
-    if verbose: print "Trying to save cleaned attribute keys to file..."
-    keyAndCount = sorted(cleanedKeysCounter.items(),
+def saveKeyCounterToFile(keyCounter, fileName, verbose):
+    if verbose: print "Trying to save attribute keys to file..."
+    keyAndCount = sorted(keyCounter.items(),
         key=lambda x: x[1], reverse=True)
     keyAndCountToStringFunction = lambda x: str(x[1]) + " " + x[0].encode("utf-8")
     keyCountString = "\n".join(map(keyAndCountToStringFunction, keyAndCount))
     try:
-        with open(outputKeysFileName, "w") as f:
+        with open(fileName, "w") as f:
             f.write(keyCountString)
     except IOError as e:
-        print "Problem saving cleaned attribute keys to file {}".format(
-                outputKeysFileName)
+        print "Problem saving attribute keys to file {}".format(
+                fileName)
     if verbose:
-        print "Successfully wrote cleaned attribute keys to file {}".format(
-                outputKeysFileName)
-       
+        print "Successfully wrote attribute keys to file {}".format(
+                fileName)
+
+def saveFiles(cleanedKeysCounter, cleanedInfoBoxList,
+        outputFileName, outputKeysFileName, verbose):
+    
+    saveKeyCounterToFile(cleanedKeysCounter, outputKeysFileName, verbose)
         
     #Dump our new, cleaned InfoBoxList to a new JSON 
     newJSONString = json.dumps(cleanedInfoBoxList, indent=2)
@@ -122,7 +125,10 @@ def clean(inputFileName, outputFileName, outputKeysFileName,
     
     infoBoxList = loadInfoBoxList(inputFileName, verbose)
     keyCounter = getKeyCounter(infoBoxList)
-    attributeKeyParser = attribute_key_parser.AttributeKeyParser(keyCounter)
+    keyTranslationFileName = "attribute_keys_raw.txt"
+    saveKeyCounterToFile(keyCounter, keyTranslationFileName, verbose)
+    attributeKeyParser = attribute_key_parser.AttributeKeyParser(
+            keyTranslationFileName, verbose)
     cleanedInfoBoxList, cleanedKeysCounter = cleanInfoBoxList(
             attributeKeyParser, infoBoxList, verbose)
     saveFiles(cleanedKeysCounter, cleanedInfoBoxList,
