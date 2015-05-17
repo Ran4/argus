@@ -253,7 +253,7 @@ public class java_key_cleaner{
 		
 		if(outputStats){
 			try{
-				FileWriter fw = new FileWriter("debug_attribute_changes.txt");
+				FileWriter fw = new FileWriter("debug/attribute_changes.txt");
 				BufferedWriter out = new BufferedWriter(fw);
 				out.write("A total of "+translate.size()+" keys where changed due to misspellings or formatting errors");
 				out.newLine();
