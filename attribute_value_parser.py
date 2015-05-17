@@ -1,13 +1,19 @@
 import re
 import itertools
 class AttributeValueParser:
-    def __init__(self):
+    def __init__(self, verbose=False):
+		
+		#Pattern for removing <br /> and nbsp
+        self.patternBr = re.compile(r"\<br[ ]*\/\>|&nbsp;")
 		
         #Pattern for getting b from [[a|b]]
         self.patternPipeLink = re.compile(r"\[\[(?:[ ]*)(?:[^\]]*?)(?:[ ]*)\|(?:[ ]*)(.*?)(?:[ ]*)\]\]")
         
         #Pattern for getting a from [[a]]
         self.patternLink = re.compile(r'\[\[(?:[ ]*)(.*?)(?:[ ]*)\]\]')
+        
+        #Pattern for removing the "Longitem" or "nowrap" environment
+        self.patternLongitem = re.compile(r'\{\{(?:[ ]*)(?:longitem|nowrap)(?:[ ]*)\|(?:(?:(?:[ ]*)(?:style|padding|line-height)(?:[^\|]+?)\|)*)(?:[ ]*)(.*?)(?:[ ]*)\}\}')
         
         #Pattern for getting list name from {{list name| or {{list name}}
         self.patternList = re.compile(r'\{\{([^|]+?)(?:[ ]*)(?:\||\})')
@@ -49,6 +55,9 @@ class AttributeValueParser:
 
         #Pattern for getting entries from a "toolbar"
         self.patternToolbar = re.compile("^\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)separator(?:[ ]*)=(?:.*?)(?=\}\}|\|)|\|(?:[ ]*)(.*?)(?:[ ]*)(?=\|)|\|(?:[ ]*)([^\|]*?)(?:[ ]*)\}\}$")
+        
+        if verbose:
+			print "AttributeValueParser has compiled all regex patterns"
     
                       
     def parseAttributeValue(self, value, verbose=False, logFileName=None):
@@ -74,34 +83,52 @@ class AttributeValueParser:
         parseAttributeValue(value) == ""
         """
         if verbose:
-                print "\nNew parse initiated."
-
+			print "\nNew parse initiated."
+			
         #Could be an image: ignore these before trying to parse it
         if any([value.endswith(fileExt) for fileExt in (".svg")]):
             if verbose:
                 print "File extension found - attribute value", value, "was purged from records."
             return ""
-            
-        #First, replace all Wiki article links in the string.
-        #    Step 1: Shit of the form [[blabla|derpderp]] should become derpderp
+        
+        #Replace all <br /> and similar
         if verbose:
-                print "Entering link conversion of type 1 ([[a|b]])."
-                print "    Value before was:", value
+		    print "Entering removal of line breaks and nbsps."
+		    print "    Value before was: '%s'" % str(value)
+        value = self.patternBr.sub(r" ", value)
+        
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
+        
+        #Replace all Wiki article links in the string.
+        #    Step 1: Stuff of the form [[blabla|derpderp]] should become derpderp
+        if verbose:
+		    print "Entering link conversion of type 1 ([[a|b]])."
+		    print "    Value before was: '%s'" % str(value)
         value = self.patternPipeLink.sub(r"\g<1>", value)
         
         if verbose:
-                print "    Value after became: '%s'" % str(value)
+            print "    Value after became: '%s'" % str(value)
                 
-        #    Step 2: Shit of the form [[derpderp]] should become derpderp
+        #    Step 2: Stuff of the form [[derpderp]] should become derpderp
         if verbose:
-                print "Entering link conversion of type 2 ([[a]])."
-                print "    Value before was:", value
+            print "Entering link conversion of type 2 ([[a]])."
+            print "    Value before was: '%s'" % str(value)
+        
         value = self.patternLink.sub(r"\g<1>", value)
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
+            
+        #    Removal of the "Longitem" environment
+        if verbose:
+            print "Entering removal of 'Longitem' and 'nowrap' environments."
+            print "    Value before was: '%s'" % str(value)
+        value = self.patternLongitem.sub(r"\g<1>", value)
         if verbose:
             print "    Value after became: '%s'" % str(value)
         
         #Now that we're done with that, we want to check if the attribute value is a list.
-        #TODO: "plain list" on wikipedia might redirect to "plainlist. Fix this?
+        #TODO: "plain list" on wikipedia might redirect to "plainlist". Fix this?
         if verbose:
                 print "Checking if attribute value is a list..."
         match = self.patternList.match(value) #We can actually use match since we are only explicitly looking for matches at the beginning.
@@ -221,6 +248,8 @@ def test(verbose=False):
         ('[[confusingLink|germany]] ister','germany ister'),
         #Multiple links:
         ('[[You should not see this|   Aber ]] [[confusingLink | Germany  ]] ist [[ geil    ]], [[da]]','Aber Germany ist geil, da'),
+        #Longitem environment:
+        ('{{longitem|virtually all subsequent [[western philosophy]], [[christian philosophy]] and pre-[[age of enlightenment|enlightenment]] science; also much [[islamic philosophy|islamic]] and [[jewish philosophy]] (see [[list of writers influenced by aristotle]])}}', 'virtually all subsequent western philosophy, christian philosophy and pre-enlightenment science; also much islamic and jewish philosophy (see list of writers influenced by aristotle)'),
         #Lists:
         ('{{bulleted list |class=sdfsdf|list_style=adfsdf|style=asdfsdf|item_style=sdfsdf |item2_style=sdfsdf| We only need this |information }}', ['We only need this', 'information']),
         ('{{flatlist|     class   =    asdfasd|style=      asdfsdfs|        indent   =asdfsdfsd|* [[cat]]* [[dog]]* [[horse]]* [[cow]]* [[sheep]]* [[pig]]}}', ['cat', 'dog', 'horse', 'cow', 'sheep', 'pig']),
@@ -235,8 +264,12 @@ def test(verbose=False):
 		('{{ordered list |item1_value=value1 |item2_value=value2|start=start|   alan turing |claude shannon    |item1_style=CSS1 |item2_style=CSS2 }}', ['alan turing', 'claude shannon']),
 		('{{toolbar|separator=comma |bethany    |     ambrose}}', ['bethany', 'ambrose']),
 		
-		#Stuff from real Wikipedia:
+		#Stuff from real Wikipedia (starting with article about aristotle):
 		('{{unbulleted list |[[peripatetic school]] |[[aristotelianism]]}}', ['peripatetic school', 'aristotelianism']),
+		('{{unbulleted list |[[golden mean (philosophy)|golden mean]] |[[aristotelian logic]] |[[syllogism]] |[[hexis]] |[[hylomorphism]] |[[on the soul|theory of the soul]]}}', ['golden mean', 'aristotelian logic', 'syllogism', 'hexis', 'hylomorphism', 'theory of the soul']),
+		('{{hlist |[[parmenides]] |[[socrates]] |[[plato]] |[[heraclitus]] |[[democritus]]}}', ['parmenides', 'socrates', 'plato', 'heraclitus', 'democritus']),
+		#NESTED LISTS DANGER WILL ROBINSON DANGER
+		#('{{hlist|[[biology]]|[[zoology]]}} {{hlist|[[physics]]|[[metaphysics]]}}', ['biology', 'zoology', 'physics', 'metaphysics']),
     ]
 
     attributeValueParser = AttributeValueParser()
