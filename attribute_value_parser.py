@@ -3,8 +3,20 @@ import itertools
 class AttributeValueParser:
     def __init__(self, verbose=False):
 		
-		#Pattern for removing <br /> and nbsp
-        self.patternBr = re.compile(r"\<br[ ]*\/\>|&nbsp;")
+		#Pattern for removing <small> and </small>
+        self.patternSmall = re.compile(r"\<[\/]*small\>")
+        
+        #Pattern for removing cref and contents
+        self.patternCref = re.compile(r"\{\{cref[^\}]*?(?:\}\}\}\}\}|\}\}(?!\}))")
+        
+        #Pattern for removing comments
+        self.patternComment = re.compile(r"<!--(?:.*?)-->")
+        
+        #Pattern for removing references
+        self.patternReference = re.compile(r"<ref>(?:.*?)<\/ref>")
+        
+        #Pattern for replacing <br /> and nbsp with whitespaces
+        self.patternBr = re.compile(r"\<br[ ]*\/\>|&nbsp;|nbsp;")
 		
         #Pattern for getting b from [[a|b]]
         self.patternPipeLink = re.compile(r"\[\[(?:[ ]*)(?:[^\]]*?)(?:[ ]*)\|(?:[ ]*)(.*?)(?:[ ]*)\]\]")
@@ -85,17 +97,64 @@ class AttributeValueParser:
         if verbose:
 			print "\nNew parse initiated."
 			
-        #Could be an image: ignore these before trying to parse it
+		#TODO: Remove all linked images (Ex: [[File:Andrei Tarkovsky.jpg|240px]])
+			
+        #The whole entry could be an image: ignore these before trying to parse it
+        #TODO: Might better be contains, not endswith???
         if any([value.endswith(fileExt) for fileExt in (".svg")]):
             if verbose:
                 print "File extension found - attribute value", value, "was purged from records."
             return ""
+            
+        #Replaces these with real < and > signs
+        value = value.replace("&lt;","<").replace("&gt;",">")
         
-        #Replace all <br /> and similar
+        #TODO: birthdate environment (Ex: {{birth date|1809|2|12}})
+        #TODO: death date and age environment (Ex: {{death date and age|1865|4|15|1809|2|12}})
+        #		Output should be in format:  	29 December 1986 (aged 54)
+        
+        #Replace all <br /> and similar with whitespaces
+        #TODO: We probably should return all values separated by <br /> as a list...
         if verbose:
 		    print "Entering removal of line breaks and nbsps."
 		    print "    Value before was: '%s'" % str(value)
         value = self.patternBr.sub(r" ", value)
+        
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
+            
+		#Remove all <small> tags
+        if verbose:
+		    print "Entering removal of <small> tags."
+		    print "    Value before was: '%s'" % str(value)
+        value = self.patternSmall.sub(r"", value)
+        
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
+            
+		#Remove all comments
+        if verbose:
+		    print "Entering removal of comments."
+		    print "    Value before was: '%s'" % str(value)
+        value = self.patternComment.sub(r"", value)
+        
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
+            
+		#Remove all references
+        if verbose:
+		    print "Entering removal of references."
+		    print "    Value before was: '%s'" % str(value)
+        value = self.patternReference.sub(r"", value)
+        
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
+            
+		#Remove all "cref" environments
+        if verbose:
+		    print "Entering removal of cref environment and contents."
+		    print "    Value before was: '%s'" % str(value)
+        value = self.patternCref.sub(r"", value)
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
@@ -163,6 +222,7 @@ class AttributeValueParser:
                 if verbose:
                     print '    some type of plainlist detected...'
                 #A subcase for endplainlist environment:
+                #TODO: There can occur a third case: a plainlist environment which does not close (See: article with Abraham Lincoln)
                 if value.endswith("{{endplainlist}}"):
                     if verbose:
                         print '    "endplainlist" detected.'
