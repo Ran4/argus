@@ -52,10 +52,10 @@ class InfoBox(object):
             print "\n"*2
         """    
         
-        
-        if len(self.infoBoxType) > 30:
+        maxLength = 40
+        if len(self.infoBoxType) > maxLength:
             #There might be a problem since the type string is so long!
-            self.handleLongInfoBoxType(verbose=False)
+            self.handleLongInfoBoxType(maxLength, verbose=True)
             
     def fixWikiLists(self, infoBoxStringList, verbose=False):
         if verbose: print "in fixWikiLists"
@@ -145,14 +145,15 @@ class InfoBox(object):
         #Return the Infobox string list
         return newInfoBoxStringList
     
-    def handleLongInfoBoxType(self, verbose=True):
+    def handleLongInfoBoxType(self, maxLength, verbose=True):
         """If the infoBoxType string is really long, chances are
         that something is wrong. Tries to fix it a little bit.
         """
         if verbose:
             print "There might be a problem with infobox '%s...'" % \
-                self.infoBoxType[:30],
-            print "(%s characters omitted)'" % (len(self.infoBoxType) - 30)
+                self.infoBoxType[:maxLength],
+            print "(%s characters omitted)'" % \
+                    (len(self.infoBoxType) - maxLength)
         
 		#If there's a pipe in the infoBoxType, store what can be
                 #    found before the pipe
@@ -207,7 +208,7 @@ class InfoBox(object):
             keyValue = self._parseKeyValue(line)
             if keyValue:
                 key, value = keyValue
-                propertiesDict[key] = value
+                propertiesDict[key.replace("\t", " ")] = value
                 
             if verbose:
                 print "Parsed attribute: %s -> %s" % (line.strip(), keyValue)
