@@ -1,39 +1,42 @@
 import re
+import itertools
 class AttributeValueParser:
     def __init__(self):
-        pass
+		
         #Pattern for getting b from [[a|b]]
-        self.patternPipeLink = re.compile(r"\[\[(?:[^\[]*?)\|(.*?)\]\]")
+        self.patternPipeLink = re.compile(r"\[\[(?:[ ]*)(?:[^\[]*?)(?:[ ]*)\|(?:[ ]*)(.*?)(?:[ ]*)\]\]")
         
         #Pattern for getting a from [[a]]
-        self.patternLink = re.compile(r'\[\[(.*?)\]\]')
+        self.patternLink = re.compile(r'\[\[(?:[ ]*)(.*?)(?:[ ]*)\]\]')
         
         #Pattern for getting list name from {{list name| or {{list name}}
         self.patternList = re.compile(r'\{\{([^|]+?)(?:[ ]*)(?:\||\})')
         
+		#TODO: Do lists starting with a {{tag}} have list attributes similar to other lists? In which format?
+        
         #Pattern for getting entries from a "bulleted list"
-        self.patternBulletedList = re.compile("^(?:\{\{(?:.*?))(?=\|)|(?:\|*)class=(?:.*?)\||(?:\|*)list_style=(?:.*?)\||(?:\|*)style=(?:.*?)\||(?:\|*)item(?:\d*)_style=(?:.*?)\||\|(.*?)(?=\|)|\|([^\|]*?)\}\}$")
+        self.patternBulletedList = re.compile("^(?:\{\{(?:.*?))(?=\|)|\|(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)(.*?)(?:[ ]*)(?=\|)|\|(?:[ ]*)([^\|]*?)(?:[ ]*)\}\}$")
         
         #Pattern for getting entries from a "flatlist"
-        self.patternFlatlist= re.compile("^(?:\{\{(?:.*?))\||(?:\|*)(?:[ ]*)class=(?:.*?)\||(?:\|*)(?:[ ]*)list_style=(?:.*?)\||(?:\|*)(?:[ ]*)style=(?:.*?)\||(?:\|*)(?:[ ]*)indent=(?:.*?)\||(?:\|*)(?:[ ]*)item(?:\d*)_style=(?:.*?)\||(?:\*|\#)(?:[ ]*)([^\*\#]+)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)([^\*\#\}]*?)\}\}$")
+        self.patternFlatlist= re.compile("^(?:\{\{(?:.*?))(?=\|)|\|(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\||\})|(?:\|*)(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\||\})|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\||\})|(?:\|*)(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\||\})|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\||\})|(?:\*|\#)(?:[ ]*)([^\*\#]+)(?:[ ]*)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)([^\*\#\}]+?)(?:[ ]*)\}\}$")
     
         #Pattern for getting entries from a "startflatlist"
-        self.patternStartflatlist = re.compile("^\{\{(?:.*?)\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+)(?=\*)|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+)\{\{(?:.*?)\}\}$")
+        self.patternStartflatlist = re.compile(r"^\{\{(?:.*?)\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+)(?:[ ]*)(?=\*)|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+)(?:[ ]*)\{\{(?:.*?)\}\}$")
         
         #Pattern for getting entries from an "endplainlist"
-        self.patternEndplainlist  = re.compile("^\{\{(?:.*?)\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+)(?=\*)|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+)\{\{(?:.*?)\}\}$")
+        self.patternEndplainlist  = re.compile("^\{\{(?:.*?)\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+?)(?:[ ]*)(?=\*)|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+)(?:[ ]*)\{\{(?:.*?)\}\}$")
 
-        #Pattern for getting entries from a "Plainlist"
-        self.patternPlainlist = re.compile("^(?:\{\{(?:.*?))\||(?:\|*)(?:[ ]*)class=(?:.*?)\||(?:\|*)(?:[ ]*)list_style=(?:.*?)\||(?:\|*)(?:[ ]*)style=(?:.*?)\||(?:\|*)(?:[ ]*)indent=(?:.*?)\||(?:\|*)(?:[ ]*)item(?:\d*)_style=(?:.*?)\||(?:\*|\#)(?:[ ]*)([^\*\#]+)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)([^\*\#\}]*?)\}\}$")
+        #Pattern for getting entries from a "plainlist"
+        self.patternPlainlist = re.compile("^(?:\{\{(?:.*?))(?=\|)|\|(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\||\})|(?:\*|\#)(?:[ ]*)([^\*\#]+)(?:[ ]*)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)([^\*\#\}]*?)(?:[ ]*)\}\}$")
         
         #Pattern for getting entries from an "endflowlist"
-        self.patternEndflowlist = re.compile("^\{\{(?:.*?)\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+)(?=\*)|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+)\{\{(?:.*?)\}\}$")
+        self.patternEndflowlist = re.compile("^\{\{(?:.*?)\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*\#\|]+?)(?:[ ]*)(?=\||\*|\#)|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*\#\|]+?)(?:[ ]*)\{\{(?:.*?)\}\}$")
         
         #Pattern for getting entries from a "flowlist"
-        self.patternFlowlist = re.compile("^(?:\{\{(?:.*?))\||(?:\|*)(?:[ ]*)class=(?:.*?)\||(?:\|*)(?:[ ]*)list_style=(?:.*?)\||(?:\|*)(?:[ ]*)style=(?:.*?)\||(?:\|*)(?:[ ]*)indent=(?:.*?)\||(?:\|*)(?:[ ]*)item(?:\d*)_style=(?:.*?)\||(?:\*|\#)(?:[ ]*)([^\*\#]+)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)([^\*\#\}]*?)\}\}$")
+        self.patternFlowlist = re.compile("^(?:\{\{(?:.*?))(?=\|)|\|(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\||\})|(?:\*|\#|\|)(?:[ ]*)([^\*\#\|]+?)(?:[ ]*)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)([^\*\#\}]*?)(?:[ ]*)\}\}$")
 
         #Pattern for getting entries from a "hlist"
-        self.patternHlist = re.compile("^\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\|)|(?:\||\*|\#)*(?:[ ]*)([^\|\*\#]+)(?=(?:\||\#|\*))|(?:\||\*|\#)*(?:[ ]*)([^\|\*\#]+)\}\}$")
+        self.patternHlist = re.compile("^\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\|)|(?:\||\*|\#)*(?:[ ]*)([^\|\*\#]+?)(?:[ ]*)(?=(?:\||\#|\*))|(?:\||\*|\#)*(?:[ ]*)([^\|\*\#]+?)(?:[ ]*)\}\}$")
            
         #Pattern for getting entries from an "unbulleted list"
         self.patternUnbulletedList = re.compile("^\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\|)|(?:\||\*|\#)*(?:[ ]*)([^\|\*\#]+)(?=(?:\||\#|\*))|(?:\||\*|\#)*(?:[ ]*)([^\|\*\#]+)\}\}$")
@@ -46,7 +49,9 @@ class AttributeValueParser:
 
         #Pattern for getting entries from a "toolbar"
         self.patternToolbar = re.compile("^\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)separator(?:[ ]*)=(?:.*?)(?:\}\}|\|)|\|(.*?)(?=\|)|\|([^\|]*?)\}\}$")
-                                     
+    
+    #def printMessage(self, x):
+	#	print x
                       
     def parseAttributeValue(self, value, verbose=False, logFileName=None):
         """Takes an attribute value as a string in un-edited wikiUML format 
@@ -70,7 +75,8 @@ class AttributeValueParser:
         value = "Barack Obama signature.svg"
         parseAttributeValue(value) == ""
         """
-        #TODO: Should the different patterns for all types of Wikilists be precompiled beforehand? 
+        if verbose:
+                print "\nNew parse initiated."
 
         #Could be an image: ignore these before trying to parse it
         if any([value.endswith(fileExt) for fileExt in (".svg")]):
@@ -84,6 +90,7 @@ class AttributeValueParser:
                 print "Entering link conversion of type 1 ([[a|b]])."
                 print "    Value before was:", value
         value = self.patternPipeLink.sub(r"\g<1>", value)
+        
         if verbose:
                 print "    Value after became:", value
                 
@@ -96,6 +103,7 @@ class AttributeValueParser:
             print "    Value after became:", value
         
         #Now that we're done with that, we want to check if the attribute value is a list.
+        #TODO: "plain list" on wikipedia might redirect to "plainlist. Fix this?
         if verbose:
                 print "Checking if attribute value is a list..."
         match = self.patternList.match(value) #We can actually use match since we are only explicitly looking for matches at the beginning.
@@ -111,20 +119,20 @@ class AttributeValueParser:
                     print '    "bulleted list" detected.'
 
                 #Returns a list of tuples with all matches, where each group corresponds to one tuple.
-                return self.patternBulletedList.findall(value)
+                return filter(None, list(itertools.chain.from_iterable(self.patternBulletedList.findall(value))))
                 
             elif listType == "flatlist":
                 if verbose:
                     print '    "flatlist" detected.'
                 #Note: We do NOT need to have a subcase for endflatlist environment, since that is initiated by {{startflatlist}}
-                return self.patternFlatlist.findall(value)
+                return filter(None, list(itertools.chain.from_iterable(self.patternFlatlist.findall(value))))
                 
             elif listType == "startflatlist":
                 if verbose:
                     print '    "startflatlist" detected.'
                 
                 #Returns a list of tuples with all matches, where each group corresponds to one tuple.
-                return self.patternStartflatlist.findall(value)
+                return filter(None, list(itertools.chain.from_iterable(self.patternStartflatlist.findall(value))))
                 
             elif listType == "plainlist":
                 if verbose:
@@ -133,11 +141,11 @@ class AttributeValueParser:
                 if value.endswith("{{endplainlist}}"):
                     if verbose:
                         print '    "endplainlist" detected.'
-                    return self.patternEndplainlist.findall(value)
+                    return filter(None, list(itertools.chain.from_iterable(self.patternEndplainlist.findall(value))))
                 else:
                     if verbose:
                         print '    "plainlist" detected.'
-                return self.patternPlainlist.findall(value)
+                return filter(None, list(itertools.chain.from_iterable(self.patternPlainlist.findall(value))))
             
             elif listType == "flowlist":
                 if verbose:
@@ -146,46 +154,46 @@ class AttributeValueParser:
                 if value.endswith("{{endflowlist}}"):
                     if verbose:
                             print '    "endflowlist" detected.'
-                    return self.patternEndflowlist.findall(value)
+                    return filter(None, list(itertools.chain.from_iterable(self.patternEndflowlist.findall(value))))
                 else:
                     if verbose:
                             print '    "flowlist" detected.'
-                    return patternFlowlist.findall(value)              
+                    return filter(None, list(itertools.chain.from_iterable(self.patternFlowlist.findall(value))))
                 
             elif listType == "hlist":
                 if verbose:
                     print '    "hlist" detected.'
 
                 #Returns a list of tuples with all matches, where each group corresponds to one tuple.
-                return self.patternHlist.findall(value)
+                return filter(None, list(itertools.chain.from_iterable(self.patternHlist.findall(value))))
                 
             elif listType == "unbulleted list":
                 if verbose:
                     print '    "unbulleted list" detected.'
 
                 #Returns a list of tuples with all matches, where each group corresponds to one tuple.
-                return self.patternUnbulletedList.findall(value)
+                return filter(None, list(itertools.chain.from_iterable(self.patternUnbulletedList.findall(value))))
                 
             elif listType == "pagelist":
                 if verbose:
                     print '    "pagelist" detected.'
 
                 #Returns a list of tuples with all matches, where each group corresponds to one tuple.
-                return self.patternPagelist.findall(value)
+                return filter(None, list(itertools.chain.from_iterable(self.patternPageList.findall(value))))
                 
             elif listType == "ordered list":
                 if verbose:
                     print '    "ordered list" detected.'
 
                 #Returns a list of tuples with all matches, where each group corresponds to one tuple.
-                return self.patternOrderedList.findall(value)
+                return filter(None, list(itertools.chain.from_iterable(self.patternOrderedList.findall(value))))
                 
             elif listType == "toolbar":
                 if verbose:
                     print '    "toolbar" detected.'
 
                 #Returns a list of tuples with all matches, where each group corresponds to one tuple.
-                return self.patternToolbar.findall(value)
+                return filter(None, list(itertools.chain.from_iterable(self.patternToolbar.findall(value))))
                 
         else:
             #No list was found...
@@ -197,14 +205,24 @@ class AttributeValueParser:
         
 def test(verbose=False):
     testValues = [
+		#Tested and working:
         ('',''),
         ('germany','germany'),
+        #Links:
         ('[[germany]]','germany'),
         ('[[confusingLink|germany]]','germany'),
         ('[[confusingLink|germany]] ister','germany ister'),
-        
-        #not yet working:
-        ('[[confusingLink | germany]] ister','germany ister'),
+        #Multiple links:
+        ('[[You should not see this|   Aber ]] [[confusingLink | Germany  ]] ist [[ geil    ]], [[da]]','Aber Germany ist geil, da'),
+        #Lists:
+        ('{{bulleted list |class=sdfsdf|list_style=adfsdf|style=asdfsdf|item_style=sdfsdf |item2_style=sdfsdf| We only need this |information }}', ['We only need this', 'information']),
+        ('{{flatlist|     class   =    asdfasd|style=      asdfsdfs|        indent   =asdfsdfsd|* [[cat]]* [[dog]]* [[horse]]* [[cow]]* [[sheep]]* [[pig]]}}', ['cat', 'dog', 'horse', 'cow', 'sheep', 'pig']),
+		('{{startflatlist}}* [[All]]* [[your]]* [[base]]* [[are]]* [[belong]]* [[to]]* [[us]]{{endflatlist}}', ['All','your','base','are','belong','to','us']),
+		('{{plainlist}}* [[These   ]]* [[not visible | wonky   ]]* [[lists]]* are   * [[hard]]* [[to]]* [[you cant see me|parse]]{{endplainlist}}',['These','wonky','lists','are','hard','to','parse']),
+		('{{plainlist|class=sdfsdf|style=border:solid 1px silver; background:lightyellow|indent=2|* [[congo]]* [[niger]]* [[zululand]]}}', ['congo', 'niger', 'zululand']),
+		('{{flowlist}}*   [[Mao Zedong]]*    [[Ho Chi Minh]]    * [[Lars Ohly]]     {{endflowlist}}', ['Mao Zedong','Ho Chi Minh','Lars Ohly']),
+		('{{flowlist |class  =asdfasdf |style  =asdas |* [[platypus]]   * [[iguana]]  *  [[zorse]]   }}',['platypus','iguana','zorse']),
+		('{{hlist|gondwanaland|   mu|  leng  |class     = class|style     = style|list_style  = style for ul tag|item_style  = style for all li tags|item1_style = style for first li tag |item2_style = style for second li tag |   atlantis   |indent    = indent for the list}}', ['gondwanaland', 'mu', 'leng', 'atlantis']),
     ]
 
     attributeValueParser = AttributeValueParser()
@@ -213,7 +231,7 @@ def test(verbose=False):
     print "attribute_value_parser.AttributeValueParser.parseAttributeValue()"
     
     for inValue, outValue in testValues:
-        parsedValue = attributeValueParser.parseAttributeValue(inValue)
+        parsedValue = attributeValueParser.parseAttributeValue(inValue, verbose)
         if verbose: print "%s -> %s" % (inValue, parsedValue)
         assert(parsedValue == outValue)
         
