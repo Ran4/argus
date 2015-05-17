@@ -43,7 +43,7 @@ def saveFiles(cleanedKeysCounter, cleanedInfoBoxList,
                 outputFileName)
         
 def cleanInfoBoxList(attributeKeyParser, infoBoxList, verbose):
-    if verbose: print "Starts cleaning up InfoBox data..."
+    if verbose: print "\nStarts cleaning up InfoBox data..."
     cleanedInfoBoxList = []
     counter = collections.Counter({
             "ignored_new_keys":0,
@@ -52,7 +52,7 @@ def cleanInfoBoxList(attributeKeyParser, infoBoxList, verbose):
             "total_attributes":0,
             })
     cleanedKeysCounter = collections.Counter()
-    attributeValueParser = attribute_value_parser.AttributeValueParser()
+    attributeValueParser = attribute_value_parser.AttributeValueParser(verbose)
     for ib in infoBoxList:
         attributeDict = {}
         #ib is a dictionary, where the keys are attribute keys
@@ -144,9 +144,9 @@ def main():
         inputFileName = defaultInputFileName
         outputFileName = defaultOutputFileName
         outputKeysFileName = defaultOutputKeysFileName
-        print "Usage:"
+        print "Usage:",
         print "attribute_cleaner inputFileName outputFileName outputKeysFileName"
-        print "Default values:"
+        print "Default values:",
         print "attribute_cleaner {} {} {}".format(inputFileName,
                 outputFileName, outputKeysFileName)
         response = raw_input("Use default values (y/n)? ")
