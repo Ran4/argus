@@ -44,7 +44,7 @@ class InfoBox(object):
         
         self.isInArticleWithPersonBox = False
         
-        maxLength = 40
+        maxLength = 80
         if len(self.infoBoxType) > maxLength:
             #There might be a problem since the type string is so long!
             self.handleLongInfoBoxType(maxLength, verbose=True)
@@ -56,17 +56,8 @@ class InfoBox(object):
         tempStringList = []
         isInWikiList = False
         for i, line in enumerate(infoBoxStringList):
-            
-            #~ if verbose:
-                #~ print i, line
-            
             numCurlyBracesInLine = line.count("{{") + line.count("}}") 
 
-            """if i is the last position and numCurlyBracesInLine is even OR
-            if is is NOT in the last position and numCurlyBracesInLine is uneven
-
-            numCurlyBracesInLine % 2 != (i == len(infoBoxStringList)-1 )
-            """
             #TODO: These variables keep track if the current line ends or begins one of these Wikilist environments.
             #       We might need to have booleans tracking if we are inside such an enviroment, if it turns out that
             #       ordinary list environment-lines often begin with non-separator characters.
@@ -159,7 +150,7 @@ class InfoBox(object):
 		#TODO: Will this always be displayed if verbose,
                 #    even if nothing has been cut off?
         if verbose:
-            print "Cutoff after first '|' or '&lt;' gives new infoBoxType: '%s'"%\
+            print "  cutoff after first '|' or '&lt;' gives new infoBoxType: '%s'"%\
                 self.infoBoxType
             
     def __str__(self):
@@ -226,7 +217,7 @@ class InfoBox(object):
             d["isFirstInArticleWithPersonBox"] = "0"
             
         if indent is None:
-            return json.dumps(d, indent=4)
+            return json.dumps(d, indent=2)
         else:
             return json.dumps(d, indent=indent)
     
@@ -266,7 +257,7 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
         atLine += 1
         
         #TODO: What is mediawiki??????
-        #if line == "</mediawiki>":
+        #Found end of the mediawiki xml
         if line.strip().startswith("</mediawiki>"):
             print "</mediawiki> found at line %s (tell=%s), filereading stops"\
                 % (atLine, f.tell())
@@ -324,7 +315,7 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
         # End of handle <page>
         ####################
         
-        if "</page>" in line: #end of an article
+        if "</page>" in line: #Reached end of an article
             record = False
             numArticlesFound += 1
             infoBoxNumber = 0 
@@ -347,11 +338,10 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
     print "Successfully finished parsing the entire Wikipedia!"
         
 def handleInfoBoxes(ibList, outputFileName):
-    #~ print "#"*50 + "\nIn handleInfoBoxes\n" + "#"*50
-    
+    """Takes a list of infoboxes and writes them to file
+    if they might be persons
+    """
     for ib in ibList:
-        #infoBoxTypeCounter[ib.infoBoxType] += 1
-        
         if (ib.isInArticleWithPersonBox and ib.countInArticle == 0) or\
                 "person" in ib.infoBoxType:
             writeToFile(ib.getJSON(indent=2)+",\n", outputFileName,
@@ -362,9 +352,9 @@ def main():
     if len(sys.argv) == 2+1:
         filePath = sys.argv[1]
         outputFileName = sys.argv[2]
-        #outputFileName = "ibs_person_raw.json"
     else:
         print "Usage: xmlwikiparser2 inputXMLFileName outputJSONFileName"
+        sys.exit()
 #~         fileName = "enwiki-20150304-pages-articles-multistream.xml"
 #~         filePath = "C:\\ovrigt\\ovrigt\\wp\\" + fileName
 #~         outputFileName = "ibs_person_raw.json"
@@ -415,19 +405,6 @@ def main():
                 
                 writeToFile(dateStr + s + "\n")
                 print(s)
-            
-            
-            #just showing some statistics on most common infoBoxTypes after 
-            #we've gotten some progress
-            """
-            if articlesGotten == 105000: #ibsGotten == 285000:
-                items = infoBoxTypeCounter.items()
-                items.sort(key=lambda x: x[1], reverse=True)
-                
-                for item in items:
-                    if "person" in item[0]:
-                    print item[1], item[0]
-            """
                 
         except StopIteration:
             print "StopIteration reached!"
