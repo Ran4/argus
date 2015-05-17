@@ -44,16 +44,6 @@ class InfoBox(object):
         
         self.isInArticleWithPersonBox = False
         
-        """
-        if "lincoln" in articleTitle and "abraham" in articleTitle:
-            print "in InfoBox.__init__ of title=%s" % articleTitle
-            print "infoBoxStringList:", self.infoBoxStringList
-            
-            print "JSON:"
-            print self.getJSON()
-            print "\n"*2
-        """    
-        
         maxLength = 40
         if len(self.infoBoxType) > maxLength:
             #There might be a problem since the type string is so long!
@@ -328,14 +318,6 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
                         infoBoxNumber)
                 infoBoxList.append(ib)
                 
-                #~ if "lincoln" in title:
-                #~     print "infoBoxList:"
-                #~     #print recordInfoBoxList
-                #~     print
-                #~     print "JSON:"
-                #~     #print ib.getJSON(indent=4)
-                #~     exit()
-                
                 recordInfoBoxList = []
                 infoBoxNumber += 1
             
@@ -343,10 +325,6 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
         ####################
         
         if "</page>" in line: #end of an article
-            
-            #~ print "#"*50 + "\nFound </page> at line %s\n" % atLine,
-            #~ print "#"*50
-            
             record = False
             numArticlesFound += 1
             infoBoxNumber = 0 
@@ -376,29 +354,22 @@ def handleInfoBoxes(ibList, outputFileName):
         
         if (ib.isInArticleWithPersonBox and ib.countInArticle == 0) or\
                 "person" in ib.infoBoxType:
-            writeToFile(ib.getJSON(indent=2)+"\n", outputFileName,
+            writeToFile(ib.getJSON(indent=2)+",\n", outputFileName,
                     verbose=False)
-            
-            #print "Got articleInfoBox:"
-            #print ib.getJSON()
-            #print "\n"*2
         
-        
-        """
-        if "person" in ib.infoBoxType:
-            writeToFile("\n".join(ib.getTSVLines()), "output.tsv")
-        """
 
 def main():
-    if len(sys.argv) > 1:
+    if len(sys.argv) == 2+1:
         filePath = sys.argv[1]
+        outputFileName = sys.argv[2]
+        #outputFileName = "ibs_person_raw.json"
     else:
-        fileName = "enwiki-20150304-pages-articles-multistream.xml"
-        filePath = "C:\\ovrigt\\ovrigt\\wp\\" + fileName
+        print "Usage: xmlwikiparser2 inputXMLFileName outputJSONFileName"
+#~         fileName = "enwiki-20150304-pages-articles-multistream.xml"
+#~         filePath = "C:\\ovrigt\\ovrigt\\wp\\" + fileName
+#~         outputFileName = "ibs_person_raw.json"
         
     f = open(filePath)
-    
-    outputFileName = "ibs_person_raw.json"
     
     with open(logger.defaultFileName, "w") as logFile: #reset file
         logFile.write("")
@@ -468,6 +439,13 @@ def main():
                 (ibsGotten/dt)
             s += "\nJSON saved to file %s" % outputFileName
                 
+            #remove trailing , from the last JSON file
+            #file ends with '},\n]', change the third to last byte
+            dataFile = open(outputFileName, "r+b")
+            dataFile.seek(-2, 2) #change ',' to ' '
+            dataFile.write(" ")
+            print "Trailing ',' in %s fix applied" % outputFileName
+
             writeToFile("]", outputFileName) #finish the JSON string
             writeToFile(s)
             print(s)
