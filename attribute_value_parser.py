@@ -194,7 +194,7 @@ class AttributeValueParser:
                 returnList = filter(None, list(itertools.chain.from_iterable(self.patternToolbar.findall(value))))
             else:
 				if verbose:
-                    print '    list of unknown type found.'
+					print '    list of unknown type found.'
                     
 				returnList = ""
                 
