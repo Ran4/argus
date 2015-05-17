@@ -11,19 +11,22 @@ class AttributeValueParser:
         
         #Pattern for removing the "small" environment and replacing a <br />
         #directly before it, if there is one.
-        self.patternSmallEnv = re.compile("(?:<br(?:[ ]*)\/>)*\{\{(?:[ ]*)small(?:[ ]*)\|(.*?)\}\}")
+        self.patternSmallEnv = re.compile("(?:<br(?:[ ]*)(?:[\/]*)>)*\{\{(?:[ ]*)small(?:[ ]*)\|(?:[\']*)(.*?)(?:[\']*)\}\}")
         
         #Pattern for removing comments
         self.patternComment = re.compile(r"<!--(?:.*?)-->")
         
         #Pattern for removing references
-        self.patternReference = re.compile(r"<ref>(?:.*?)<\/ref>")
+        self.patternReference = re.compile(r"<ref>(?:.*?)<\/ref>|<ref(?:.*?)\/>")
+        
+        #Pattern for removing references of the type "(see: foobar)"
+        self.patternSeeRef = re.compile(r"(?: \- | \– |[ ])*\(see[ |\: ](?:.*?)\)")
         
         #Pattern for replacing nbsp with whitespaces
         self.patternNbsp = re.compile(r"&nbsp;|nbsp;")
         
         #Pattern for replacing <br />
-        self.patternBr = re.compile("\<br[ ]*\/\>")
+        self.patternBr = re.compile("\<br[ ]*(?:[\/]*)\>")
 		
         #Pattern for getting b from [[a|b]]
         self.patternPipeLink = re.compile(r"\[\[(?:[ ]*)(?:[^\]]*?)(?:[ ]*)\|(?:[ ]*)(.*?)(?:[ ]*)\]\]")
@@ -31,8 +34,8 @@ class AttributeValueParser:
         #Pattern for getting a from [[a]]
         self.patternLink = re.compile(r'\[\[(?:[ ]*)(.*?)(?:[ ]*)\]\]')
         
-        #Pattern for removing the "Longitem" or "nowrap" environment
-        self.patternLongitem = re.compile(r'\{\{(?:[ ]*)(?:longitem|nowrap)(?:[ ]*)\|(?:(?:(?:[ ]*)(?:style|padding|line-height)(?:[^\|]+?)\|)*)(?:[ ]*)(.*?)(?:[ ]*)\}\}')
+        #Pattern for removing the "Longitem", "bigger" or "nowrap" environments
+        self.patternLongitem = re.compile(r'\{\{(?:[ ]*)(?:longitem|nowrap|bigger)(?:[ ]*)\|(?:(?:(?:[ ]*)(?:style|padding|line-height)(?:[^\|]+?)\|)*)(?:[ ]*)(.*?)(?:[ ]*)\}\}')
         
         #Pattern for getting list name from {{list name| or {{list name}}
         self.patternList = re.compile(r'\{\{([^|]+?)(?:[ ]*)(?:\||\})')
@@ -120,6 +123,7 @@ class AttributeValueParser:
         #TODO: birthdate environment (Ex: {{birth date|1809|2|12}})
         #TODO: death date and age environment (Ex: {{death date and age|1865|4|15|1809|2|12}})
         #		Output should be in format: 29 December 1986 (aged 54)
+        #TODO: convert environment (Ex: {{convert|550|ft|m|0}})
         
 		#Remove all "cref" environments
         if verbose:
@@ -140,10 +144,6 @@ class AttributeValueParser:
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
-        
-        #Replace all remaining <br /> and similar with whitespaces
-        #TODO: We probably should return all remaining values separated by
-        #<br /> or <br/> as a list...
         
         #Removes all nbsps
         if verbose:
@@ -177,6 +177,15 @@ class AttributeValueParser:
 		    print "Entering removal of references."
 		    print "    Value before was: '%s'" % str(value)
         value = self.patternReference.sub(r"", value)
+        
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
+        
+		#Remove all references of the type "(see: foobar)"
+        if verbose:
+		    print "Entering removal of references of type '(see: foo)'."
+		    print "    Value before was: '%s'" % str(value)
+        value = self.patternSeeRef.sub(r"", value)
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
@@ -239,7 +248,7 @@ class AttributeValueParser:
                 #Returns a list of tuples with all matches, where each group corresponds to one tuple.
                 returnList = filter(None, list(itertools.chain.from_iterable(self.patternBulletedList.findall(value))))
                 
-            elif listType == "flatlist":
+            elif listType == "flatlist" or listType == "flat list":
                 if verbose:
                     print '    "flatlist" detected.'
                 #Note: We do NOT need to have a subcase for endflatlist environment, since that is initiated by {{startflatlist}}
@@ -252,7 +261,7 @@ class AttributeValueParser:
                 #Returns a list of tuples with all matches, where each group corresponds to one tuple.
                 returnList = filter(None, list(itertools.chain.from_iterable(self.patternStartflatlist.findall(value))))
                 
-            elif listType == "plainlist":
+            elif listType == "plainlist" or listType == "plain list":
                 if verbose:
                     print '    some type of plainlist detected...'
                 #A subcase for endplainlist environment:
@@ -266,7 +275,7 @@ class AttributeValueParser:
                         print '    "plainlist" detected.'
                 returnList = filter(None, list(itertools.chain.from_iterable(self.patternPlainlist.findall(value))))
             
-            elif listType == "flowlist":
+            elif listType == "flowlist" or listType == "flow list":
                 if verbose:
                     print '    some type of flowlist detected...'
                 #A subcase for endflowlist environment:
@@ -293,7 +302,7 @@ class AttributeValueParser:
                 #Returns a list of tuples with all matches, where each group corresponds to one tuple.
                 returnList = filter(None, list(itertools.chain.from_iterable(self.patternUnbulletedList.findall(value))))
                 
-            elif listType == "pagelist":
+            elif listType == "pagelist" or listType == "page list":
                 if verbose:
                     print '    "pagelist" detected.'
 
@@ -334,28 +343,28 @@ class AttributeValueParser:
 					print "Returning '%s'" % str(value)
 				value = filter(None, self.patternBr.split(value))
             else:
-				if verbose:
-						print 'No list was found in attribute value.'
-						print "Returning '%s'" % str(value)
+                if verbose:
+                    print 'No list was found in attribute value.'
+                    print "Returning '%s'" % str(value)
             return value
         
         
 def test(verbose=False):
     testValues = [
-		#Tested and working:
-        ('',''),
-        ('germany','germany'),
-        #Links:
-        ('[[germany]]','germany'),
-        ('[[confusingLink|germany]]','germany'),
-        ('[[confusingLink|germany]] sister','germany sister'),
-        #Multiple links:
-        ('[[You should not see this|   Aber ]] [[confusingLink | Germany  ]] ist [[ geil    ]], [[da]]','Aber Germany ist geil, da'),
-        #Longitem environment:
-        ('{{longitem|virtually all subsequent [[western philosophy]], [[christian philosophy]] and pre-[[age of enlightenment|enlightenment]] science; also much [[islamic philosophy|islamic]] and [[jewish philosophy]] (see [[list of writers influenced by aristotle]])}}', 'virtually all subsequent western philosophy, christian philosophy and pre-enlightenment science; also much islamic and jewish philosophy (see list of writers influenced by aristotle)'),
-        #Lists:
-        ('{{bulleted list |class=sdfsdf|list_style=adfsdf|style=asdfsdf|item_style=sdfsdf |item2_style=sdfsdf| We only need this |information }}', ['We only need this', 'information']),
-        ('{{flatlist|     class   =    asdfasd|style=      asdfsdfs|        indent   =asdfsdfsd|* [[cat]]* [[dog]]* [[horse]]* [[cow]]* [[sheep]]* [[pig]]}}', ['cat', 'dog', 'horse', 'cow', 'sheep', 'pig']),
+		#Trivial:
+		('',''),
+		('germany','germany'),
+		#Links:
+		('[[germany]]','germany'),
+		('[[confusingLink|germany]]','germany'),
+		('[[confusingLink|germany]] sister','germany sister'),
+		#Multiple links:
+		('[[You should not see this|   Aber ]] [[confusingLink | Germany  ]] ist [[ geil    ]], [[da]]','Aber Germany ist geil, da'),
+		#Longitem environment:
+		('{{longitem|virtually all subsequent [[western philosophy]], [[christian philosophy]] and pre-[[age of enlightenment|enlightenment]] science; also much [[islamic philosophy|islamic]] and [[jewish philosophy]] (see [[list of writers influenced by aristotle]])}}', 'virtually all subsequent western philosophy, christian philosophy and pre-enlightenment science; also much islamic and jewish philosophy (see list of writers influenced by aristotle)'),
+		#Lists:
+		('{{bulleted list |class=sdfsdf|list_style=adfsdf|style=asdfsdf|item_style=sdfsdf |item2_style=sdfsdf| We only need this |information }}', ['We only need this', 'information']),
+		('{{flatlist|     class   =    asdfasd|style=      asdfsdfs|        indent   =asdfsdfsd|* [[cat]]* [[dog]]* [[horse]]* [[cow]]* [[sheep]]* [[pig]]}}', ['cat', 'dog', 'horse', 'cow', 'sheep', 'pig']),
 		('{{startflatlist}}* [[All]]* [[your]]* [[base]]* [[are]]* [[belong]]* [[to]]* [[us]]{{endflatlist}}', ['All','your','base','are','belong','to','us']),
 		#('{{plainlist}}* [[These   ]]* [[not visible | wonky   ]]* [[lists]]* are   * [[hard]]* [[to]]* [[you cant see me|parse]]{{endplainlist}}',['These','wonky','lists','are','hard','to','parse']),
 		('{{plainlist|class=sdfsdf|style=border:solid 1px silver; background:lightyellow|indent=2|* [[congo]]* [[niger]]* [[zululand]]}}', ['congo', 'niger', 'zululand']),
