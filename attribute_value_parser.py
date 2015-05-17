@@ -50,8 +50,6 @@ class AttributeValueParser:
         #Pattern for getting entries from a "toolbar"
         self.patternToolbar = re.compile("^\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)separator(?:[ ]*)=(?:.*?)(?=\}\}|\|)|\|(?:[ ]*)(.*?)(?:[ ]*)(?=\|)|\|(?:[ ]*)([^\|]*?)(?:[ ]*)\}\}$")
     
-    #def printMessage(self, x):
-	#	print x
                       
     def parseAttributeValue(self, value, verbose=False, logFileName=None):
         """Takes an attribute value as a string in un-edited wikiUML format 
@@ -194,6 +192,11 @@ class AttributeValueParser:
 
                 #Returns a list of tuples with all matches, where each group corresponds to one tuple.
                 returnList = filter(None, list(itertools.chain.from_iterable(self.patternToolbar.findall(value))))
+            else:
+				if verbose:
+					print '    list of unknown type found.'
+                    
+				returnList = ""
                 
             if verbose:
 				print "Returning: %s" % str(returnList)
