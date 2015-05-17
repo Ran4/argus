@@ -1,5 +1,7 @@
 import re
 
+from termcolor import colored
+
 class AttributeKeyParser:
     """Class that is used to clean keys
     """
@@ -54,7 +56,7 @@ def test(verbose=False):
             "date_of birth",
             ]
 
-    outValues = ["dateofbirth"
+    outValues = ["dateofbirth",
             "birthdate",
             "birthdate",
             "birthdate",
@@ -62,12 +64,17 @@ def test(verbose=False):
             ]
    
     for inValue, outValue in zip(inValues, outValues):
+        retValue = attributeKeyParser.findNewKey(inValue)
+        
         if verbose:
-            print inValue
-            print "->"
-            print outValue
+            print "'" + inValue + "'"
+            if retValue == outValue:
+                print "->"
+            else:
+                print colored("-> ERROR! Should be '%s'" % outValue, "magenta")
+            print "'" + outValue + "'"
             print
-        assert(attributeKeyParser.findNewKey(inValue) == outValue)
+        assert(retValue == outValue)
     
     
     print "Successfully tested AttributeKeyParser.findNewKey"

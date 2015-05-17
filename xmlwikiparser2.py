@@ -4,6 +4,7 @@ from pprint import pprint as pp
 from collections import Counter
 import json
 
+from termcolor import colored
 import logger
 from logger import writeToFile
 
@@ -505,7 +506,8 @@ def testFixWikiLists(verbose=False):
             print
         assert(retValue == outValue)
     
-    print "Successfully tested xmlwikiparser2.InfoBox.fixWikiLists()"
+    print colored("Successfully tested xmlwikiparser2.InfoBox.fixWikiLists()",
+            "green")
 
 if __name__ == "__main__":
     main()
