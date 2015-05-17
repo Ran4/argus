@@ -255,7 +255,7 @@ public class java_key_cleaner{
 			try{
 				FileWriter fw = new FileWriter("debug/attribute_changes.txt");
 				BufferedWriter out = new BufferedWriter(fw);
-				out.write("A total of "+translate.size()+" keys where changed due to misspellings or formatting errors");
+				out.write("#A total of "+translate.size()+" keys where changed due to misspellings or formatting errors");
 				out.newLine();
 				int numOfChangesInJSON = 0;
 				for(int i=0;i<wordNum;i++){
@@ -263,7 +263,7 @@ public class java_key_cleaner{
 						numOfChangesInJSON+=numOcc[i];
 					}
 				}
-				out.write("A total of "+numOfChangesInJSON+" keys in the JSON file was corrected.\nThese words changed where the following:");
+				out.write("#A total of "+numOfChangesInJSON+" keys in the JSON file was corrected.\n#These words changed where the following:");
 				out.newLine();
 				out.write("#NUM_WORDS_CHANGED="+translate.size());
 				out.newLine();
