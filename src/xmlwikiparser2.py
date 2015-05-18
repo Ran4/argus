@@ -434,6 +434,7 @@ def main():
             dataFile = open(outputFileName, "r+b")
             dataFile.seek(-2, 2) #change ',' to ' '
             dataFile.write(" ")
+            dataFile.close()
             print "Trailing ',' in %s fix applied" % outputFileName
 
             writeToFile("]", outputFileName) #finish the JSON string
