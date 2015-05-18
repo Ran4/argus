@@ -28,11 +28,14 @@ class AttributeValueParser:
         #TODO: Pattern for creating dot-separated lists
         self.patternDot = re.compile(u"\{\{\u00b7\}\}")
         
+        #Pattern for removing {{*}}
+        self.patternCBDot = re.compile("\{\{\*\}\}")
+        
         #Pattern for removing cref and contents
         self.patternCref = re.compile(r"\{\{cref[^\}]*?(?:\}\}\}\}\}|\}\}(?!\}))")
         
-        #Pattern for removing sfn and sfnp
-        self.patternSfn = re.compile(r"\{\{sfn(?:.*?)\}\}")
+        #Pattern for removing sfn, refn and sfnp
+        self.patternSfn = re.compile(r"\{\{(?:sfn|refn)(?:.*?)\}\}")
         
         #Pattern for removing the "small" environment and replacing a <br />
         #directly before it, if there is one.
@@ -164,7 +167,7 @@ class AttributeValueParser:
             
         #The whole entry could be an image: ignore these before trying to parse
         #TODO: Might better be contains, not endswith???
-        if any([value.endswith(fileExt) for fileExt in (".svg")]):
+        if any([value.endswith(fileExt) for fileExt in (".svg",)]):
             if verbose:
                 print "File extension found - attribute value", value, "was purged from records."
             return ""
@@ -175,6 +178,15 @@ class AttributeValueParser:
         #TODO: death date and age environment (Ex: {{death date and age|1865|4|15|1809|2|12}})
         #        Output should be in format: 29 December 1986 (aged 54)
         #TODO: convert environment (Ex: {{convert|550|ft|m|0}})
+        
+        #Removes the {{*}} stuff
+        if verbose:
+            print "Entering removal of {{*}}."
+            print "    Value before was: '%s'" % str(value)
+        value = self.patternCBDot.sub(r"", value)
+        
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
         
         #Remove all "cref" environments
         if verbose:
@@ -457,7 +469,7 @@ class AttributeValueParser:
                 #Returns a list of tuples with all matches, where each group corresponds to one tuple.
                 returnList = filter(None, list(itertools.chain.from_iterable(self.patternHlist.findall(value))))
                 
-            elif listType == "unbulleted list":
+            elif listType == "unbulleted list" or listType == "ublist":
                 if verbose:
                     print '    "unbulleted list" detected.'
 
@@ -553,6 +565,7 @@ def test(verbose=False):
         ('germany','germany'),
         #Links:
         ('[[germany]]','germany'),
+        ('michael bloomberg','michael bloomberg'),
         ('[[confusingLink|germany]]','germany'),
         ('[[confusingLink|germany]] sister','germany sister'),
         #Multiple links:

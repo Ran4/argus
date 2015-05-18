@@ -290,6 +290,7 @@ public class java_key_cleaner{
 			FileWriter fw = new FileWriter(outfile);
 			BufferedWriter out = new BufferedWriter(fw);
 			for(int i=0;i<wordNum;i++){
+				voc[i] = voc[i].replace("-","_");
 				out.write(orgVoc[i]+"\t"+voc[i]);
 				out.newLine();
 			}
