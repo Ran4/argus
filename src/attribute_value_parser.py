@@ -585,13 +585,14 @@ class AttributeValueParser:
                             print colored("WARNING: Fixing of list entries has failed.", "magenta")
                 
                 #Try to concatenate all elements enclosed in parantheses to the previous element
-                newReturnList = [returnList[0]]
-                for i, element in enumerate(returnList[1:]):
-                    if self.patternEnclosedByParentheses.match(element):
-                        newReturnList[-1] += element
-                    else:
-                        newReturnList.append(element)
-                returnList = newReturnList
+                if len(returnList) > 1:
+                    newReturnList = [returnList[0]]
+                    for i, element in enumerate(returnList[1:]):
+                        if self.patternEnclosedByParentheses.match(element):
+                            newReturnList[-1] += element
+                        else:
+                            newReturnList.append(element)
+                    returnList = newReturnList
             if verbose:
                 print "Returning: %s" % str(returnList)   
             return returnList
