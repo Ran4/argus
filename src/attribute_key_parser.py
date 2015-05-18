@@ -58,12 +58,19 @@ class AttributeKeyParser:
             exit()
         
         if verbose: print "Loaded translation dictionary from file"
+        
+        #Ignore these keys completely
+        self.ignoredKeys = ["image", "alt", "caption", "image_size",
+            "footnotes", "background", "module", "bgcolor",]
 
     def findNewKey(self, key, verbose=False):
         """Takes a key as a string, and changes it to be more generic
         E.g. "date of birth" -> "birthdate"
         """
         newKey = key
+        
+        if key in self.ignoredKeys:
+            return ""
         
         if key in self.translationDict:
             newKey = self.translationDict[key]
