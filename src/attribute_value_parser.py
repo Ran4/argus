@@ -25,8 +25,11 @@ class AttributeValueParser:
         #Pattern for removing <small> and </small>
         self.patternSmall = re.compile(r"\<[\/]*small\>")
         
-        #TODO: Pattern for creating dot-separated lists
-        self.patternDot = re.compile(u"\{\{\u00b7\}\}")
+        #Pattern for creating dot-separated lists
+        self.patternDot = re.compile(u"\{\{\xB7\}\}")
+        
+        #Pattern for tidying up list entries
+        self.patternFixListEntries = re.compile("^[ ]*(.*?)[\, ]*$")
         
         #Pattern for removing {{*}}
         self.patternCBDot = re.compile("\{\{(?:\*|ndash|mdash|spaced ndash)\}\}")
@@ -72,8 +75,14 @@ class AttributeValueParser:
         #Pattern for seeing if string ends with }}
         self.patternCurlyBrackets = re.compile(r"\}\}$")
         
+        #Pattern for seeing if string starts with #
+        self.patternStartsWithSquare = re.compile(r"^\#")
+        
+        #Pattern for getting everything on the right of the first pipe
+        self.patternRightOfPipe = re.compile(r"\|(?:.*)")
+        
         #Pattern for replacing <br />
-        self.patternBr = re.compile("\<br[ ]*(?:[\/]*)\>")
+        self.patternBr = re.compile("\<br[ ]*(?:[\/]*)[ ]*\>")
         
         #Pattern for replacing unicode hyphens
         self.patternHyphen = re.compile(u"\\u2013")
@@ -553,18 +562,47 @@ class AttributeValueParser:
                 returnList = filter(None, list(itertools.chain.from_iterable(self.patternToolbar.findall(value))))
             else:
                 if verbose:
-                    print '    ERROR: List of unknown type found.'
-                    
+                    print colored("WARNING: List of unknown type found!", "magenta")  
                 returnList = ""
                 
+            #Fix list entries as needed
+            if returnList != "":
+                assert(isinstance(returnList, list))
+                if verbose:
+                    print '    Fixing list entries...'  
+                for string in returnList:
+                    match = self.patternFixListEntries.match(string)
+                    if match:
+                        string = match.group(1)
+                    else:
+                        if verbose:
+                            print colored("WARNING: Fixing of list entries has failed.", "magenta")  
+                    
             if verbose:
-                print "Returning: %s" % str(returnList)
+                print "Returning: %s" % str(returnList)   
             return returnList
                 
         else:
             #No list was found... Check if the attribute value is
             #<br />-separated or dot ({{.}})-separated. If that is the case, split it using that as a
             #separator. Otherwise, return the value as it is.
+            
+            
+            #Remove everything on the right of first pipe, to compensate for bad Wikipedia formatting
+            if verbose:
+                print "Entering removal of right-of-pipe elements."
+                print "    Value before was: '%s'" % str(value)
+            value = self.patternRightOfPipe.sub(r"", value)
+            if verbose:
+                print "    Value after became: '%s'" % str(value)
+
+            #Delete the entry if it starts with a #
+            if verbose:
+                print "Entering removal of #-prepended entries"
+                print "    Value before was: '%s'" % str(value)
+            value = self.patternStartsWithSquare.sub(r"", value)
+            if verbose:
+                print "    Value after became: '%s'" % str(value)
             
             #Remove eventual curly brackets at end
             if verbose:
@@ -602,11 +640,11 @@ def test(verbose=False):
         if (isinstance(inValue, str) or isinstance(inValue, unicode)) \
                 and (isinstance(outValue, str), isinstance(outValue, unicode)):
             if len(inValue) != len(outValue):
-                print colored("Mismatching length!", "magenta")
+                print colored("WARNING: Mismatching length!", "magenta")
             else:
                 for i in range(len(inValue)):
                     if inValue[i] != outValue[i]:
-                        print colored("Mismatching character '%s' != '%s' at position %s" % \
+                        print colored("WARNING: Mismatching character '%s' != '%s' at position %s" % \
                             (inValue[i], outValue[i], i),
                             "magenta")
         #else: #TODO: add per-character check for lists too...
