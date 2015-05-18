@@ -12,7 +12,8 @@ def saveKeyCounterToFile(keyCounter, fileName, verbose):
     if verbose: print "Trying to save attribute keys to file..."
     keyAndCount = sorted(keyCounter.items(),
         key=lambda x: x[1], reverse=True)
-    keyAndCountToStringFunction = lambda x: str(x[1]) + " " + x[0].encode("utf-8")
+    keyAndCountToStringFunction = lambda x: \
+        str(x[1]) + " " + x[0].encode("utf-8")
     keyCountString = "\n".join(map(keyAndCountToStringFunction, keyAndCount))
     try:
         with open(fileName, "w") as f:
@@ -110,6 +111,9 @@ def getKeyCounter(infoBoxList):
     keyCounter = collections.Counter()
     for ib in infoBoxList:
         for key in ib:
+            #TODO: remove this, this is already done in xmlwikiparser2.py
+            if "\t" in key:
+                key = key.replace("\t", "")
             keyCounter[key] += 1
 
     return keyCounter
@@ -127,6 +131,9 @@ def clean(inputFileName, outputFileName, outputKeysFileName,
     
     infoBoxList = loadInfoBoxList(inputFileName, verbose)
     keyCounter = getKeyCounter(infoBoxList)
+    
+    assert(all(["\t" not in key for key in keyCounter.keys()]))
+    
     keyTranslationFileName = os.path.abspath("../raw_output/attribute_keys_raw.txt")
     saveKeyCounterToFile(keyCounter, keyTranslationFileName, verbose)
     attributeKeyParser = attribute_key_parser.AttributeKeyParser(

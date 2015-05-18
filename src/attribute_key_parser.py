@@ -1,8 +1,9 @@
 #!/usr/bin/env python2
 import re
+import os
 
 from termcolor import colored
-import os
+import logger
 
 class AttributeKeyParser:
     """Class that is used to clean keys
@@ -19,6 +20,13 @@ class AttributeKeyParser:
         #Calls Java code
         cleanedKeysFileName = os.path.abspath(
                 "../output/attribute_keys_cleaned.txt")
+        self.warningLogMessageFileName = os.path.abspath(
+                "../logs/attributekeyparser_warnings.log")
+        
+        #Clear log file
+        with open(self.warningLogMessageFileName, "w") as f:
+            f.write("")
+        
         try:
             cmd = "java java_key_cleaner %s %s" % \
                     (keyTranslationFileName, cleanedKeysFileName)
@@ -40,10 +48,8 @@ class AttributeKeyParser:
         try:
             with open(cleanedKeysFileName) as f:
                 for line in f:
-                    raw, cleaned = line.split("\t")
+                    raw, cleaned = line.strip().split("\t")
                     self.translationDict[raw] = cleaned
-                    
-                    #print "lol opened cleanedKeysFileName, got cleaned=", cleaned.strip()
         except:
             print colored("Problem reading list of cleaned keys from file",
                     "yellow")
@@ -60,8 +66,13 @@ class AttributeKeyParser:
         if key in self.translationDict:
             newKey = self.translationDict[key]
         else:
-            print colored("WARNING: %s not found in translation dict" % key,
-                "magenta")
+            if key == "":
+                return ""
+            warningMessage = "WARNING: '%s' not found in translation dict" % key
+            print colored(warningMessage, "magenta")
+            
+            logger.writeToFile((warningMessage+"\n").encode("utf8"),
+                    self.warningLogMessageFileName, timeStamp=True)
         
         assert(isinstance(newKey, unicode) or isinstance(newKey, str))
         

@@ -1,10 +1,15 @@
+import time
 defaultFileName = "../logs/log.log"
 
-def writeToFile(s, fileName=defaultFileName, verbose=False):
+def writeToFile(s, fileName=defaultFileName, verbose=False,
+        timeStamp=False):
     """Appends a string s to a file...
     """
     try:
         with open(fileName, "a") as logFile:
+            if timeStamp:
+                timeStampString = time.strftime("%y%m%d_%H:%M.%S ")
+                logFile.write(timeStampString)
             logFile.write(s)
             
         if verbose:
