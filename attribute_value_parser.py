@@ -53,10 +53,10 @@ class AttributeValueParser:
         #Pattern for removing the "Longitem", "bigger" or "nowrap" environments
         self.patternLongitem = re.compile(r'\{\{(?:[ ]*)(?:longitem|nowrap|bigger)(?:[ ]*)\|(?:(?:(?:[ ]*)(?:style|padding|line-height)(?:[^\|]+?)\|)*)(?:[ ]*)(.*?)(?:[ ]*)\}\}')
         
-        #Gets date of birth out of a "birth date and age environment" (and not from a date of birth environment)
+        #Gets date of birth out of a "birth date and age" environment (and NOT from a "birth date" environment)
         self.patternBda = re.compile('\{\{(?:birth date and age|bda)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*)')
         
-        #Gets date of birth out of a "birth date and age environment" (and not from a date of birth environment)
+        #Gets date of birth out of a "birth date" environment
         self.patternDob = re.compile('\{\{(?:birth date|dob)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*)')
         
         #Pattern for getting list name from {{list name| or {{list name}}
@@ -175,7 +175,8 @@ class AttributeValueParser:
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
-		#Replaces the various birthdate environments (Ex: {{birth date|1809|2|12}})
+		#Replaces some birthdate environments (Ex: {{birth date|1809|2|12}})
+		#TODO: Handle more environments: http://en.wikipedia.org/wiki/Template:Birth_date
 		#with plain text describing the same thing.
 		#If the person in question is living, you get their age as well.
 		if verbose:
