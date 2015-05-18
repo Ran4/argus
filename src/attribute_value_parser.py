@@ -1,25 +1,28 @@
 import re
 import itertools
 from datetime import date
+
+from termcolor import colored
+
 class AttributeValueParser:
     def __init__(self, verbose=False):
-		
-		#For parsing date environments
+        
+        #For parsing date environments
         self.months = {1 : "January",
             2 : "February",
-			3 : "March",
-			4 : "April",
-			5 : "May",
-			6 : "June",
-			7 : "July",
-			8 : "August",
-			9 : "September",
-			10 : "October",
-			11 : "November",
-			12 : "December",
-		}
-		
-		#Pattern for removing <small> and </small>
+            3 : "March",
+            4 : "April",
+            5 : "May",
+            6 : "June",
+            7 : "July",
+            8 : "August",
+            9 : "September",
+            10 : "October",
+            11 : "November",
+            12 : "December",
+        }
+        
+        #Pattern for removing <small> and </small>
         self.patternSmall = re.compile(r"\<[\/]*small\>")
         
         #Pattern for removing cref and contents
@@ -36,14 +39,14 @@ class AttributeValueParser:
         self.patternReference = re.compile(r"<ref>(?:.*?)<\/ref>|<ref(?:.*?)\/>")
         
         #Pattern for removing references of the type "(see: foobar)"
-        self.patternSeeRef = re.compile(r"(?: \- | \– |[ ])*\(see[ |\: ](?:.*?)\)")
+        self.patternSeeRef = re.compile(r"(?: \- |[ ])*\(see[ |\: ](?:.*?)\)")
         
         #Pattern for replacing nbsp with whitespaces
         self.patternNbsp = re.compile(r"&nbsp;|nbsp;")
         
         #Pattern for replacing <br />
         self.patternBr = re.compile("\<br[ ]*(?:[\/]*)\>")
-		
+        
         #Pattern for getting b from [[a|b]]
         self.patternPipeLink = re.compile(r"\[\[(?:[ ]*)(?:[^\]]*?)(?:[ ]*)\|(?:[ ]*)(.*?)(?:[ ]*)\]\]")
         
@@ -62,8 +65,8 @@ class AttributeValueParser:
         #Pattern for getting list name from {{list name| or {{list name}}
         self.patternList = re.compile(r'\{\{([^|]+?)(?:[ ]*)(?:\||\})')
         
-		#TODO: Do lists starting with a {{tag}} have list attributes similar to
-		#other lists? In which format?
+        #TODO: Do lists starting with a {{tag}} have list attributes similar to
+        #other lists? In which format?
         
         #Pattern for getting entries from a "bulleted list"
         self.patternBulletedList = re.compile("^(?:\{\{(?:.*?))(?=\|)|\|(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)(.*?)(?:[ ]*)(?=\|)|\|(?:[ ]*)([^\|]*?)(?:[ ]*)\}\}$")
@@ -102,7 +105,7 @@ class AttributeValueParser:
         self.patternToolbar = re.compile("^\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)separator(?:[ ]*)=(?:.*?)(?=\}\}|\|)|\|(?:[ ]*)(.*?)(?:[ ]*)(?=\|)|\|(?:[ ]*)([^\|]*?)(?:[ ]*)\}\}$")
         
         if verbose:
-			print "AttributeValueParser has compiled all regex patterns"
+            print "AttributeValueParser has compiled all regex patterns"
     
                       
     def parseAttributeValue(self, value, verbose=False, logFileName=None):
@@ -128,10 +131,10 @@ class AttributeValueParser:
         parseAttributeValue(value) == ""
         """
         if verbose:
-			print "\nNew parse initiated."
-			
-		#TODO: Remove all linked images (Ex: [[File:Andrei Tarkovsky.jpg|240px]])
-			
+            print "\nNew parse initiated."
+            
+        #TODO: Remove all linked images (Ex: [[File:Andrei Tarkovsky.jpg|240px]])
+            
         #The whole entry could be an image: ignore these before trying to parse
         #TODO: Might better be contains, not endswith???
         if any([value.endswith(fileExt) for fileExt in (".svg")]):
@@ -143,24 +146,24 @@ class AttributeValueParser:
         value = value.replace("&lt;","<").replace("&gt;",">")
         
         #TODO: death date and age environment (Ex: {{death date and age|1865|4|15|1809|2|12}})
-        #		Output should be in format: 29 December 1986 (aged 54)
+        #        Output should be in format: 29 December 1986 (aged 54)
         #TODO: convert environment (Ex: {{convert|550|ft|m|0}})
         
-		#Remove all "cref" environments
+        #Remove all "cref" environments
         if verbose:
-		    print "Entering removal of cref environment and contents."
-		    print "    Value before was: '%s'" % str(value)
+            print "Entering removal of cref environment and contents."
+            print "    Value before was: '%s'" % str(value)
         value = self.patternCref.sub(r"", value)
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
-		#Remove all "small" environments (Ex: {{small|(April 21, 1832 – July 10, 1832)}})
-		#Plus, if these are preceeded by a <br />, this means that we should
-		#remove that break before creating a list out of break-separated values.
+        #Remove all "small" environments (Ex: {{small|(April 21, 1832 - July 10, 1832)}})
+        #Plus, if these are preceeded by a <br />, this means that we should
+        #remove that break before creating a list out of break-separated values.
         if verbose:
-		    print "Entering removal of 'small' environment, checking for preceding br-tags and replacing them with whitespace."
-		    print "    Value before was: '%s'" % str(value)
+            print "Entering removal of 'small' environment, checking for preceding br-tags and replacing them with whitespace."
+            print "    Value before was: '%s'" % str(value)
         value = self.patternSmallEnv.sub(r" \g<1>", value)
         
         if verbose:
@@ -168,70 +171,70 @@ class AttributeValueParser:
         
         #Removes all nbsps
         if verbose:
-		    print "Entering removal of nbsps."
-		    print "    Value before was: '%s'" % str(value)
+            print "Entering removal of nbsps."
+            print "    Value before was: '%s'" % str(value)
         value = self.patternNbsp.sub(r" ", value)
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
-		#Replaces some birthdate environments (Ex: {{birth date|1809|2|12}})
-		#TODO: Handle more environments: http://en.wikipedia.org/wiki/Template:Birth_date
-		#with plain text describing the same thing.
-		#If the person in question is living, you get their age as well.
-		if verbose:
-		    print "Entering parsing of birthdate environment."
-		    print "    Value before was: '%s'" % str(value)
-		match = self.patternBda.match(value)
-		if match:
-			if verbose:
-				print "        'Birthdate and age' environment detected."
-			#Calculate the person's age in years
-			today = date.today()
-			ageInYears = today.year - match.group(1) - ((today.month, today.day) < (match.group(2), match.group(3)))
-			#Replace match with a descriptive string
-			value = self.patternBda.sub(match.group(3) + " " + self.months[match.group(2)] + " " + match.group(1) + "(age " + ageInYears + ")", value) #Note: we assume that second group is a digit
-		else:
-			match = self.patternDob.match(value):
-			if match:
-				if verbose:
-					print "        'Date of birth' environment detected."
-				value = self.patternDob.sub(match.group(3) + " " + self.months[match.group(2)] + " " + match.group(1), value)
+        #Replaces some birthdate environments (Ex: {{birth date|1809|2|12}})
+        #TODO: Handle more environments: http://en.wikipedia.org/wiki/Template:Birth_date
+        #with plain text describing the same thing.
+        #If the person in question is living, you get their age as well.
+        if verbose:
+            print "Entering parsing of birthdate environment."
+            print "    Value before was: '%s'" % str(value)
+        match = self.patternBda.match(value)
+        if match:
+            if verbose:
+                print "        'Birthdate and age' environment detected."
+            #Calculate the person's age in years
+            today = date.today()
+            ageInYears = today.year - match.group(1) - ((today.month, today.day) < (match.group(2), match.group(3)))
+            #Replace match with a descriptive string
+            value = self.patternBda.sub(match.group(3) + " " + self.months[match.group(2)] + " " + match.group(1) + "(age " + ageInYears + ")", value) #Note: we assume that second group is a digit
+        else:
+            match = self.patternDob.match(value)
+            if match:
+                if verbose:
+                    print "        'Date of birth' environment detected."
+                value = self.patternDob.sub(match.group(3) + " " + self.months[match.group(2)] + " " + match.group(1), value)
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
-		#Remove all <small> tags
+        #Remove all <small> tags
         if verbose:
-		    print "Entering removal of <small> tags."
-		    print "    Value before was: '%s'" % str(value)
+            print "Entering removal of <small> tags."
+            print "    Value before was: '%s'" % str(value)
         value = self.patternSmall.sub(r"", value)
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
-		#Remove all comments
+        #Remove all comments
         if verbose:
-		    print "Entering removal of comments."
-		    print "    Value before was: '%s'" % str(value)
+            print "Entering removal of comments."
+            print "    Value before was: '%s'" % str(value)
         value = self.patternComment.sub(r"", value)
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
-		#Remove all references
+        #Remove all references
         if verbose:
-		    print "Entering removal of references."
-		    print "    Value before was: '%s'" % str(value)
+            print "Entering removal of references."
+            print "    Value before was: '%s'" % str(value)
         value = self.patternReference.sub(r"", value)
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
         
-		#Remove all references of the type "(see: foobar)"
+        #Remove all references of the type "(see: foobar)"
         if verbose:
-		    print "Entering removal of references of type '(see: foo)'."
-		    print "    Value before was: '%s'" % str(value)
+            print "Entering removal of references of type '(see: foo)'."
+            print "    Value before was: '%s'" % str(value)
         value = self.patternSeeRef.sub(r"", value)
         
         if verbose:
@@ -240,8 +243,8 @@ class AttributeValueParser:
         #Replace all Wiki article links in the string.
         #    Step 1: Stuff of the form [[blabla|derpderp]] should become derpderp
         if verbose:
-		    print "Entering link conversion of type 1 ([[a|b]])."
-		    print "    Value before was: '%s'" % str(value)
+            print "Entering link conversion of type 1 ([[a|b]])."
+            print "    Value before was: '%s'" % str(value)
         value = self.patternPipeLink.sub(r"\g<1>", value)
         
         if verbose:
@@ -279,13 +282,13 @@ class AttributeValueParser:
                 
             #Since we are in a list, we want to replace the <br />s with
             #whitespaces.
-			if verbose:
-				print "    Entering removal of <br />s, since we have discovered a list."
-				print "        Value before was: '%s'" % str(value)
-			value = self.patternBr.sub(r" ", value)
-			
-			if verbose:
-				print "        Value after became: '%s'" % str(value)
+            if verbose:
+                print "    Entering removal of <br />s, since we have discovered a list."
+                print "        Value before was: '%s'" % str(value)
+            value = self.patternBr.sub(r" ", value)
+            
+            if verbose:
+                print "        Value after became: '%s'" % str(value)
             
             #Now that we have obtained the list type, we want to do different things depending on which list type it is.
             if listType == "bulleted list":
@@ -370,13 +373,13 @@ class AttributeValueParser:
                 #Returns a list of tuples with all matches, where each group corresponds to one tuple.
                 returnList = filter(None, list(itertools.chain.from_iterable(self.patternToolbar.findall(value))))
             else:
-				if verbose:
-					print '    ERROR: List of unknown type found.'
+                if verbose:
+                    print '    ERROR: List of unknown type found.'
                     
-				returnList = ""
+                returnList = ""
                 
             if verbose:
-				print "Returning: %s" % str(returnList)
+                print "Returning: %s" % str(returnList)
             return returnList
                 
         else:
@@ -385,10 +388,10 @@ class AttributeValueParser:
             #separator. Otherwise, return the value as it is.
 
             if "<br />" in value:
-				if verbose:
-					print 'Attribute value is a list separated by <br />.'
-					print "Returning '%s'" % str(value)
-				value = filter(None, self.patternBr.split(value))
+                if verbose:
+                    print 'Attribute value is a list separated by <br />.'
+                    print "Returning '%s'" % str(value)
+                value = filter(None, self.patternBr.split(value))
             else:
                 if verbose:
                     print 'No list was found in attribute value.'
@@ -397,37 +400,54 @@ class AttributeValueParser:
         
         
 def test(verbose=False):
+    
+    def asserter(inValue, outValue):
+        if (isinstance(inValue, str) or isinstance(inValue, unicode)) \
+                and (isinstance(outValue, str), isinstance(outValue, unicode)):
+            if len(inValue) != len(outValue):
+                print colored("Mismatching length!", "magenta")
+            else:
+                for i in range(len(inValue)):
+                    if inValue[i] != outValue[i]:
+                        print colored("Mismatching character '%s' != '%s' at position %s" % \
+                            (inValue[i], outValue[i], i),
+                            "magenta")
+        #else: #TODO: add per-character check for lists too...
+        #    print colored("lolwhat, types=%s, %s" % (type(inValue), type(outValue)), "yellow")
+                            
+        assert(inValue == outValue)
+    
     testValues = [
-		#Trivial:
-		('',''),
-		('germany','germany'),
-		#Links:
-		('[[germany]]','germany'),
-		('[[confusingLink|germany]]','germany'),
-		('[[confusingLink|germany]] sister','germany sister'),
-		#Multiple links:
-		('[[You should not see this|   Aber ]] [[confusingLink | Germany  ]] ist [[ geil    ]], [[da]]','Aber Germany ist geil, da'),
-		#Longitem environment:
-		('{{longitem|virtually all subsequent [[western philosophy]], [[christian philosophy]] and pre-[[age of enlightenment|enlightenment]] science; also much [[islamic philosophy|islamic]] and [[jewish philosophy]] (see [[list of writers influenced by aristotle]])}}', 'virtually all subsequent western philosophy, christian philosophy and pre-enlightenment science; also much islamic and jewish philosophy (see list of writers influenced by aristotle)'),
-		#Lists:
-		('{{bulleted list |class=sdfsdf|list_style=adfsdf|style=asdfsdf|item_style=sdfsdf |item2_style=sdfsdf| We only need this |information }}', ['We only need this', 'information']),
-		('{{flatlist|     class   =    asdfasd|style=      asdfsdfs|        indent   =asdfsdfsd|* [[cat]]* [[dog]]* [[horse]]* [[cow]]* [[sheep]]* [[pig]]}}', ['cat', 'dog', 'horse', 'cow', 'sheep', 'pig']),
-		('{{startflatlist}}* [[All]]* [[your]]* [[base]]* [[are]]* [[belong]]* [[to]]* [[us]]{{endflatlist}}', ['All','your','base','are','belong','to','us']),
-		#('{{plainlist}}* [[These   ]]* [[not visible | wonky   ]]* [[lists]]* are   * [[hard]]* [[to]]* [[you cant see me|parse]]{{endplainlist}}',['These','wonky','lists','are','hard','to','parse']),
-		('{{plainlist|class=sdfsdf|style=border:solid 1px silver; background:lightyellow|indent=2|* [[congo]]* [[niger]]* [[zululand]]}}', ['congo', 'niger', 'zululand']),
-		('{{flowlist}}*   [[Mao Zedong]]*    [[Ho Chi Minh]]    * [[Lars Ohly]]     {{endflowlist}}', ['Mao Zedong','Ho Chi Minh','Lars Ohly']),
-		('{{flowlist |class  =asdfasdf |style  =asdas |* [[platypus]]   * [[iguana]]  *  [[zorse]]   }}',['platypus','iguana','zorse']),
-		('{{hlist|gondwanaland|   mu|  leng  |class     = class|style     = style|list_style  = style for ul tag|item_style  = style for all li tags|item1_style = style for first li tag |item2_style = style for second li tag |   atlantis   |indent    = indent for the list}}', ['gondwanaland', 'mu', 'leng', 'atlantis']),
-		('{{unbulleted list|snorlax   |     pikachu|class     = class|style     = style|list_style  = style for ul tag|item_style  = style for all li tags|item1_style = style for first li tag |item2_style = style for second li tag |  charizard }}', ['snorlax', 'pikachu', 'charizard']),
-		('{{pagelist|nspace= |delim=''|sean connery   |    roger moore|   george lazenby   }}', ['sean connery', 'roger moore', 'george lazenby']),
-		('{{ordered list |item1_value=value1 |item2_value=value2|start=start|   alan turing |claude shannon    |item1_style=CSS1 |item2_style=CSS2 }}', ['alan turing', 'claude shannon']),
-		('{{toolbar|separator=comma |bethany    |     ambrose}}', ['bethany', 'ambrose']),
-		#Stuff from real Wikipedia (starting with article about aristotle):
-		('{{unbulleted list |[[peripatetic school]] |[[aristotelianism]]}}', ['peripatetic school', 'aristotelianism']),
-		('{{unbulleted list |[[golden mean (philosophy)|golden mean]] |[[aristotelian logic]] |[[syllogism]] |[[hexis]] |[[hylomorphism]] |[[on the soul|theory of the soul]]}}', ['golden mean', 'aristotelian logic', 'syllogism', 'hexis', 'hylomorphism', 'theory of the soul']),
-		('{{hlist |[[parmenides]] |[[socrates]] |[[plato]] |[[heraclitus]] |[[democritus]]}}', ['parmenides', 'socrates', 'plato', 'heraclitus', 'democritus']),
-		#NESTED AND/OR MULTIPLE LISTS: DANGER WILL ROBINSON DANGER
-		#('{{hlist|[[biology]]|[[zoology]]}} {{hlist|[[physics]]|[[metaphysics]]}}', ['biology', 'zoology', 'physics', 'metaphysics']),
+        #Trivial:
+        ('',''),
+        ('germany','germany'),
+        #Links:
+        ('[[germany]]','germany'),
+        ('[[confusingLink|germany]]','germany'),
+        ('[[confusingLink|germany]] sister','germany sister'),
+        #Multiple links:
+        ('[[You should not see this|   Aber ]] [[confusingLink | Germany  ]] ist [[ geil    ]], [[da]]','Aber Germany ist geil, da'),
+        #Longitem environment:
+        ('{{longitem|virtually all subsequent [[western philosophy]], [[christian philosophy]] and pre-[[age of enlightenment|enlightenment]] science; also much [[islamic philosophy|islamic]] and [[jewish philosophy]] (see [[list of writers influenced by aristotle]])}}', 'virtually all subsequent western philosophy, christian philosophy and pre-enlightenment science; also much islamic and jewish philosophy'),
+        #Lists:
+        ('{{bulleted list |class=sdfsdf|list_style=adfsdf|style=asdfsdf|item_style=sdfsdf |item2_style=sdfsdf| We only need this |information }}', ['We only need this', 'information']),
+        ('{{flatlist|     class   =    asdfasd|style=      asdfsdfs|        indent   =asdfsdfsd|* [[cat]]* [[dog]]* [[horse]]* [[cow]]* [[sheep]]* [[pig]]}}', ['cat', 'dog', 'horse', 'cow', 'sheep', 'pig']),
+        ('{{startflatlist}}* [[All]]* [[your]]* [[base]]* [[are]]* [[belong]]* [[to]]* [[us]]{{endflatlist}}', ['All','your','base','are','belong','to','us']),
+        #('{{plainlist}}* [[These   ]]* [[not visible | wonky   ]]* [[lists]]* are   * [[hard]]* [[to]]* [[you cant see me|parse]]{{endplainlist}}',['These','wonky','lists','are','hard','to','parse']),
+        ('{{plainlist|class=sdfsdf|style=border:solid 1px silver; background:lightyellow|indent=2|* [[congo]]* [[niger]]* [[zululand]]}}', ['congo', 'niger', 'zululand']),
+        ('{{flowlist}}*   [[Mao Zedong]]*    [[Ho Chi Minh]]    * [[Lars Ohly]]     {{endflowlist}}', ['Mao Zedong','Ho Chi Minh','Lars Ohly']),
+        ('{{flowlist |class  =asdfasdf |style  =asdas |* [[platypus]]   * [[iguana]]  *  [[zorse]]   }}',['platypus','iguana','zorse']),
+        ('{{hlist|gondwanaland|   mu|  leng  |class     = class|style     = style|list_style  = style for ul tag|item_style  = style for all li tags|item1_style = style for first li tag |item2_style = style for second li tag |   atlantis   |indent    = indent for the list}}', ['gondwanaland', 'mu', 'leng', 'atlantis']),
+        ('{{unbulleted list|snorlax   |     pikachu|class     = class|style     = style|list_style  = style for ul tag|item_style  = style for all li tags|item1_style = style for first li tag |item2_style = style for second li tag |  charizard }}', ['snorlax', 'pikachu', 'charizard']),
+        ('{{pagelist|nspace= |delim=''|sean connery   |    roger moore|   george lazenby   }}', ['sean connery', 'roger moore', 'george lazenby']),
+        ('{{ordered list |item1_value=value1 |item2_value=value2|start=start|   alan turing |claude shannon    |item1_style=CSS1 |item2_style=CSS2 }}', ['alan turing', 'claude shannon']),
+        ('{{toolbar|separator=comma |bethany    |     ambrose}}', ['bethany', 'ambrose']),
+        #Stuff from real Wikipedia (starting with article about aristotle):
+        ('{{unbulleted list |[[peripatetic school]] |[[aristotelianism]]}}', ['peripatetic school', 'aristotelianism']),
+        ('{{unbulleted list |[[golden mean (philosophy)|golden mean]] |[[aristotelian logic]] |[[syllogism]] |[[hexis]] |[[hylomorphism]] |[[on the soul|theory of the soul]]}}', ['golden mean', 'aristotelian logic', 'syllogism', 'hexis', 'hylomorphism', 'theory of the soul']),
+        ('{{hlist |[[parmenides]] |[[socrates]] |[[plato]] |[[heraclitus]] |[[democritus]]}}', ['parmenides', 'socrates', 'plato', 'heraclitus', 'democritus']),
+        #NESTED AND/OR MULTIPLE LISTS: DANGER WILL ROBINSON DANGER
+        #('{{hlist|[[biology]]|[[zoology]]}} {{hlist|[[physics]]|[[metaphysics]]}}', ['biology', 'zoology', 'physics', 'metaphysics']),
     ]
 
     attributeValueParser = AttributeValueParser()
@@ -438,10 +458,12 @@ def test(verbose=False):
     for inValue, outValue in testValues:
         parsedValue = attributeValueParser.parseAttributeValue(inValue, verbose)
         if verbose: print "%s -> %s" % (inValue, parsedValue)
-        assert(parsedValue == outValue)
+        asserter(parsedValue, outValue)
         
-    print "Successfully tested",
-    print "attribute_value_parser.AttributeValueParser.parseAttributeValue()"
+    if verbose:
+        print colored("Successfully tested attribute_value_parser.AttributeValueParser.parseAttributeValue()", "green")
+    else:
+        print "Successfully tested attribute_value_parser.AttributeValueParser.parseAttributeValue()"
 
 if __name__ == "__main__":
     test(verbose=True)
