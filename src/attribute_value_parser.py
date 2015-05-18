@@ -37,6 +37,9 @@ class AttributeValueParser:
         #Pattern for removing titles encased as '''title'''
         self.patternTitle = re.compile("'''(.*?)'''")
         
+        #Pattern for checking if string is enclosed by parantheses
+        self.patternEnclosedByParentheses = re.compile("^\((?:[^\)\(]*)\)$")
+        
         #Pattern for removing cref and contents
         self.patternCref = re.compile(r"\{\{cref[^\}]*?(?:\}\}\}\}\}|\}\}(?!\}))")
         
@@ -576,8 +579,16 @@ class AttributeValueParser:
                         string = match.group(1)
                     else:
                         if verbose:
-                            print colored("WARNING: Fixing of list entries has failed.", "magenta")  
-                    
+                            print colored("WARNING: Fixing of list entries has failed.", "magenta")
+                
+                #Try to concatenate all elements enclosed in parantheses to the previous element
+                newReturnList = [returnList[0]]
+                for i, element in enumerate(returnList[1:]):
+                    if self.patternEnclosedByParentheses.match(element):
+                        newReturnList[-1] += element
+                    else:
+                        newReturnList.append(element)
+                returnList = newReturnList
             if verbose:
                 print "Returning: %s" % str(returnList)   
             return returnList
