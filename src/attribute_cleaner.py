@@ -153,6 +153,7 @@ def clean(inputFileName, outputFileName, outputKeysFileName,
                     outputFileName, outputKeysFileName, verbose)
     
 defaultInputFileName = os.path.abspath("../raw_output/ibs_person_raw_76M.json")
+#defaultInputFileName = os.path.abspath("../raw_output/ibs_person_raw.json")
 defaultOutputFileName = os.path.abspath("../output/infobox_output_cleaned.json")
 defaultOutputKeysFileName = os.path.abspath("../output/attribute_keys_cleaned.txt")
     
