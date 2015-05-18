@@ -90,6 +90,9 @@ class AttributeValueParser:
         #Pattern for removing the "Longitem", "bigger" or "nowrap" environments
         self.patternLongitem = re.compile(r'\{\{(?:[ ]*)(?:smaller|longitem|nowrap|bigger)(?:[ ]*)\|(?:(?:(?:[ ]*)(?:style|padding|line-height)(?:[^\|]+?)\|)*)(?:[ ]*)(.*?)(?:[ ]*)\}\}')
         
+        #Gets death date and age out of a "death date and age" environment
+        self.patternDda = re.compile('\{\{(?:birth date and age|bda)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
+        
         #Gets date of birth out of a "birth date and age" environment (and NOT from a "birth date" environment)
         self.patternBda = re.compile('\{\{(?:birth date and age|bda)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
         
@@ -309,9 +312,7 @@ class AttributeValueParser:
                     #We define dateAndAgeString as an empty string if we have not defined it previously, so that we won't crash on subbing
                     dateAndAgeString = ""
                     print colored("        WARNING: Invalid date and age format when parsing attribute value '%s'" % value, "magenta")
-            value = self.patternBda.sub(dateAndAgeString, value)
-            
-            
+            value = self.patternBda.sub(dateAndAgeString, value) 
         else:
             match = self.patternDob.match(value)
             if match:
@@ -327,10 +328,52 @@ class AttributeValueParser:
                         dateString = ""
                         print colored("        WARNING: Invalid date format when parsing attribute value '%s'" % value, "magenta")
                 value = self.patternDob.sub(dateString, value)
-        
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
+        #Replaces some death date environments (death date and age)
+        match = self.patternDda.match(value)
+        if match:
+            if verbose:
+                print "        'Death date and age' environment detected."
+            try:
+                ageInYears = int(match.group(1)) - int(match.group(4)) - ((int(match.group(2)), int(match.group(3))) < (int(match.group(5)), int(match.group(6))))
+                dateString = "%s %s %s (age %s)" % (match.group(3), self.months[int(match.group(2))], match.group(1), str(ageInYears))
+            except:
+                try:
+                    ageInYears = int(match.group(1)) - int(match.group(4)) - (int(match.group(2)) < int(match.group(5)))
+                    dateString = "%s %s %s (age %s)" % (match.group(3), self.months[int(match.group(2))], match.group(1), str(ageInYears))
+                except:
+                    try:
+                        ageInYears = int(match.group(1)) - int(match.group(4))
+                        dateString = "%s %s %s (age %s)" % (match.group(3), self.months[int(match.group(2))], match.group(1), str(ageInYears))
+                    except:
+                        #We define dateString as an empty string if we have not defined it previously, so that we won't crash on subbing
+                        dateString = ""
+                        print colored("        WARNING: Invalid date format when parsing attribute value '%s'" % value, "magenta")
+            value = self.patternDda.sub(dateString, value)
+        else:
+            #Try if we can find a match for year of death environment (mutually exclusive to the former)
+            match = self.patternDoy.match(value)
+            if match:
+                if verbose:
+                    print "        'Death year and age' environment detected."
+                try:
+                    ageInYears = int(match.group(1)) - int(match.group(2))
+                    dateString = "%s (age %s)" % (match.group(1), str(ageInYears))
+                except:
+                    try:
+                        ageInYears = int(match.group(1)) - int(match.group(2))
+                        dateString = "%s (age %s)" % (match.group(1), str(ageInYears))
+                    except:
+                        #We define dateString as an empty string if we have not defined it previously, so that we won't crash on subbing
+                        dateString = ""
+                        print colored("        WARNING: Invalid date format when parsing attribute value '%s'" % value, "magenta")
+                value = self.patternDoy.sub(dateString, value)    
+        
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
+                    
         #Remove all <small> tags
         if verbose:
             print "Entering removal of <small> tags."
