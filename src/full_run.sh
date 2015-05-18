@@ -10,3 +10,5 @@ javac java_key_cleaner.java
 echo Calling attribute_cleaner.py ../raw_output/ibs_person_raw.json ../output/infobox_output_cleaned.json ../debug/attribute_keys_cleaned.txt
 python attribute_cleaner.py ../raw_output/ibs_person_raw.json ../output/infobox_output_cleaned.json ../debug/attribute_keys_cleaned.txt
  
+echo Calling statistics.py noshow
+python statistics.py noshow silent
