@@ -25,11 +25,14 @@ class AttributeValueParser:
         #Pattern for removing <small> and </small>
         self.patternSmall = re.compile(r"\<[\/]*small\>")
         
-        #Pattern for creating dot-separated lists
+        #TODO: Pattern for creating dot-separated lists
         self.patternDot = re.compile(u"\{\{\u00b7\}\}")
         
         #Pattern for removing cref and contents
         self.patternCref = re.compile(r"\{\{cref[^\}]*?(?:\}\}\}\}\}|\}\}(?!\}))")
+        
+        #Pattern for removing sfn and sfnp
+        self.patternSfn = re.compile(r"\{\{sfn(?:.*?)\}\}")
         
         #Pattern for removing the "small" environment and replacing a <br />
         #directly before it, if there is one.
@@ -38,8 +41,14 @@ class AttributeValueParser:
         #Pattern for removing comments
         self.patternComment = re.compile(r"<!--(?:.*?)-->")
         
+        #Pattern for removing thinsp environment
+        self.patternThinsp = re.compile(r"\{\{thinsp\}\}")
+        
+        #Pattern for removing sup environment
+        self.patternSup = re.compile(r"\{\{sup\|(?:.*?)\}\}")
+        
         #Pattern for removing references
-        self.patternReference = re.compile(r"<ref>(?:.*?)<\/ref>|<ref(?:.*?)\/>")
+        self.patternReference = re.compile(r"<(?:ref|ref group(?:[^\>])*|ref name(?:[^\>])*)>(?:.*?)<\/ref>|<ref(?:.*?)\/>")
         
         #Pattern for removing references of the type "(see: foobar)"
         self.patternSeeRef = re.compile(r"(?: \- |[ ])*\(see[ |\: ](?:.*?)\)")
@@ -176,6 +185,15 @@ class AttributeValueParser:
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
+        #Remove all "sfn" environments
+        if verbose:
+            print "Entering removal of sfn environment and contents."
+            print "    Value before was: '%s'" % str(value)
+        value = self.patternSfn.sub(r"", value)
+        
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
+            
         #Remove all "small" environments (Ex: {{small|(April 21, 1832 - July 10, 1832)}})
         #Plus, if these are preceeded by a <br />, this means that we should
         #remove that break before creating a list out of break-separated values.
@@ -201,6 +219,24 @@ class AttributeValueParser:
             print "Entering removal of nbsps."
             print "    Value before was: '%s'" % str(value)
         value = self.patternNbsp.sub(r" ", value)
+        
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
+            
+        #Removes the thinsp environment
+        if verbose:
+            print "Entering removal of thinsp."
+            print "    Value before was: '%s'" % str(value)
+        value = self.patternThinsp.sub(r"", value)
+        
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
+            
+        #Removes the sup environment
+        if verbose:
+            print "Entering removal of sup."
+            print "    Value before was: '%s'" % str(value)
+        value = self.patternSup.sub(r"", value)
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
