@@ -45,7 +45,16 @@ class AttributeValueParser:
         self.patternSeeRef = re.compile(r"(?: \- |[ ])*\(see[ |\: ](?:.*?)\)")
         
         #Pattern for replacing nbsp with whitespaces
-        self.patternNbsp = re.compile(r"&nbsp;|nbsp;")
+        self.patternNbsp = re.compile(r"(\&amp;)*(\&)*nbsp;")
+        
+        #Pattern for replacing &amp;ndash; with "-"
+        self.patternNdash = re.compile(r"\&amp\;ndash\;")
+        
+        #Pattern for replacing &quot;
+        self.patternQuote = re.compile(r"\&quot;")
+        
+        #Pattern for seeing if string ends with }}
+        self.patternCurlyBrackets = re.compile(r"\}\}$")
         
         #Pattern for replacing <br />
         self.patternBr = re.compile("\<br[ ]*(?:[\/]*)\>")
@@ -177,12 +186,30 @@ class AttributeValueParser:
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
+            
+        #Removes all ndashes
+        if verbose:
+            print "Entering removal of ndash."
+            print "    Value before was: '%s'" % str(value)
+        value = self.patternNdash.sub(r"-", value)
+        
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
         
         #Removes all nbsps
         if verbose:
             print "Entering removal of nbsps."
             print "    Value before was: '%s'" % str(value)
         value = self.patternNbsp.sub(r" ", value)
+        
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
+            
+        #Removes all quot
+        if verbose:
+            print "Entering removal of quot."
+            print "    Value before was: '%s'" % str(value)
+        value = self.patternQuote.sub(r"'", value)
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
@@ -435,8 +462,16 @@ class AttributeValueParser:
             #No list was found... Check if the attribute value is
             #<br />-separated or dot ({{.}})-separated. If that is the case, split it using that as a
             #separator. Otherwise, return the value as it is.
+            
+            #Remove eventual curly brackets at end
+            if verbose:
+                print "Entering removal of curly brackets."
+                print "    Value before was: '%s'" % str(value)
+            value = self.patternCurlyBrackets.sub(r"", value)
+            if verbose:
+                print "    Value after became: '%s'" % str(value)
 
-            if "<br />" in value or "<br/>" in value:
+            if "<br />" in value or "<br/>" in value or "<br>" in value:
                 if verbose:
                     print 'Attribute value is a list separated by <br />.'
                     print "Returning '%s'" % str(value)
