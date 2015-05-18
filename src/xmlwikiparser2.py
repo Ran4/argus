@@ -421,7 +421,7 @@ def main():
             print "StopIteration reached!"
             dt = time.time() - startTime
             s = "Done generating. "
-            s += "Generated %s infoboxes, taking %d seconds (=%.1f minutes)" % \
+            s += "Generated %s infoboxes, taking %d seconds (=%.1f minutes)" %\
                 (ibsGotten, dt, dt/60.0)
             s += " at an average of %.1f articles per second" % \
                 (ibsGotten/dt)

@@ -8,10 +8,6 @@ def performUnitTests(verbose):
     print "UNIT TESTING STARTED"
     print "#"*79
     
-    
-    WARNING = '\033[93m'
-    #use termcolor module instead!
-    
     warningMessage = termcolor.colored("Problem with unittest!",
             "yellow")
     bigDivider = "#"*79
