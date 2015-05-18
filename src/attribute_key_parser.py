@@ -17,7 +17,8 @@ class AttributeKeyParser:
         #return
 
         #Calls Java code
-        cleanedKeysFileName = "attribute_keys_cleaned.txt"
+        cleanedKeysFileName = os.path.abspath(
+                "../output/attribute_keys_cleaned.txt")
         try:
             cmd = "java java_key_cleaner %s %s" % \
                     (keyTranslationFileName, cleanedKeysFileName)
@@ -48,17 +49,17 @@ class AttributeKeyParser:
         
         if verbose: print "Loaded translation dictionary from file"
 
-    def findNewKey(self, key):
+    def findNewKey(self, key, verbose=False):
         """Takes a key as a string, and changes it to be more generic
         E.g. "date of birth" -> "birthdate"
         """
         newKey = key
         
-        #~  key = key.replace("_", "-").replace(" ", "-")
-        #~  
-        #~  match = re.match("(.+)-of-(.+)", key)
-        #~  if match and len(match.groups()) == 2:
-        #~      newKey = match.groups(2) + match.groups(1)
+        if key in self.translationDict:
+            newKey = self.translationDict[key]
+        else:
+            print colored("WARNING: %s not found in translation dict" % key,
+                "magenta")
         
         assert(isinstance(newKey, unicode) or isinstance(newKey, str))
         
@@ -73,7 +74,7 @@ def test(verbose=False):
     infoBoxList = attribute_cleaner.loadInfoBoxList(inputFileName,
             verbose)
     keyCounter = attribute_cleaner.getKeyCounter(infoBoxList)
-    keyTranslationFileName = "attribute_keys_raw.txt"
+    keyTranslationFileName = os.path.abspath("attribute_keys_raw.txt")
     attribute_cleaner.saveKeyCounterToFile(keyCounter,
             keyTranslationFileName, verbose)
     attributeKeyParser = AttributeKeyParser(keyTranslationFileName, verbose)

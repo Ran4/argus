@@ -135,9 +135,9 @@ def clean(inputFileName, outputFileName, outputKeysFileName,
     saveFiles(cleanedKeysCounter, cleanedInfoBoxList,
                     outputFileName, outputKeysFileName, verbose)
     
-defaultInputFileName = "ibs_person_raw_76M.json"
-defaultOutputFileName = "infobox_output_cleaned.json"
-defaultOutputKeysFileName = "debug/attribute_keys_cleaned.txt"
+defaultInputFileName = os.path.abspath("../raw_output/ibs_person_raw_76M.json")
+defaultOutputFileName = os.path.abspath("../output/infobox_output_cleaned.json")
+defaultOutputKeysFileName = os.path.abspath("../output/attribute_keys_cleaned.txt")
     
 def main():
     if len(sys.argv) != 3+1: #The right number of arguments wasn't given
@@ -154,9 +154,9 @@ def main():
         if response.lower() not in ("y", "yes"):
             return
     else:
-        inputFileName = sys.argv[1]
-        outputFileName  = sys.argv[2]
-        outputKeysFileName  = sys.argv[3]
+        inputFileName = os.path.abspath(sys.argv[1])
+        outputFileName  = os.path.abspath(sys.argv[2])
+        outputKeysFileName  = os.path.abspath(sys.argv[3])
     
     clean(inputFileName, outputFileName, outputKeysFileName, verbose=True)
 

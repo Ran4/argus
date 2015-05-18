@@ -4,7 +4,7 @@
 .*.swp
 *~
 
-attribute_keys_cleaned.txt
-debug/attribute_keys_cleaned.txt
+raw_output/ibs_person_raw.json
+output/attribute_keys_cleaned.txt
 debug/attribute_changes.txt
 big_files/*

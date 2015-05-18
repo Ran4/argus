@@ -1,10 +1,9 @@
-defaultFileName = "log.log"
+defaultFileName = "../logs/log.log"
 
 def writeToFile(s, fileName=defaultFileName, verbose=False):
     """Appends a string s to a file...
     """
     try:
-        fileName = fileName
         with open(fileName, "a") as logFile:
             logFile.write(s)
             

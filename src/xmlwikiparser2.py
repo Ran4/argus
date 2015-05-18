@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 import sys
+import os
 import time
 from pprint import pprint as pp
 from collections import Counter
@@ -346,12 +347,11 @@ def handleInfoBoxes(ibList, outputFileName):
                 "person" in ib.infoBoxType:
             writeToFile(ib.getJSON(indent=2)+",\n", outputFileName,
                     verbose=False)
-        
 
 def main():
     if len(sys.argv) == 2+1:
-        filePath = sys.argv[1]
-        outputFileName = sys.argv[2]
+        filePath = os.path.abspath(sys.argv[1])
+        outputFileName = os.path.abspath(sys.argv[2])
     else:
         print "Usage: xmlwikiparser2 inputXMLFileName outputJSONFileName"
         sys.exit()
