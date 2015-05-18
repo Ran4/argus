@@ -320,6 +320,10 @@ public class java_key_cleaner{
 			//infile = args[0];
 			//outfile = args[1];
 		}
+		else if(args.length == 3){
+			a = new java_key_cleaner(args[0],args[1]);
+			number_of_char = Integer.parseInt(args[2]);
+		}
 		else{
 			a = new java_key_cleaner();
 		}
