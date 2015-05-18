@@ -1,7 +1,23 @@
 import re
 import itertools
+from datetime import date
 class AttributeValueParser:
     def __init__(self, verbose=False):
+		
+		#For parsing date environments
+        self.months = {1 : "January",
+            2 : "February",
+			3 : "March",
+			4 : "April",
+			5 : "May",
+			6 : "June",
+			7 : "July",
+			8 : "August",
+			9 : "September",
+			10 : "Oktober",
+			11 : "November",
+			12 : "December",
+		}
 		
 		#Pattern for removing <small> and </small>
         self.patternSmall = re.compile(r"\<[\/]*small\>")
@@ -36,6 +52,12 @@ class AttributeValueParser:
         
         #Pattern for removing the "Longitem", "bigger" or "nowrap" environments
         self.patternLongitem = re.compile(r'\{\{(?:[ ]*)(?:longitem|nowrap|bigger)(?:[ ]*)\|(?:(?:(?:[ ]*)(?:style|padding|line-height)(?:[^\|]+?)\|)*)(?:[ ]*)(.*?)(?:[ ]*)\}\}')
+        
+        #Gets date of birth out of a "birth date and age environment" (and not from a date of birth environment)
+        self.patternBda = re.compile('\{\{(?:birth date and age|bda)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*)')
+        
+        #Gets date of birth out of a "birth date and age environment" (and not from a date of birth environment)
+        self.patternDob = re.compile('\{\{(?:birth date|dob)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*)')
         
         #Pattern for getting list name from {{list name| or {{list name}}
         self.patternList = re.compile(r'\{\{([^|]+?)(?:[ ]*)(?:\||\})')
@@ -120,7 +142,6 @@ class AttributeValueParser:
         #Replaces these with real < and > signs
         value = value.replace("&lt;","<").replace("&gt;",">")
         
-        #TODO: birthdate environment (Ex: {{birth date|1809|2|12}})
         #TODO: death date and age environment (Ex: {{death date and age|1865|4|15|1809|2|12}})
         #		Output should be in format: 29 December 1986 (aged 54)
         #TODO: convert environment (Ex: {{convert|550|ft|m|0}})
@@ -150,6 +171,31 @@ class AttributeValueParser:
 		    print "Entering removal of nbsps."
 		    print "    Value before was: '%s'" % str(value)
         value = self.patternNbsp.sub(r" ", value)
+        
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
+            
+		#Replaces the various birthdate environments (Ex: {{birth date|1809|2|12}})
+		#with plain text describing the same thing.
+		#If the person in question is living, you get their age as well.
+		if verbose:
+		    print "Entering parsing of birthdate environment."
+		    print "    Value before was: '%s'" % str(value)
+		match = self.patternBda.match(value)
+		if match:
+			if verbose:
+				print "        'Birthdate and age' environment detected."
+			#Calculate the person's age in years
+			today = date.today()
+			ageInYears = today.year - match.group(1) - ((today.month, today.day) < (match.group(2), match.group(3)))
+			#Replace match with a descriptive string
+			value = self.patternBda.sub(match.group(3) + " " + self.months[match.group(2)] + " " + match.group(1) + "(age " + ageInYears + ")", value) #Note: we assume that second group is a digit
+		else:
+			match = self.patternDob.match(value):
+			if match:
+				if verbose:
+					print "        'Date of birth' environment detected."
+				value = self.patternDob.sub(match.group(3) + " " + self.months[match.group(2)] + " " + match.group(1), value)
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
