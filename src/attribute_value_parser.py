@@ -26,7 +26,7 @@ class AttributeValueParser:
         self.patternSmall = re.compile(r"(?i)\<[\/]*small\>")
         
         #Pattern for creating dot-separated lists
-        self.patternDot = re.compile(u"\{\{\xB7\}\}")
+        self.patternDot = re.compile(u"(?i)\{\{\xb7\}\}")
         
         #Pattern for tidying up list entries
         self.patternFixListEntries = re.compile("^[ ]*(.*?)[\, ]*$")
