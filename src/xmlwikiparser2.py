@@ -58,17 +58,18 @@ class InfoBox(object):
         isInWikiList = False
         for i, line in enumerate(infoBoxStringList):
             numCurlyBracesInLine = line.count("{{") + line.count("}}") 
+            lowLine = line.lower()
 
             #TODO: These variables keep track if the current line ends or begins one of these Wikilist environments.
             #       We might need to have booleans tracking if we are inside such an enviroment, if it turns out that
             #       ordinary list environment-lines often begin with non-separator characters.
-            isBeginSpecialWikiList = "{{plainlist}}" in line \
-                or "{{flowlist}}" in line \
-                or "{{startflatlist}}" in line
+            isBeginSpecialWikiList = "{{plainlist}}" in lowLine \
+                or "{{flowlist}}" in lowLine \
+                or "{{startflatlist}}" in lowLine
                 
-            isEndSpecialWikiList = "{{endplainlist}}" in line \
-                or "{{endflowlist}}" in line \
-                or "{{endflatlist}}" in line
+            isEndSpecialWikiList = "{{endplainlist}}" in lowLine \
+                or "{{endflowlist}}" in lowLine \
+                or "{{endflatlist}}" in lowLine
             
             #The below case occurs if: 
             #   The number of curly braces on a row is unbalanced which means:
@@ -354,7 +355,7 @@ def handleInfoBoxes(ibList, outputFileName):
     """
     for ib in ibList:
         if (ib.isInArticleWithPersonBox and ib.countInArticle == 0) or\
-                "person" in ib.infoBoxType:
+                "person" in ib.infoBoxType.lower():
             writeToFile(ib.getJSON(indent=2)+",\n", outputFileName,
                     verbose=False)
 
