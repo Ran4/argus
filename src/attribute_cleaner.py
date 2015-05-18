@@ -93,7 +93,7 @@ def cleanInfoBoxList(attributeKeyParser, infoBoxList, verbose):
     if verbose: print s
     logger.writeToFile(s, timeStamp=True)
         
-    s = "%s keys not found" % numNotFound
+    s = "%s keys not found" % attributeKeyParser.numNotFound
     logger.writeToFile(s, timeStamp=True)
     if verbose: print s
     
