@@ -105,6 +105,9 @@ class AttributeValueParser:
         #Gets death date and age out of a "death date and age" environment
         self.patternDda = re.compile('\{\{(?:birth date and age|bda)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
         
+        #Gets death date and age out of a "death year and age" environment
+        self.patternDya = re.compile('\{\{(?:death year and age|dya)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:\d+)(?:[ ]*))*(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
+        
         #Gets date of birth out of a "birth date and age" environment (and NOT from a "birth date" environment)
         self.patternBda = re.compile('\{\{(?:birth date and age|bda)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
         
@@ -366,7 +369,7 @@ class AttributeValueParser:
             value = self.patternDda.sub(dateString, value)
         else:
             #Try if we can find a match for year of death environment (mutually exclusive to the former)
-            match = self.patternDoy.match(value)
+            match = self.patternDya.match(value)
             if match:
                 if verbose:
                     print "        'Death year and age' environment detected."
@@ -381,7 +384,7 @@ class AttributeValueParser:
                         #We define dateString as an empty string if we have not defined it previously, so that we won't crash on subbing
                         dateString = ""
                         print colored("        WARNING: Invalid date format when parsing attribute value '%s'" % value, "magenta")
-                value = self.patternDoy.sub(dateString, value)    
+                value = self.patternDya.sub(dateString, value)    
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
