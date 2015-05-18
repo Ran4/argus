@@ -390,7 +390,7 @@ def main():
     
     ibsGotten = 0
     articlesGotten = 0
-    startTime = time.time()    
+    startTime = time.time()
     while True:
         try:
             ibList = ibGenerator.next()

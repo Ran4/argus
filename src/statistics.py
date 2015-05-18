@@ -45,8 +45,8 @@ class Statistics:
         ##
         
         self.commonNames = self.commonNameSubStringsCounter().most_common(50)
-        self.statOutput("Most common name substrings: %s" % mostCommonFormat(
-            self.commonNames))
+        #self.statOutput("Most common name substrings: %s" % mostCommonFormat(
+        #    self.commonNames))
         
         ##
         lastLetters = []
@@ -61,17 +61,24 @@ class Statistics:
         for char in "abcdefghijklmnopqrstuvwxyz":
             self.lastLetterInValueStats.append((char, lastLetters.count(char)))
             
-        self.statOutput("Most common last letters: %s" % mostCommonFormat(
-            self.lastLetterInValueStats))
+        #self.statOutput("Most common last letters: %s" % mostCommonFormat(
+        #    self.lastLetterInValueStats))
             
         ##
         deathDates = self.getAllValues(key="death_date", expandLists=False)
-        print "len(deathDates):", len(deathDates)
-        
-        global deathDates
-        exit()
+        #print "len(deathDates):", len(deathDates)
         
         #http://pastebin.com/9rHnQZkH
+        
+        ##
+        
+        #for key in ["salary"]:
+        for key in ["wage"]:
+            values = self.getAllValues(key=key, expandLists=True)
+            print colored("Found %s values with the key '%s'" % (len(values), key), "white")
+            #print ", ".join(salaries)
+            pp(map(lambda x: x.encode("utf-8"), values))
+            print colored("End of %s" % key, "white")
         
         ##
         
@@ -85,7 +92,7 @@ class Statistics:
         
         
         if self.verbose: print "  Plotting most common names value"
-        #Example: self.commonNames = [("john", 1877), ("william", 987)]
+        ##Example: self.commonNames = [("john", 1877), ("william", 987)]
         commonNamesValues = map(itemgetter(1), self.commonNames)
         xx = range(len(commonNamesValues))
         #plt.plot(xx, commonNamesValues)
@@ -95,8 +102,8 @@ class Statistics:
         if self.verbose: print "  Plotting most common last letter of values"
         commonLastLetterValues = map(itemgetter(1), self.lastLetterInValueStats)
         xx = range(len(commonLastLetterValues))
-        plt.plot(xx, commonLastLetterValues)
-        if showPlots: plt.show()
+        #plt.plot(xx, commonLastLetterValues)
+        #if showPlots: plt.show()
         
         
         #################################################################
@@ -105,7 +112,7 @@ class Statistics:
     def mostCommonFormat(self, mostCommonList):
         return ", ".join(map(lambda x: "%s (%s)" % x, mostCommonList))
     
-    def getAllValues(self, ofType=None, key=None, expandLists=False):
+    def getAllValues(self, ofType=None, key=None, expandLists=True):
         retValues = []
         for pageDict in self.j:
             for pageDictKey in pageDict:
@@ -117,7 +124,7 @@ class Statistics:
                     retValues.append(value)
                 else:
                     if expandLists:
-                        retvalues += value
+                        retValues += value
         
         return retValues
                     

@@ -98,7 +98,8 @@ def cleanInfoBoxList(attributeKeyParser, infoBoxList, verbose):
 
 def loadInfoBoxList(inputFileName, verbose):
     with open(inputFileName) as inputFile:
-        #~ infoBoxList = json.load(inputFile)
+        print "Trying to load JSON file from %s" % inputFile
+        
         infoBoxList = json.load(inputFile, encoding="latin-1")
         assert isinstance(infoBoxList, list)
         if verbose:
