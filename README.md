@@ -1,21 +1,14 @@
-# argus
+# Argus
 Fetches public personal information in natural language from a Wikipedia dump, and stores it in a json-formatted database.
 
 The project is named "Argus" after the hundred-eyed giant of Greek mythology (additionally, Argus was the name of the builder of the Argonauts' ship - the leader of whom was Jason, a name which is a homophone to the database format the program uses).
 
-##Requirements
-```
-Python 2.7
-Python modules:
-    matplotlib  #Not required: used in statistics.py to generate plots
+##Quick start
+* Download wikipedia xml dump (http://en.wikipedia.org/wiki/Wikipedia:Database_download) and save it to root directory (`argus/`)
+* Clone the repository `git clone https://github.com/Ran4/argus.git`
+* Run `./full_run.sh` (possibly modifying the `xmlwikiparser2.py` line).
 
-Java JDK >6
-```
-
-##Usage
-Run `./full_run.sh` (possibly modify the `xmlwikiparser2.py` line).
-
-`full_run.sh` will parse a wikipedia xml dump (can be downloaded here: http://en.wikipedia.org/wiki/Wikipedia:Database_download), finding all the infoboxes and storing them all as a single json file in `raw_output/`. The initial json dump will then be cleaned, with the final output json residing in `output/`.
+`full_run.sh` will parse a wikipedia xml dump, finding all the infoboxes and storing them all as a single json file in `raw_output/`. The initial json dump will then be cleaned, with the final output json residing in `output/`.
 
 ## Manual run
 
@@ -34,4 +27,12 @@ python attribute_cleaner.py ../raw_output/ibs_person_raw.json ../output/infobox_
 python statistics.py noshow silent
 ```
 
-# Additional
+##Requirements
+```
+Python 2.7
+Python modules:
+    matplotlib  #Not required: used in statistics.py to generate plots
+
+Java JDK >6
+```
+## Additional
