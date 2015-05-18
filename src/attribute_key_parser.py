@@ -69,9 +69,9 @@ class AttributeKeyParser:
             if key == "":
                 return ""
             warningMessage = "WARNING: '%s' not found in translation dict" % key
-            print colored(warningMessage, "magenta")
+            print colored(warningMessage.encode("utf-8"), "magenta")
             
-            logger.writeToFile((warningMessage+"\n").encode("utf8"),
+            logger.writeToFile((warningMessage+"\n").encode("utf-8"),
                     self.warningLogMessageFileName, timeStamp=True)
         
         assert(isinstance(newKey, unicode) or isinstance(newKey, str))
