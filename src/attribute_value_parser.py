@@ -25,6 +25,9 @@ class AttributeValueParser:
         #Pattern for removing <small> and </small>
         self.patternSmall = re.compile(r"\<[\/]*small\>")
         
+        #Pattern for creating dot-separated lists
+        self.patternDot = re.compile(u"\{\{\u00b7\}\}")
+        
         #Pattern for removing cref and contents
         self.patternCref = re.compile(r"\{\{cref[^\}]*?(?:\}\}\}\}\}|\}\}(?!\}))")
         
@@ -47,8 +50,14 @@ class AttributeValueParser:
         #Pattern for replacing <br />
         self.patternBr = re.compile("\<br[ ]*(?:[\/]*)\>")
         
+        #Pattern for replacing unicode hyphens
+        self.patternHyphen = re.compile(u"\\u2013")
+        
         #Pattern for getting b from [[a|b]]
         self.patternPipeLink = re.compile(r"\[\[(?:[ ]*)(?:[^\]]*?)(?:[ ]*)\|(?:[ ]*)(.*?)(?:[ ]*)\]\]")
+        
+        #Pattern for removing wikipedia pictures
+        self.patternWikiPic = re.compile(r"\[\[file\:(.*?)\]\]")
         
         #Pattern for getting a from [[a]]
         self.patternLink = re.compile(r'\[\[(?:[ ]*)(.*?)(?:[ ]*)\]\]')
@@ -57,10 +66,10 @@ class AttributeValueParser:
         self.patternLongitem = re.compile(r'\{\{(?:[ ]*)(?:longitem|nowrap|bigger)(?:[ ]*)\|(?:(?:(?:[ ]*)(?:style|padding|line-height)(?:[^\|]+?)\|)*)(?:[ ]*)(.*?)(?:[ ]*)\}\}')
         
         #Gets date of birth out of a "birth date and age" environment (and NOT from a "birth date" environment)
-        self.patternBda = re.compile('\{\{(?:birth date and age|bda)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*)')
+        self.patternBda = re.compile('\{\{(?:birth date and age|bda)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
         
         #Gets date of birth out of a "birth date" environment
-        self.patternDob = re.compile('\{\{(?:birth date|dob)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*)')
+        self.patternDob = re.compile('\{\{(?:birth date|dob)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
         
         #Pattern for getting list name from {{list name| or {{list name}}
         self.patternList = re.compile(r'\{\{([^|]+?)(?:[ ]*)(?:\||\})')
@@ -178,6 +187,15 @@ class AttributeValueParser:
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
+        #Replaces all unicode hyphens
+        if verbose:
+            print "Entering removal of hyphens."
+            print "    Value before was: '%s'" % str(value)
+        value = self.patternHyphen.sub(r"-", value)
+        
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
+            
         #Replaces some birthdate environments (Ex: {{birth date|1809|2|12}})
         #TODO: Handle more environments: http://en.wikipedia.org/wiki/Template:Birth_date
         #with plain text describing the same thing.
@@ -257,6 +275,16 @@ class AttributeValueParser:
             print "Entering removal of references of type '(see: foo)'."
             print "    Value before was: '%s'" % str(value)
         value = self.patternSeeRef.sub(r"", value)
+        
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
+            
+        #Replace all Wiki article links in the string.
+        #    Step 1: Stuff of the form [[blabla|derpderp]] should become derpderp
+        if verbose:
+            print "Entering removal of Wikipedia pictures of format [[file: asdasd|asdasdasd]]."
+            print "    Value before was: '%s'" % str(value)
+        value = self.patternWikiPic.sub(r"", value)
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
@@ -405,18 +433,28 @@ class AttributeValueParser:
                 
         else:
             #No list was found... Check if the attribute value is
-            #<br />-separated. If that is the case, split it using that as a
+            #<br />-separated or dot ({{.}})-separated. If that is the case, split it using that as a
             #separator. Otherwise, return the value as it is.
 
-            if "<br />" in value:
+            if "<br />" in value or "<br/>" in value:
                 if verbose:
                     print 'Attribute value is a list separated by <br />.'
                     print "Returning '%s'" % str(value)
                 value = filter(None, self.patternBr.split(value))
             else:
+                #Checking for dot-separated lists
                 if verbose:
-                    print 'No list was found in attribute value.'
-                    print "Returning '%s'" % str(value)
+                    print "Entering check for lists separated by dots."
+                    print "    Value before was: '%s'" % str(value)
+                match = self.patternDot.match(value)
+                if match:
+                    value = filter(None, self.patternDot.split(value))
+                if verbose:
+                    print "    Value after became: '%s'" % str(value)
+                else:
+                    if verbose:
+                        print 'No list was found in attribute value.'
+                        print "Returning '%s'" % str(value)
             return value
         
         
