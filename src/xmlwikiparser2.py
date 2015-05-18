@@ -186,16 +186,21 @@ class InfoBox(object):
     
     def getPropertiesDict(self, verbose=False):
         """Returns a dictionary of properties of the infobox.
+        
+        NOTE: All the keys are returned as lowercase characters,
+        and have all '\t' characters changed to ' '
         """
         propertiesDict = {}
         for line in self.infoBoxStringList:
             keyValue = self._parseKeyValue(line)
             if keyValue:
                 key, value = keyValue
-                propertiesDict[key.replace("\t", " ")] = value
+                key = key.lower().replace("\t", " ")
+                propertiesDict[key] = value
                 
             if verbose:
-                print "Parsed attribute: %s -> %s" % (line.strip(), keyValue)
+                print "Parsed attribute: %s -> %s" % (line.strip(),
+                        str((key, value)))
                 
         return propertiesDict
         
@@ -204,6 +209,9 @@ class InfoBox(object):
         """Gets the attribute key/values plus the wikipedia url,
         isoCode, and if it's the first infobox in an article that has a 
         personbox as a JSON string.
+        
+        NOTE: All the keys are returned as lowercase characters
+        and have all '\t' characters changed to ' '
         """
         wikiUrl = 'http://en.wikipedia.org/wiki/' + \
             self.articleTitle.replace(" ", "_")
@@ -277,7 +285,8 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
         if not record:
             continue
             
-        recordList.append(line.strip().lower())
+        #recordList.append(line.strip().lower())
+        recordList.append(line.strip())
         
         if line.startswith("{{Persondata"):
             isInArticleWithPersonBox = True
@@ -290,7 +299,8 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
             #~ print "found infoboxline"
 
         if recordInfoBox: #We are currently inside of an infobox
-            recordInfoBoxList.append(line.strip().lower())
+            #recordInfoBoxList.append(line.strip().lower())
+            recordInfoBoxList.append(line.strip())
             numCurlyBrackets += line.count("{{") - line.count("}}")
            
             #~ print "%s %s" % (numCurlyBrackets, line.strip().lower())
