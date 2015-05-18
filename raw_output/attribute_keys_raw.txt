@@ -858,11 +858,11 @@
 125 succeeding
 125 goldenbauhiniaawards
 124 current_record
+124 deputy1
 123 medal_templates
 123 managerclubs8
 123 leader1
 123 nationalteam4
-123 deputy1
 122 worlds
 122 year6
 122 disappeared_date
@@ -4814,7 +4814,6 @@
 1 am2
 1 tournament_list
 1 500 total points
-1 deputy	1
 1 wimbledonmixeddoublesresult
 1 birth_date4
 1 date of origin

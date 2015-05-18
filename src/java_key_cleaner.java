@@ -71,6 +71,9 @@ public class java_key_cleaner{
 			
 			String line = null;
 			while((line = in.readLine()) != null) {
+				if(line.indexOf('\t')!=-1){
+					System.out.println("Warning \""+line+"\" contains a tab");
+				}
 				String mult[] = line.split("\\s+");
 				line = "";
 				for(int i=1;i<mult.length-1;i++){
