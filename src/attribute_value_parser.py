@@ -29,13 +29,16 @@ class AttributeValueParser:
         self.patternDot = re.compile(u"\{\{\u00b7\}\}")
         
         #Pattern for removing {{*}}
-        self.patternCBDot = re.compile("\{\{\*\}\}")
+        self.patternCBDot = re.compile("\{\{(?:\*|ndash|mdash|spaced ndash)\}\}")
+        
+        #Pattern for removing titles encased as '''title'''
+        self.patternTitle = re.compile("'''(.*?)'''")
         
         #Pattern for removing cref and contents
         self.patternCref = re.compile(r"\{\{cref[^\}]*?(?:\}\}\}\}\}|\}\}(?!\}))")
         
-        #Pattern for removing sfn, refn and sfnp
-        self.patternSfn = re.compile(r"\{\{(?:sfn|refn)(?:.*?)\}\}")
+        #Pattern for removing sfn, refn, cite journal and sfnp
+        self.patternSfn = re.compile(r"\{\{(?:sfn|refn|cite journal|citation needed)(?:.*?)\}\}")
         
         #Pattern for removing the "small" environment and replacing a <br />
         #directly before it, if there is one.
@@ -184,6 +187,15 @@ class AttributeValueParser:
             print "Entering removal of {{*}}."
             print "    Value before was: '%s'" % str(value)
         value = self.patternCBDot.sub(r"", value)
+        
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
+            
+        #Removes the titles encased as '''title'''
+        if verbose:
+            print "Entering removal of encased titles."
+            print "    Value before was: '%s'" % str(value)
+        value = self.patternTitle.sub(r"", value)
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
@@ -354,8 +366,7 @@ class AttributeValueParser:
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
-        #Replace all Wiki article links in the string.
-        #    Step 1: Stuff of the form [[blabla|derpderp]] should become derpderp
+        #Remove all Wiki pictures
         if verbose:
             print "Entering removal of Wikipedia pictures of format [[file: asdasd|asdasdasd]]."
             print "    Value before was: '%s'" % str(value)
