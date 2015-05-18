@@ -1,4 +1,5 @@
 #!/bin/bash
+#All paths given are relative to runstart in /src/
 echo Calling xmlwikiparser2.py to output raw infobox values, should take 30-45 minutes with an ssd
 python xmlwikiparser2.py  ../raw_output/ibs_person_raw.json
 #python xmlwikiparser2.py ../debug/enwiki_first35klines.txt ../raw_output/ibs_person_raw.json
