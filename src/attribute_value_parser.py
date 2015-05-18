@@ -194,7 +194,15 @@ class AttributeValueParser:
             ageInYears = today.year - int(match.group(1)) - ((today.month, today.day) < (int(match.group(2)), int(match.group(3))))
             #Replace match with a descriptive string
             #value = self.patternBda.sub(match.group(3) + " " + self.months[int(match.group(2))] + " " + match.group(1) + "(age " + str(ageInYears) + ")", value) #Note: we assume that second group is a digit
-            dateAndAgeString = "%s %s %s (age %s)" % (match.group(3), self.months[int(match.group(2))], match.group(1), str(ageInYears))
+            try:
+                dateAndAgeString = "%s %s %s (age %s)" % (match.group(3), self.months[int(match.group(2))], match.group(1), str(ageInYears))
+            except:
+                try:
+                    dateAndAgeString = "%s %s %s (age %s)" % (match.group(2), self.months[int(match.group(3))], match.group(1), str(ageInYears))
+                except:
+                    #We define dateAndAgeString as an empty string if we have not defined it previously, so that we won't crash on subbing
+                    dateAndAgeString = ""
+                    print colored("        WARNING: Invalid date and age format when parsing attribute value '%s'" % value, "magenta")
             value = self.patternBda.sub(dateAndAgeString, value)
             
             
@@ -203,7 +211,16 @@ class AttributeValueParser:
             if match:
                 if verbose:
                     print "        'Date of birth' environment detected."
-                value = self.patternDob.sub(match.group(3) + " " + self.months[int(match.group(2))] + " " + match.group(1), value)
+                try:
+                    dateString = "%s %s %s" % (match.group(3), self.months[int(match.group(2))], match.group(1))
+                except:
+                    try:
+                        dateString = "%s %s %s" % (match.group(2), self.months[int(match.group(3))], match.group(1))
+                    except:
+                        #We define dateString as an empty string if we have not defined it previously, so that we won't crash on subbing
+                        dateString = ""
+                        print colored("        WARNING: Invalid date format when parsing attribute value '%s'" % value, "magenta")
+                value = self.patternDob.sub(dateString, value)
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
