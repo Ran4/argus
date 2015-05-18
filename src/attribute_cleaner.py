@@ -2,11 +2,11 @@
 import sys
 import os
 import collections
+import json
 
 import attribute_key_parser
 import attribute_value_parser
-
-import json
+import logger
 
 def saveKeyCounterToFile(keyCounter, fileName, verbose):
     if verbose: print "Trying to save attribute keys to file..."
@@ -86,13 +86,21 @@ def cleanInfoBoxList(attributeKeyParser, infoBoxList, verbose):
             
         cleanedInfoBoxList.append(attributeDict) 
         
-    if verbose:
-        print "{}/{} keys and {}/{} values was ignored".format(
-            counter["ignored_new_keys"], counter["total_attributes"],
-            counter["ignored_new_values"], counter["total_attributes"])
+    
+    s = "{}/{} keys and {}/{} values was ignored".format(
+        counter["ignored_new_keys"], counter["total_attributes"],
+        counter["ignored_new_values"], counter["total_attributes"])
+    if verbose: print s
+    logger.writeToFile(s, timeStamp=True)
         
-        print "Changed {} infoboxes, will now write {} infoboxes".format(
-                counter["changed_infoboxes"], len(cleanedInfoBoxList))
+    s = "%s keys not found" % numNotFound
+    logger.writeToFile(s, timeStamp=True)
+    if verbose: print s
+    
+    s = "Changed {} infoboxes, will now write {} infoboxes".format(
+            counter["changed_infoboxes"], len(cleanedInfoBoxList))
+    logger.writeToFile(s, timeStamp=True)
+    if verbose: print s
         
     return cleanedInfoBoxList, cleanedKeysCounter
 

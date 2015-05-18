@@ -14,6 +14,8 @@ class AttributeKeyParser:
         clean keys.
         """
         
+        self.numNotFound = 0
+        
         #print colored("WARNING! KEY CLEANING IGNORED!", "magenta")
         #return
 
@@ -68,11 +70,14 @@ class AttributeKeyParser:
         else:
             if key == "":
                 return ""
+            self.numNotFound += 1
             warningMessage = "WARNING: '%s' not found in translation dict" % key
             print colored(warningMessage.encode("utf-8"), "magenta")
             
             logger.writeToFile((warningMessage+"\n").encode("utf-8"),
                     self.warningLogMessageFileName, timeStamp=True)
+            
+            return newKey
         
         assert(isinstance(newKey, unicode) or isinstance(newKey, str))
         
