@@ -11,8 +11,8 @@ public class java_key_cleaner{
 	public static int ignore_occurance = 100; //number of attributes with less than this occurances will be ignored
 	public boolean outputStats = true; //output statistics
 	
-	String infile = "attribute_keys_cleaned.txt";
-	String outfile = "correct_attributes.txt";
+	String infile = "../debug/attribute_keys_cleaned.txt";
+	String outfile = "../debug/correct_attributes.txt";
 	
 	/*
 	Input: String a, Length of a, String b, Length of b
@@ -73,9 +73,10 @@ public class java_key_cleaner{
 			while((line = in.readLine()) != null) {
 				String mult[] = line.split("\\s+");
 				line = "";
-				for(int i=1;i<mult.length;i++){
-					line+=mult[i];
+				for(int i=1;i<mult.length-1;i++){
+					line+=mult[i]+" ";
 				}
+                line+=mult[mult.length-1];
 				if(Integer.parseInt(mult[0])<ignore_occurance){
 					ignore++;
 				}
@@ -253,7 +254,7 @@ public class java_key_cleaner{
 		
 		if(outputStats){
 			try{
-				FileWriter fw = new FileWriter("debug/attribute_changes.txt");
+				FileWriter fw = new FileWriter("../debug/attribute_changes.txt");
 				BufferedWriter out = new BufferedWriter(fw);
 				out.write("#A total of "+translate.size()+" keys where changed due to misspellings or formatting errors");
 				out.newLine();

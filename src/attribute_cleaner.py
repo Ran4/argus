@@ -127,7 +127,7 @@ def clean(inputFileName, outputFileName, outputKeysFileName,
     
     infoBoxList = loadInfoBoxList(inputFileName, verbose)
     keyCounter = getKeyCounter(infoBoxList)
-    keyTranslationFileName = "attribute_keys_raw.txt"
+    keyTranslationFileName = os.path.abspath("../raw_output/attribute_keys_raw.txt")
     saveKeyCounterToFile(keyCounter, keyTranslationFileName, verbose)
     attributeKeyParser = attribute_key_parser.AttributeKeyParser(
             keyTranslationFileName, verbose)

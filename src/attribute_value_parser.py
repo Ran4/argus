@@ -191,15 +191,19 @@ class AttributeValueParser:
                 print "        'Birthdate and age' environment detected."
             #Calculate the person's age in years
             today = date.today()
-            ageInYears = today.year - match.group(1) - ((today.month, today.day) < (match.group(2), match.group(3)))
+            ageInYears = today.year - int(match.group(1)) - ((today.month, today.day) < (int(match.group(2)), int(match.group(3))))
             #Replace match with a descriptive string
-            value = self.patternBda.sub(match.group(3) + " " + self.months[int(match.group(2))] + " " + match.group(1) + "(age " + ageInYears + ")", value) #Note: we assume that second group is a digit
+            #value = self.patternBda.sub(match.group(3) + " " + self.months[int(match.group(2))] + " " + match.group(1) + "(age " + str(ageInYears) + ")", value) #Note: we assume that second group is a digit
+            dateAndAgeString = "%s %s %s (age %s)" % (match.group(3), self.months[int(match.group(2))], match.group(1), str(ageInYears))
+            value = self.patternBda.sub(dateAndAgeString, value)
+            
+            
         else:
             match = self.patternDob.match(value)
             if match:
                 if verbose:
                     print "        'Date of birth' environment detected."
-                value = self.patternDob.sub(match.group(3) + " " + self.months[match.group(2)] + " " + match.group(1), value)
+                value = self.patternDob.sub(match.group(3) + " " + self.months[int(match.group(2))] + " " + match.group(1), value)
         
         if verbose:
             print "    Value after became: '%s'" % str(value)

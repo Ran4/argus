@@ -42,6 +42,8 @@ class AttributeKeyParser:
                 for line in f:
                     raw, cleaned = line.split("\t")
                     self.translationDict[raw] = cleaned
+                    
+                    #print "lol opened cleanedKeysFileName, got cleaned=", cleaned.strip()
         except:
             print colored("Problem reading list of cleaned keys from file",
                     "yellow")
@@ -74,7 +76,7 @@ def test(verbose=False):
     infoBoxList = attribute_cleaner.loadInfoBoxList(inputFileName,
             verbose)
     keyCounter = attribute_cleaner.getKeyCounter(infoBoxList)
-    keyTranslationFileName = os.path.abspath("attribute_keys_raw.txt")
+    keyTranslationFileName = os.path.abspath("../raw_output/attribute_keys_raw.txt")
     attribute_cleaner.saveKeyCounterToFile(keyCounter,
             keyTranslationFileName, verbose)
     attributeKeyParser = AttributeKeyParser(keyTranslationFileName, verbose)
