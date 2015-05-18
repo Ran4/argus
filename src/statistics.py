@@ -71,8 +71,9 @@ class Statistics:
         global deathDates
         exit()
         
-        ##
+        #http://pastebin.com/9rHnQZkH
         
+        ##
         
     def doPlots(self, showPlots=True):
         import matplotlib.pyplot as plt #use matplotlib to plot stuff
