@@ -9,12 +9,10 @@ from operator import itemgetter, attrgetter
 from termcolor import colored
 import logger
 
-statisticsOutputFileName = os.path.abspath(
-    "../stats/statistics_output.txt")
-
 class Statistics:
-    def __init__(self, JSONFileName, verbose):
+    def __init__(self, JSONFileName, statisticsOutputFileName, verbose):
         self.verbose = verbose
+        self.statisticsOutputFileName = statisticsOutputFileName
         try:
             with open(JSONFileName) as jsonFile:
                 self.JSONLists = json.load(jsonFile)
@@ -25,18 +23,21 @@ class Statistics:
             sys.exit()
             
         #Clear statistics output file
-        with open(statisticsOutputFileName, "w") as f:
+        with open(self.statisticsOutputFileName, "w") as f:
             f.write("")
             
         print "Loaded JSON and emptied statistics output file (%s)" % \
-            statisticsOutputFileName
+            self.statisticsOutputFileName
             
-    def statOutput(self, s):
-        if self.verbose:
+    def statOutput(self, s, verboseOverride=None):
+        if verboseOverride is not None:
+            verbose = verboseOverride
+        else:
+            verbose = self.verbose
+        
+        if verbose:
             print s
-        logger.writeToFile(s.encode("utf-8"), statisticsOutputFileName)
-    
-    
+        logger.writeToFile(s.encode("utf-8"), self.statisticsOutputFileName)
     
     
     def doStatistics(self):
@@ -44,9 +45,9 @@ class Statistics:
         
         ##
         
-        self.commonNames = self.commonNameSubStringsCounter().most_common(50)
-        #self.statOutput("Most common name substrings: %s" % mostCommonFormat(
-        #    self.commonNames))
+        self.commonNames = self.commonNameSubStringsCounter().most_common(100)
+        self.statOutput("Most common name substrings: %s" % mostCommonFormat(
+            self.commonNames))
         
         ##
         lastLetters = []
@@ -61,8 +62,8 @@ class Statistics:
         for char in "abcdefghijklmnopqrstuvwxyz":
             self.lastLetterInValueStats.append((char, lastLetters.count(char)))
             
-        #self.statOutput("Most common last letters: %s" % mostCommonFormat(
-        #    self.lastLetterInValueStats))
+        self.statOutput("Most common last letters: %s" % mostCommonFormat(
+            self.lastLetterInValueStats))
             
         ##
         deathDates = self.getAllValues(key="death_date", expandLists=False)
@@ -72,13 +73,17 @@ class Statistics:
         
         ##
         
-        #for key in ["salary"]:
-        for key in ["wage"]:
+        for key in ["salary", "known_for"]:
             values = self.getAllValues(key=key, expandLists=True)
-            print colored("Found %s values with the key '%s'" % (len(values), key), "white")
-            #print ", ".join(salaries)
-            pp(map(lambda x: x.encode("utf-8"), values))
-            print colored("End of %s" % key, "white")
+            s = "####Found %s values with the key '%s'" % (len(values), key)
+            self.statOutput(s, verboseOverride=True)
+            if self.verbose: print colored(s, "white")
+            if self.verbose: print "Values:", map(lambda x: x.encode("utf-8"), values)
+            self.statOutput("\n".join(values), verboseOverride=False)
+            
+            s = "####End of %s" % key
+            self.statOutput(s, verboseOverride=False)
+            if self.verbose: print colored(s, "white")
         
         ##
         
@@ -95,15 +100,15 @@ class Statistics:
         ##Example: self.commonNames = [("john", 1877), ("william", 987)]
         commonNamesValues = map(itemgetter(1), self.commonNames)
         xx = range(len(commonNamesValues))
-        #plt.plot(xx, commonNamesValues)
-        #if showPlots: plt.show()
+        plt.plot(xx, commonNamesValues)
+        if showPlots: plt.show()
         
         
         if self.verbose: print "  Plotting most common last letter of values"
         commonLastLetterValues = map(itemgetter(1), self.lastLetterInValueStats)
         xx = range(len(commonLastLetterValues))
-        #plt.plot(xx, commonLastLetterValues)
-        #if showPlots: plt.show()
+        plt.plot(xx, commonLastLetterValues)
+        if showPlots: plt.show()
         
         
         #################################################################
@@ -153,6 +158,7 @@ class Statistics:
             
 
 def main(showPlots):
+    #Handle arguments
     args = map(lambda x: x.lower(), sys.argv[1:])
     
     if len(args) == 0:
@@ -169,17 +175,26 @@ def main(showPlots):
     if any("noshow" in arg for arg in args):
         showPlots = False
     
-    JSONFileName = os.path.abspath("../output/infobox_output_cleaned.json")
+    #Start running statistics
     
-    global s #TODO: remove me, just used for debugging
+    statisticsOutputFileName = os.path.abspath("../stats/statistics_output.txt")
     
-    s = Statistics(JSONFileName, verbose)
+    hugeFileFileName = os.path.abspath("../output/infobox_output_cleaned_150518.json")
+    if os.path.isfile(hugeFileFileName):
+        print "Found huge file '%s', using that..." % hugeFileFileName
+        JSONFileName = hugeFileFileName
+    else: #Open smaller version instead
+        JSONFileName = os.path.abspath("../output/infobox_output_cleaned.json")
+        print "Uses smaller file '%s'" % JSONFileName
+    
+    print "Statistics will be written to file '%s'" % statisticsOutputFileName
+    s = Statistics(JSONFileName, statisticsOutputFileName, verbose)
+    
     s.doStatistics()
     if not noPlots:
         s.doPlots(showPlots)
-    
-    global j #TODO: remove me, just used for debugging
-    j = s.JSONLists
+        
+    print colored("Done with statistics.py", "green")
 
 if __name__ == "__main__":
     main(showPlots=True)

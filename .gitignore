@@ -1,6 +1,5 @@
 *.log
 *.pyc
-*.class
 .*.swp
 *~
 
@@ -8,3 +7,5 @@ raw_output/ibs_person_raw.json
 output/attribute_keys_cleaned.txt
 debug/attribute_changes.txt
 big_files/*
+
+output/infobox_output_cleaned_150518.json
