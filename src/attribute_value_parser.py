@@ -193,7 +193,7 @@ class AttributeValueParser:
             today = date.today()
             ageInYears = today.year - match.group(1) - ((today.month, today.day) < (match.group(2), match.group(3)))
             #Replace match with a descriptive string
-            value = self.patternBda.sub(match.group(3) + " " + self.months[match.group(2)] + " " + match.group(1) + "(age " + ageInYears + ")", value) #Note: we assume that second group is a digit
+            value = self.patternBda.sub(match.group(3) + " " + self.months[int(match.group(2))] + " " + match.group(1) + "(age " + ageInYears + ")", value) #Note: we assume that second group is a digit
         else:
             match = self.patternDob.match(value)
             if match:
