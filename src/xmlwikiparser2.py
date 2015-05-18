@@ -364,11 +364,13 @@ def main():
         filePath = os.path.abspath(sys.argv[1])
         outputFileName = os.path.abspath(sys.argv[2])
     else:
-        print "Usage: xmlwikiparser2 inputXMLFileName outputJSONFileName"
-        sys.exit()
-#~         fileName = "enwiki-20150304-pages-articles-multistream.xml"
-#~         filePath = "C:\\ovrigt\\ovrigt\\wp\\" + fileName
-#~         outputFileName = "ibs_person_raw.json"
+        if "windows" in sys.argv:
+            fileName = "enwiki-20150304-pages-articles-multistream.xml"
+            filePath = "C:\\ovrigt\\ovrigt\\wp\\" + fileName
+            outputFileName = "ibs_person_raw.json"
+        else:
+            print "Usage: xmlwikiparser2 inputXMLFileName outputJSONFileName"
+            sys.exit()
         
     f = open(filePath)
     
