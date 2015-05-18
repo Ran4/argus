@@ -48,7 +48,7 @@ class InfoBox(object):
         maxLength = 80
         if len(self.infoBoxType) > maxLength:
             #There might be a problem since the type string is so long!
-            self.handleLongInfoBoxType(maxLength, verbose=True)
+            self.handleLongInfoBoxType(maxLength, verbose)
             
     def fixWikiLists(self, infoBoxStringList, verbose=False):
         if verbose: print "in fixWikiLists"
