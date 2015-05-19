@@ -65,13 +65,14 @@ class InfoBox(object):
             #       ordinary list environment-lines often begin with non-separator characters.
             isBeginSpecialWikiList = "{{plainlist}}" in lowLine \
                 or "{{flowlist}}" in lowLine \
-                or "{{startflatlist}}" in lowLine
+                or "{{startflatlist}}" in lowLine \
+                or "{{startplainlist" in lowLine
                 
             isEndSpecialWikiList = "{{endplainlist}}" in lowLine \
                 or "{{endflowlist}}" in lowLine \
                 or "{{endflatlist}}" in lowLine
             
-            #The below case occurs if: 
+            #The below case occurs if:
             #   The number of curly braces on a row is unbalanced which means:
             #       We begin a Wikilist
             #       We end a Wikilist
@@ -140,16 +141,16 @@ class InfoBox(object):
             print "(%s characters omitted)'" % \
                     (len(self.infoBoxType) - maxLength)
         
-		#If there's a pipe in the infoBoxType, store what can be
+        #If there's a pipe in the infoBoxType, store what can be
                 #    found before the pipe
         if "|" in self.infoBoxType:
             self.infoBoxType = self.infoBoxType.split("|")[0].strip()
-		#If there's a "<" sign, this means we have discovered a comment.
+        #If there's a "<" sign, this means we have discovered a comment.
                 #Store what can be found before the comment.
         if "&lt;" in self.infoBoxType:
             self.infoBoxType = self.infoBoxType.split("&lt;")[0].strip()
         
-		#TODO: Will this always be displayed if verbose,
+        #TODO: Will this always be displayed if verbose,
                 #    even if nothing has been cut off?
         if verbose:
             print "  cutoff after first '|' or '&lt;' gives new infoBoxType: '%s'"%\
@@ -310,7 +311,7 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
             #~ print "%s %s" % (numCurlyBrackets, line.strip().lower())
             
             #~ print "in recordInfoBox, line: '%s'" % line.strip()
-			#TODO: Lines must only end in these formats. These might not be separate lines.
+            #TODO: Lines must only end in these formats. These might not be separate lines.
             #if line == "}}\n" or line == "|}}\n": #Found end of InfoBox
             if numCurlyBrackets == 0:
                 recordInfoBox = False

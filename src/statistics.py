@@ -55,7 +55,8 @@ class Statistics:
             self.statisticsOutputFileName
             
     def performQuery(self, queryInput, imageOutputPath=None,
-            queryType=None, useSmartTranslation=False, verbose=False):
+            queryType=None, searchType=None,
+            useSmartTranslation=False, verbose=False):
         """
         
         Returns a output string and a bool deciding if we saved the image or not
@@ -78,7 +79,7 @@ class Statistics:
                 print s
                 key = self.translationDict[key]
             
-        values = self.getAllValues(key=key, expandLists=True)
+        values = self.getAllValues(key=key, expandLists=True, searchType=searchType)
         if not values:
             s += "No values found with key='%s'" % key
             if verbose:
@@ -213,13 +214,19 @@ class Statistics:
     def mostCommonFormat(self, mostCommonList, sep=", "):
         return sep.join(map(lambda x: "%s (%s)" % x, mostCommonList))
     
-    def getAllValues(self, ofType=None, key=None, expandLists=True):
+    def getAllValues(self, ofType=None, key=None, expandLists=True,
+            searchType=None):
         retValues = []
         for pageDict in self.j:
             for pageDictKey in pageDict:
                 value = pageDict[pageDictKey]
-                if key is not None and pageDictKey != key:
-                    continue
+                
+                if searchType == "in_search":
+                    if key is not None and key not in pageDictKey:
+                        continue
+                else:
+                    if key is not None and pageDictKey != key:
+                        continue
                 
                 if isinstance(value, unicode):
                     retValues.append(value)

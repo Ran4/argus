@@ -80,19 +80,18 @@ class Server:
         
     def submit_query(self):
         queryInput = request.GET.get("query_input")
-        noSmartTransTag = request.GET.get("no_smart_translation")
-        print "Got noSmartTransTag: %s" % noSmartTransTag
-        useSmartTranslation = False if noSmartTransTag else True
-        
+        useSmartTranslation = not bool(request.GET.get("no_smart_translation"))
+        inSearch = bool(request.GET.get("in_search"))
         
         print "Got queryInput = '%s'" % queryInput
         
         textResponse = "Statistics query crashed..."
+        searchType = None
         queryType = "mostcommon"
         
         textResponse, imageWasSaved = self.statistics.performQuery(
             queryInput, self.queryImageOutputFilePath,
-            queryType, useSmartTranslation,
+            queryType, searchType, useSmartTranslation,
             verbose=False)
             
         if imageWasSaved:
