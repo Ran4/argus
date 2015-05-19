@@ -61,7 +61,7 @@ class AttributeValueParser:
         #Pattern for getting entries from a "startflatlist"
         self.patternStartflatlist = re.compile(r"^(?i)\{\{(?:.*?)\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+)(?:[ ]*)(?=\*)|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+?)(?:[ ]*)\{\{(?:.*?)\}\}$")
         #Pattern for getting entries from an "endplainlist"
-        self.patternEndplainlist  = re.compile(r"^(?i)\{\{(?:.*?)\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+?)(?:[ ]*)(?=\*|\{\{endplainlist\}\}$)(?:\{\{endplainlist\}\}$)*")
+        self.patternEndplainlist  = re.compile(r"^(?i)(?:\{\{(?:.*?))(?=\|)|(?:\||\*|\#)(?:[ ]*)([^\*\#]+?)(?:[ ]*)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)([^\*\#\}]*?)(?:[ ]*)\{\{endplainlist\}\}$")
         #Pattern for getting entries from a "plainlist"
         self.patternPlainlist = re.compile("^(?i)(?:\{\{(?:.*?))(?=\|)|\|(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\||\})|(?:\*|\#)(?:[ ]*)([^\*\#]+)(?:[ ]*)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)([^\*\#\}]*?)(?:[ ]*)\}\}$")
         #Pattern for getting entries from an "endflowlist"
@@ -86,7 +86,7 @@ class AttributeValueParser:
         ########################################################################
         
         #TODO: Pattern for creating dot-separated lists
-        self.patternDot = re.compile(u"(?i)\{\{\xb7\}\}")
+        self.patternDot = re.compile(u"(?i)\{\{\u00b7\}\}")
         #TODO: Pattern for replacing unicode hyphens (Why do this though???)
         self.patternHyphen = re.compile(u"\\u2013")
 
@@ -136,6 +136,8 @@ class AttributeValueParser:
         self.patternPipeLink = re.compile(r"\[\[(?:[ ]*)(?:[^\]]*?)(?:[ ]*)\|(?:[ ]*)(.*?)(?:[ ]*)\]\]")
         #Pattern for getting a from [[a]]
         self.patternLink = re.compile(r'\[\[(?:[ ]*)(.*?)(?:[ ]*)\]\]')
+        #Pattern for getting (a) from ''(a)'' or (a)
+        self.patternDoubleQuotes = re.compile("^(?:\'\'(?=\())*(.*?)(?:(?<=\))\'\')*$")
         
         #Pattern for extracting contents from the "Longitem", "bigger",
         #   "nowrap", "flagicon", "flag" and "flagcountry" environments
@@ -171,17 +173,61 @@ class AttributeValueParser:
         #Pattern for removing whitespaces from ends of strings
         #and also trailing commas.
         #(used for cleanup)
-        self.patternFixListEntries = re.compile("^[ ]*(.*?)[\, ]*$")
+        self.patternFixListEntries = re.compile("^[ ]*(.*?)(?:\,| )*$")
         
         ################################################
         ##REGEX PATTERNS FOR IDENTIFYING SPECIAL STRINGS
         
         #Pattern for checking if string is enclosed by parantheses
-        self.patternEnclosedByParentheses = re.compile("^\((?:[^\)\(]*)\)$")
+        #(possibly also by double quotation marks)
+        self.patternEnclosedByParentheses = re.compile("^(\'\')*\((?:[^\)\(]*)\)(\'\')*$")
 
         if verbose:
             print "AttributeValueParser has compiled all regex patterns"
-    
+            
+            
+    def concatenateParenthesesEnclosedEntries(self, aList, verbose=False):
+        """Takes a list which should be maximally parsed already, and
+        concatenates entries enclosed by parentheses to the previous ones.
+        Also, remove '', wherever they occur.
+        
+        Arguments:
+        If verbose is True, current operations will be printed.
+        A list of strings.
+        
+        Return value:
+        A list which has been cleaned to specifications.
+        """
+        #Clean list entries as needed
+        if aList != "":
+            assert(isinstance(aList, list))
+            if verbose:
+                print '    Removing whitespaces on both ends and trailing commas...'  
+            for i, string in enumerate(aList):
+                match = self.patternFixListEntries.match(string)
+                if match:
+                    if verbose:
+                        print "        " + string + ' being fixed to ' + match.group(1)
+                    aList[i] = match.group(1)
+                else:
+                    if verbose:
+                        print colored("WARNING: Fixing of list entries has failed.", "magenta")
+            if verbose:
+                print "    Fixed strings are: "
+                for string in aList:
+                    print "        " + string
+            #Try to concatenate all elements enclosed in parantheses to the previous element
+            if len(aList) > 1:
+                newList = [aList[0]]
+                if verbose:
+                    print '    Concatenating entries in parentheses to previous entries...'
+                for i, string in enumerate(aList[1:]):
+                    if self.patternEnclosedByParentheses.match(string):
+                        newList[-1] += " " + self.patternDoubleQuotes.match(string).group(1)
+                    else:
+                        newList.append(string)
+                aList = newList
+        return aList
                       
     def parseAttributeValue(self, value, verbose=False, logFileName=None):
         """Takes an attribute value as a string in un-edited Wiki markup format 
@@ -228,7 +274,7 @@ class AttributeValueParser:
         
         #Removes the {{*}} stuff
         if verbose:
-            print "Entering removal of {{*}}."
+            print colored("Entering removal of {{*}}.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternCBDot.sub(r"", value)
         
@@ -237,7 +283,7 @@ class AttributeValueParser:
             
         #Removes the titles encased as '''title'''
         if verbose:
-            print "Entering removal of encased titles."
+            print colored("Entering removal of encased titles.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternTitle.sub(r"", value)
         
@@ -246,7 +292,7 @@ class AttributeValueParser:
         
         #Remove all "cref" environments
         if verbose:
-            print "Entering removal of cref environment and contents."
+            print colored("Entering removal of cref environment and contents.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternCref.sub(r"", value)
         
@@ -255,7 +301,7 @@ class AttributeValueParser:
             
         #Remove all "sfn" environments
         if verbose:
-            print "Entering removal of sfn environment and contents."
+            print colored("Entering removal of sfn environment and contents.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternSfn.sub(r"", value)
         
@@ -267,7 +313,7 @@ class AttributeValueParser:
         #we should remove that break before creating a list out of
         #break-separated values.
         if verbose:
-            print "Entering removal of 'small' environment, checking for preceding br-tags and replacing them with whitespace."
+            print colored("Entering removal of 'small' environment, checking for preceding br-tags and replacing them with whitespace.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternSmallEnv.sub(r" \g<1>", value)
         
@@ -276,7 +322,7 @@ class AttributeValueParser:
             
         #Removes all ndashes
         if verbose:
-            print "Entering removal of ndash."
+            print colored("Entering removal of ndash.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternNdash.sub(r"-", value)
         
@@ -285,7 +331,7 @@ class AttributeValueParser:
         
         #Removes all nbsps
         if verbose:
-            print "Entering removal of nbsps."
+            print colored("Entering removal of nbsps.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternNbsp.sub(r" ", value)
         
@@ -294,7 +340,7 @@ class AttributeValueParser:
             
         #Removes the thinsp environment
         if verbose:
-            print "Entering removal of thinsp."
+            print colored("Entering removal of thinsp.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternThinsp.sub(r"", value)
         
@@ -303,7 +349,7 @@ class AttributeValueParser:
             
         #Removes the sup environment
         if verbose:
-            print "Entering removal of sup."
+            print colored("Entering removal of sup.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternSup.sub(r"", value)
         
@@ -312,7 +358,7 @@ class AttributeValueParser:
             
         #Removes all quot
         if verbose:
-            print "Entering removal of quot."
+            print colored("Entering removal of quot.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternQuote.sub(r"'", value)
         
@@ -321,7 +367,7 @@ class AttributeValueParser:
             
         #TODO: Replaces all unicode hyphens
         if verbose:
-            print "Entering removal of hyphens."
+            print colored("Entering removal of hyphens.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternHyphen.sub(r"-", value)
         
@@ -332,7 +378,7 @@ class AttributeValueParser:
         #with plain text describing the same thing.
         #If the person in question is living, you get their age as well.
         if verbose:
-            print "Entering parsing of birthdate environment."
+            print colored("Entering parsing of birthdate environment.", "blue")
             print "    Value before was: '%s'" % str(value)
         match = self.patternBda.match(value)
         if match:
@@ -416,7 +462,7 @@ class AttributeValueParser:
                     
         #Remove all <small> tags
         if verbose:
-            print "Entering removal of <small> tags."
+            print colored("Entering removal of <small> tags.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternSmall.sub(r"", value)
         
@@ -425,7 +471,7 @@ class AttributeValueParser:
             
         #Remove all comments
         if verbose:
-            print "Entering removal of comments."
+            print colored("Entering removal of comments.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternComment.sub(r"", value)
         
@@ -434,7 +480,7 @@ class AttributeValueParser:
             
         #Remove all references
         if verbose:
-            print "Entering removal of references."
+            print colored("Entering removal of references.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternReference.sub(r"", value)
         
@@ -443,7 +489,7 @@ class AttributeValueParser:
         
         #Remove all references of the type "(see: foobar)"
         if verbose:
-            print "Entering removal of references of type '(see: foo)'."
+            print colored("Entering removal of references of type '(see: foo)'.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternSeeRef.sub(r"", value)
         
@@ -452,7 +498,7 @@ class AttributeValueParser:
             
         #Remove all Wiki markup picture links
         if verbose:
-            print "Entering removal of Wiki markup pictures of format [[file: picture|text]]."
+            print colored("Entering removal of Wiki markup pictures of format [[file: picture|text]].", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternWikiPic.sub(r"", value)
         
@@ -462,7 +508,7 @@ class AttributeValueParser:
         #Replace all Wiki markup article links in the string.
         #    Step 1: Stuff of the form [[link|example]] should become example
         if verbose:
-            print "Entering link conversion of type 1 ([[link|example]])."
+            print colored("Entering link conversion of type 1 ([[link|example]]).", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternPipeLink.sub(r"\g<1>", value)
         
@@ -471,7 +517,7 @@ class AttributeValueParser:
                 
         #    Step 2: Stuff of the form [[example]] should become example
         if verbose:
-            print "Entering link conversion of type 2 ([[example]])."
+            print colored("Entering link conversion of type 2 ([[example]]).", "blue")
             print "    Value before was: '%s'" % str(value)
         
         value = self.patternLink.sub(r"\g<1>", value)
@@ -480,7 +526,7 @@ class AttributeValueParser:
             
         #    Removal of the "Longitem" environment
         if verbose:
-            print "Entering removal of 'Longitem' and 'nowrap' environments."
+            print colored("Entering removal of 'Longitem' and 'nowrap' environments.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternLongitem.sub(r"\g<1>", value)
         if verbose:
@@ -489,7 +535,7 @@ class AttributeValueParser:
         #Now that we're done with that, we want to check if the attribute value
         #is a list.
         if verbose:
-                print "Checking if attribute value is a list..."
+                print colored("Entering check for attribute value being a list...", "blue")
         match = self.patternList.match(value) #We can actually use match since we are only explicitly looking for matches at the beginning.
         if match:
             if verbose:
@@ -540,7 +586,7 @@ class AttributeValueParser:
                 else:
                     if verbose:
                         print '    "plainlist" detected.'
-                returnList = filter(None, list(itertools.chain.from_iterable(self.patternPlainlist.findall(value))))
+                    returnList = filter(None, list(itertools.chain.from_iterable(self.patternPlainlist.findall(value))))
             
             elif self.patternFlowlistName.match(listType):
                 if verbose:
@@ -548,7 +594,7 @@ class AttributeValueParser:
                 #A subcase for endflowlist environment:
                 if value.endswith("{{endflowlist}}"):
                     if verbose:
-                            print '    "endflowlist" detected.'
+                        print '    "endflowlist" detected'
                     returnList = filter(None, list(itertools.chain.from_iterable(self.patternEndflowlist.findall(value))))
                 else:
                     if verbose:
@@ -594,28 +640,7 @@ class AttributeValueParser:
                     print colored("WARNING: List of unknown type found!", "magenta")  
                 returnList = ""
                 
-            #Fix list entries as needed
-            if returnList != "":
-                assert(isinstance(returnList, list))
-                if verbose:
-                    print '    Fixing list entries...'  
-                for string in returnList:
-                    match = self.patternFixListEntries.match(string)
-                    if match:
-                        string = match.group(1)
-                    else:
-                        if verbose:
-                            print colored("WARNING: Fixing of list entries has failed.", "magenta")
-                
-                #Try to concatenate all elements enclosed in parantheses to the previous element
-                if len(returnList) > 1:
-                    newReturnList = [returnList[0]]
-                    for i, element in enumerate(returnList[1:]):
-                        if self.patternEnclosedByParentheses.match(element):
-                            newReturnList[-1] += element
-                        else:
-                            newReturnList.append(element)
-                    returnList = newReturnList
+            returnList = self.concatenateParenthesesEnclosedEntries(returnList, verbose)
             if verbose:
                 print "Returning: %s" % str(returnList)   
             return returnList
@@ -627,7 +652,7 @@ class AttributeValueParser:
             
             #Remove everything on the right of first pipe, to compensate for bad Wikipedia formatting
             if verbose:
-                print "Entering removal of right-of-pipe elements."
+                print colored("Entering removal of right-of-pipe elements.", "blue")
                 print "    Value before was: '%s'" % str(value)
             value = self.patternRightOfPipe.sub(r"", value)
             if verbose:
@@ -635,7 +660,7 @@ class AttributeValueParser:
 
             #Delete the entry if it starts with a #
             if verbose:
-                print "Entering removal of #-prepended entries"
+                print colored("Entering removal of #-prepended entries", "blue")
                 print "    Value before was: '%s'" % str(value)
             value = self.patternStartsWithSquare.sub(r"", value)
             if verbose:
@@ -643,7 +668,7 @@ class AttributeValueParser:
             
             #Remove eventual curly brackets at end
             if verbose:
-                print "Entering removal of curly brackets."
+                print colored("Entering removal of curly brackets.", "blue")
                 print "    Value before was: '%s'" % str(value)
             value = self.patternCurlyBrackets.sub(r"", value)
             if verbose:
@@ -652,16 +677,19 @@ class AttributeValueParser:
             if "<br />" in value or "<br/>" in value or "<br>" in value:
                 if verbose:
                     print 'Attribute value is a list separated by <br />.'
-                    print "Returning '%s'" % str(value)
                 value = filter(None, self.patternBr.split(value))
+                value = self.concatenateParenthesesEnclosedEntries(value, verbose)
+                if verbose:
+                    print "Returning '%s'" % str(value)
             else:
                 #Checking for dot-separated lists
                 if verbose:
-                    print "Entering check for lists separated by dots."
+                    print colored("Entering check for lists separated by dots.", "blue")
                     print "    Value before was: '%s'" % str(value)
-                match = self.patternDot.match(value)
+                match = self.patternDot.search(value)
                 if match:
                     value = filter(None, self.patternDot.split(value))
+                    value = self.concatenateParenthesesEnclosedEntries(value, verbose)
                 if verbose:
                     print "    Value after became: '%s'" % str(value)
                 else:
@@ -711,7 +739,7 @@ def test(verbose=False):
         ('{{bulleted list |class=sdfsdf|list_style=adfsdf|style=asdfsdf|item_style=sdfsdf |item2_style=sdfsdf| We only need this |information }}', ['We only need this', 'information']),
         ('{{flatlist|     class   =    asdfasd|style=      asdfsdfs|        indent   =asdfsdfsd|* [[cat]]* [[dog]]* [[horse]]* [[cow]]* [[sheep]]* [[pig]]}}', ['cat', 'dog', 'horse', 'cow', 'sheep', 'pig']),
         ('{{startflatlist}}* [[All]]* [[your]]* [[base]]* [[are]]* [[belong]]* [[to]]* [[us]]{{endflatlist}}', ['All','your','base','are','belong','to','us']),
-        ('{{plainlist}}* [[These   ]]* [[not visible | wonky   ]]* [[lists]]* are   * [[hard]]* [[to]]* [[you cant see me|parse]]{{endplainlist}}',['These','wonky','lists','are','hard','to','parse']),
+        ('{{plainlist}}* [[These   ]]* [[not visible | wonky   ]]* [[lists]]* are   * [[hard]]* [[to]]* [[you cant see me|parse]] {{endplainlist}}',['These','wonky','lists','are','hard','to','parse']),
         ('{{plainlist|class=sdfsdf|style=border:solid 1px silver; background:lightyellow|indent=2|* [[congo]]* [[niger]]* [[zululand]]}}', ['congo', 'niger', 'zululand']),
         ('{{flowlist}}*   [[Mao Zedong]]*    [[Ho Chi Minh]]    * [[Lars Ohly]]     {{endflowlist}}', ['Mao Zedong','Ho Chi Minh','Lars Ohly']),
         ('{{flowlist |class  =asdfasdf |style  =asdas |* [[platypus]]   * [[iguana]]  *  [[zorse]]   }}',['platypus','iguana','zorse']),
@@ -724,6 +752,7 @@ def test(verbose=False):
         ('{{unbulleted list |[[peripatetic school]] |[[aristotelianism]]}}', ['peripatetic school', 'aristotelianism']),
         ('{{unbulleted list |[[golden mean (philosophy)|golden mean]] |[[aristotelian logic]] |[[syllogism]] |[[hexis]] |[[hylomorphism]] |[[on the soul|theory of the soul]]}}', ['golden mean', 'aristotelian logic', 'syllogism', 'hexis', 'hylomorphism', 'theory of the soul']),
         ('{{hlist |[[parmenides]] |[[socrates]] |[[plato]] |[[heraclitus]] |[[democritus]]}}', ['parmenides', 'socrates', 'plato', 'heraclitus', 'democritus']),
+        ('[[Milan|Mediolanum]],<br />[[Italy (Roman Empire)|Italia annonaria]], [[Roman Empire]]<br />''[[Italy|(present-day Italy)]]''', ['Mediolanum', 'Italia annonaria, Roman Empire (present-day Italy)'])
         #TODO: Nested and/or multiple lists
         #('{{hlist|[[biology]]|[[zoology]]}} {{hlist|[[physics]]|[[metaphysics]]}}', ['biology', 'zoology', 'physics', 'metaphysics']),
     ]
