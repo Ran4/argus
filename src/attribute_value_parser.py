@@ -54,8 +54,8 @@ class AttributeValueParser:
         #Pattern for removing comments
         self.patternComment = re.compile(r"<!--(?:.*?)-->")
         
-        #Pattern for removing thinsp environment
-        self.patternThinsp = re.compile(r"(?i)\{\{thinsp\}\}|\{\{dot\}\}")
+        #Pattern for removing thinsp tag
+        self.patternThinsp = re.compile(r"(?i)\{\{thinsp\}\}")
         
         #Pattern for removing sup environment
         self.patternSup = re.compile(r"(?i)\{\{sup\|(?:.*?)\}\}")
@@ -67,7 +67,7 @@ class AttributeValueParser:
         self.patternSeeRef = re.compile(r"(?i)(?: \- |[ ])*\(see[ |\: ](?:.*?)\)")
         
         #Pattern for replacing nbsp with whitespaces
-        self.patternNbsp = re.compile(r"(?i)(\&amp;)*(\&)*nbsp;")
+        self.patternNbsp = re.compile(r"(?i)(?:(\&amp;)*(\&)*nbsp;)|\{\{dot\}\}|\{\{int\:dot\-separator\}\}|\{\{nbsp\}\}")
         
         #Pattern for replacing &amp;ndash; with "-"
         self.patternNdash = re.compile(r"(?i)\&amp\;ndash\;")
