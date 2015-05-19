@@ -9,6 +9,13 @@ from operator import itemgetter, attrgetter
 from termcolor import colored
 import logger
 
+try:
+    import matplotlib.pyplot as plt
+    plottingModulesLoaded = True
+except:
+    plottingModulesLoaded = False
+    
+
 class Statistics:
     def __init__(self, JSONFileName, statisticsOutputFileName, verbose):
         self.verbose = verbose
@@ -29,17 +36,63 @@ class Statistics:
         print "Loaded JSON and emptied statistics output file (%s)" % \
             self.statisticsOutputFileName
             
-    def performQuery(self, queryInput):
+    def performQuery(self, queryInput, imageOutputPath=None,
+            queryType=None, verbose=False):
         """
         
-        Returns True on success
+        Returns a output string and a bool deciding if we saved the image or not
         """
         print "In Statistics, got queryInput:", queryInput
         
+        s = "" #return string
         
+        key = queryInput
+        values = self.getAllValues(key=key, expandLists=True)
+        if not values:
+            s += "No values found with key='%s'" % key
+            if verbose:
+                print s
+            return s, False
         
+        s += "<p style='font-weight:bold;'>Found %s values with the key '%s'</p>" % \
+            (len(values), key)
+        if verbose:
+            print s
+            
+        #s += "Values: %s" % map(lambda x: x.encode("utf-8"), values)
         
-        return True
+        if queryType == "mostcommon":
+            numMostCommonvalues = 30
+            s += "<p style='font-weight:bold;'>" + \
+                "Showing the %s most common values</p>" % \
+                numMostCommonvalues
+            mostCommonValues = Counter(values).most_common(numMostCommonvalues)
+            s += self.mostCommonFormat(mostCommonValues, sep="</br>")
+            
+            
+            if not imageOutputPath or not plottingModulesLoaded:
+                return s, False
+                
+            ##Example: self.commonNames = [("john", 1877), ("william", 987)]
+            yy = map(itemgetter(1), mostCommonValues)
+            
+            plt.plot(range(len(yy)), yy)
+            
+            plt.title("Most common occurances of attribute '%s'" % key)
+            
+            plt.savefig(imageOutputPath)
+            print "Saved figure to %s" % imageOutputPath
+            
+            if verbose:
+                plt.show()
+                
+            plt.clf() #clear plot
+            
+            return s, True
+            
+        else: #just return all values
+            s += "\n".join(values)
+            return s, False
             
     def statOutput(self, s, verboseOverride=None):
         if verboseOverride is not None:
@@ -126,8 +179,8 @@ class Statistics:
         #################################################################
         if self.verbose: print "Plotting complete!"
             
-    def mostCommonFormat(self, mostCommonList):
-        return ", ".join(map(lambda x: "%s (%s)" % x, mostCommonList))
+    def mostCommonFormat(self, mostCommonList, sep=", "):
+        return sep.join(map(lambda x: "%s (%s)" % x, mostCommonList))
     
     def getAllValues(self, ofType=None, key=None, expandLists=True):
         retValues = []

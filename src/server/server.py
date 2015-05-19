@@ -31,6 +31,9 @@ class Server:
         self.statistics = statistics.Statistics(JSONFileName,
             statisticsOutputFileName, verbose=False)
             
+        self.queryImageOutputFilePath = os.path.abspath(
+            "../../stats/plots/query_output.png")
+            
         print "Statistics module loaded!"
         
     def loadTemplates(self):
@@ -52,27 +55,60 @@ class Server:
         r = self.app.route
         r("/", callback=self.index)
         r("/submit_query", method="GET", callback=self.submit_query)
+        r('/static/:filename', callback=self.serveStatic)
+        
+    
+    def serveStatic(self, filename):
+        root = os.path.abspath("../../stats/plots/")
+        return static_file(filename,
+            root=root)
         
     def index(self):
         self.loadTemplates()
-        return template(self.template, queryform="<b>BIG</b>")
+        return template(self.template,
+            textresponse="",
+            queryform="<b>BIG</b>")
         
     def submit_query(self):
         queryInput = request.GET.get("query_input")
         
         print "Got queryInput = '%s'" % queryInput
         
-        returnedImageName = "error.png"
-        try:
-            self.statistics.performQuery(queryInput=queryInput)
-        except:
-            print "Problem calling statistics.performQuery()"
+        textResponse = "Statistics query crashed..."
+        queryType = "mostcommon"
+        
+        textResponse, imageWasSaved = \
+            self.statistics.performQuery(queryInput=queryInput,
+            imageOutputPath=self.queryImageOutputFilePath,
+            queryType=queryType,
+            verbose=False)
+            
+        if imageWasSaved:
+            #get this from after / in self.queryImageOutputFilePath instead
+            
+            splittedPath = os.path.split(self.queryImageOutputFilePath)
+            print "splitted path:", str(splittedPath)
+            path, fname = splittedPath
+            
+            imageName = fname
+            #imageName = "query_output.png"
+        else:
+            imageName = "server_error.png"
+            
+        maxTextResponseLength = 80*1000
+        if len(textResponse) > maxTextResponseLength:
+            textResponse = textResponse[:maxTextResponseLength] + \
+                "\n(%s more characters were dropped from output)" % \
+                    (len(textResponse) - maxTextResponseLength)
+                    
         
         #Return things
         self.loadTemplates()
-        returnedImageName = "imagename.png"
         return template(self.template,
-            queryform=template(self.queryTemplate, imagename=returnedImageName))
+            textresponse=textResponse,
+            queryform=template(
+                self.queryTemplate, imagename=(imageName))
+        ).replace("&lt;","<").replace("&gt;",">").replace('&quot;','"').replace("&#039;",'"')
         
         
 def main():
