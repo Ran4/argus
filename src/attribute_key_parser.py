@@ -61,7 +61,8 @@ class AttributeKeyParser:
         
         #Ignore these keys completely
         self.ignoredKeys = ["image", "alt", "caption", "image_size",
-            "footnotes", "background", "module", "bgcolor",]
+            "footnotes", "background", "module", "bgcolor",
+            "signature", "signature_alt",]
 
     def findNewKey(self, key, verbose=False):
         """Takes a key as a string, and changes it to be more generic
