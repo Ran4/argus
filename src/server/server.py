@@ -28,8 +28,17 @@ class Server:
         statisticsOutputFileName = os.path.abspath(
             "../../stats/statistics_output_server.txt")
         
+        cleanedKeysFileName = os.path.abspath(
+                "../../output/attribute_keys_cleaned.txt")
+        
+        if not os.path.isfile(cleanedKeysFileName):
+            print "Couldn't find attribute_keys_cleaned file at '%s'" % \
+                cleanedKeysFileName
+            cleanedKeysFileName = None
+        
         self.statistics = statistics.Statistics(JSONFileName,
-            statisticsOutputFileName, verbose=False)
+            statisticsOutputFileName, cleanedKeysFileName,
+            verbose=False)
             
         self.queryImageOutputFilePath = os.path.abspath(
             "../../stats/plots/query_output.png")
@@ -71,16 +80,19 @@ class Server:
         
     def submit_query(self):
         queryInput = request.GET.get("query_input")
+        noSmartTransTag = request.GET.get("no_smart_translation")
+        print "Got noSmartTransTag: %s" % noSmartTransTag
+        useSmartTranslation = False if noSmartTransTag else True
+        
         
         print "Got queryInput = '%s'" % queryInput
         
         textResponse = "Statistics query crashed..."
         queryType = "mostcommon"
         
-        textResponse, imageWasSaved = \
-            self.statistics.performQuery(queryInput=queryInput,
-            imageOutputPath=self.queryImageOutputFilePath,
-            queryType=queryType,
+        textResponse, imageWasSaved = self.statistics.performQuery(
+            queryInput, self.queryImageOutputFilePath,
+            queryType, useSmartTranslation,
             verbose=False)
             
         if imageWasSaved:

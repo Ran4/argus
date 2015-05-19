@@ -219,12 +219,15 @@ class InfoBox(object):
         isoCode = "en"
         
         d = self.getPropertiesDict()
-        d["wikiURL"] = wikiUrl
-        d["isoCode"] = isoCode
+        d["wikiurl"] = wikiUrl
+        d["isocode"] = isoCode
+        
+        """
         if self.isInArticleWithPersonBox and self.countInArticle == 0:
-            d["isFirstInArticleWithPersonBox"] = "1"
+            d["isfirstinarticlewithpersonbox"] = "1"
         else:
-            d["isFirstInArticleWithPersonBox"] = "0"
+            d["isfirstinarticlewithpersonbox"] = "0"
+        """
             
         if indent is None:
             return json.dumps(d, indent=2)

@@ -17,7 +17,8 @@ except:
     
 
 class Statistics:
-    def __init__(self, JSONFileName, statisticsOutputFileName, verbose):
+    def __init__(self, JSONFileName, statisticsOutputFileName,
+            cleanedKeysFileName=None, verbose=False):
         self.verbose = verbose
         self.statisticsOutputFileName = statisticsOutputFileName
         try:
@@ -29,6 +30,23 @@ class Statistics:
                 JSONFileName, "yellow")
             sys.exit()
             
+        #Loads translation dict
+        self.translationDict = {}
+        if cleanedKeysFileName:
+            try:
+                with open(cleanedKeysFileName) as f:
+                    for line in f:
+                        raw, cleaned = line.strip().split("\t")
+                        self.translationDict[raw] = cleaned
+            except:
+                print colored(
+                    "Problem reading list of cleaned keys from file '%s'" % \
+                    cleanedKeysFileName, "yellow")
+                exit()
+            
+            print "Loaded translation dictionary from file"
+        
+            
         #Clear statistics output file
         with open(self.statisticsOutputFileName, "w") as f:
             f.write("")
@@ -37,16 +55,29 @@ class Statistics:
             self.statisticsOutputFileName
             
     def performQuery(self, queryInput, imageOutputPath=None,
-            queryType=None, verbose=False):
+            queryType=None, useSmartTranslation=False, verbose=False):
         """
         
         Returns a output string and a bool deciding if we saved the image or not
         """
-        print "In Statistics, got queryInput:", queryInput
-        
         s = "" #return string
         
-        key = queryInput
+        ##REMOVE ME!
+        #~ d = self.translationDict 
+        #~ notSameList = ["%s %s" % (key, d[key]) for key in d if key != d[key]]
+        #~ open("outfile_removeme.txt", "w").write("\n".join(notSameList))
+        
+        #~ exit()
+        
+        
+        key = queryInput.lower()
+        if key in self.translationDict and useSmartTranslation:
+            if key != self.translationDict[key]:
+                s += "(searching for '%s' instead of '%s')</br>" % \
+                    (self.translationDict[key], queryInput)
+                print s
+                key = self.translationDict[key]
+            
         values = self.getAllValues(key=key, expandLists=True)
         if not values:
             s += "No values found with key='%s'" % key
@@ -54,7 +85,7 @@ class Statistics:
                 print s
             return s, False
         
-        s += "<p style='font-weight:bold;'>Found %s values with the key '%s'</p>" % \
+        s += "<p style='font-weight:bold;'>Found %s people with the attribute '%s'</p>" % \
             (len(values), key)
         if verbose:
             print s
@@ -251,9 +282,13 @@ def main(showPlots):
     else: #Open smaller version instead
         JSONFileName = os.path.abspath("../output/infobox_output_cleaned.json")
         print "Uses smaller file '%s'" % JSONFileName
+        
+    cleanedKeysFileName = os.path.abspath(
+        "../output/attribute_keys_cleaned.txt")
     
     print "Statistics will be written to file '%s'" % statisticsOutputFileName
-    s = Statistics(JSONFileName, statisticsOutputFileName, verbose)
+    s = Statistics(JSONFileName, statisticsOutputFileName,
+        cleanedKeysFileName, verbose)
     
     s.doStatistics()
     if not noPlots:

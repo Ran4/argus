@@ -63,6 +63,9 @@ class AttributeKeyParser:
         self.ignoredKeys = ["image", "alt", "caption", "image_size",
             "footnotes", "background", "module", "bgcolor",
             "signature", "signature_alt",]
+            
+    def getTranslationDict(self):
+        pass
 
     def findNewKey(self, key, verbose=False):
         """Takes a key as a string, and changes it to be more generic
@@ -75,6 +78,10 @@ class AttributeKeyParser:
         
         if key in self.translationDict:
             newKey = self.translationDict[key]
+            if newKey in self.ignoredKeys:
+                #translated to a key that should be ignored
+                return ""
+                
         else:
             if key == "":
                 return ""
