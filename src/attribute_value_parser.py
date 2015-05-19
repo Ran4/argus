@@ -6,6 +6,14 @@ from termcolor import colored
 
 class AttributeValueParser:
     def __init__(self, verbose=False):
+        """Initializes all regex patterns and dictionaries needed for parsing.
+        
+        Regex patterns are grouped by functionality for easier merging, if you
+        should wish to do so later.
+        
+        Arguments:
+        If verbose is True, current operations will be printed.
+        """
         
         #Dictionary for parsing date environments
         self.months = {1 : "January",
@@ -21,94 +29,6 @@ class AttributeValueParser:
             11 : "November",
             12 : "December",
         }
-        
-        ########################################################################
-        #MISC REGEX PATTERNS
-        #(For identifying/deleting/extracting data from 
-        #   various miscellaneous environments)
-        ########################################################################
-        
-        #TODO: Pattern for creating dot-separated lists
-        self.patternDot = re.compile(u"(?i)\{\{\xb7\}\}")
-        #TODO: Pattern for replacing unicode hyphens (Why do this though???)
-        self.patternHyphen = re.compile(u"\\u2013")
-
-        #Pattern for extracting contents of the "small" environment
-        #and replacing a <br /> directly before it, if there is one.
-        self.patternSmallEnv = re.compile("(?i)(?:<br(?:[ ]*)(?:[\/]*)>)*\{\{(?:[ ]*)small(?:[ ]*)\|(?:[\']*)(.*?)(?:[\']*)\}\}")
-
-        #Pattern for removing cref and contents
-        self.patternCref = re.compile(r"(?i)\{\{cref[^\}]*?(?:\}\}\}\}\}|\}\}(?!\}))")
-        #Pattern for removing comments
-        self.patternComment = re.compile(r"<!--(?:.*?)-->")
-        #Pattern for removing thinsp tag
-        self.patternThinsp = re.compile(r"(?i)\{\{thinsp\}\}")
-        #Pattern for removing sup environment
-        self.patternSup = re.compile(r"(?i)\{\{sup\|(?:.*?)\}\}")
-        #Pattern for removing references
-        self.patternReference = re.compile(r"(?i)<(?:span|ref|ref group(?:[^\>])*|ref name(?:[^\>])*)>(?:.*?)<\/(?:ref|span)>|<ref(?:.*?)\/>")
-        #Pattern for removing references of the type "(see: foobar)"
-        self.patternSeeRef = re.compile(r"(?i)(?: \- |[ ])*\(see[ |\: ](?:.*?)\)")
-        #Pattern for removing <small> and </small> tags
-        self.patternSmall = re.compile(r"(?i)\<[\/]*small\>")
-        #Pattern for removing {{*}}
-        self.patternCBDot = re.compile("(?i)\{\{(?:\*|ndash|mdash|spaced ndash)\}\}")
-        #Pattern for removing sfn, refn, cite journal and sfnp
-        #Also pad, 
-        self.patternSfn = re.compile(r"(?i)\{\{(?:sfn|refn|cite journal|citation needed|dn|disambiguation needed|pad)(?:.*?)\}\}")
-        #Pattern for removing list sub-titles encased as '''title'''
-        self.patternTitle = re.compile("'''(.*?)'''")
-        
-        #Pattern for replacing nbsp with whitespaces
-        self.patternNbsp = re.compile(r"(?i)(?:(\&amp;)*(\&)*nbsp;)|\{\{dot\}\}|\{\{int\:dot\-separator\}\}|\{\{nbsp\}\}")
-        #Pattern for replacing &amp;ndash; with "-"
-        self.patternNdash = re.compile(r"(?i)\&amp\;ndash\;")
-        #Pattern for replacing &quot; with a '
-        self.patternQuote = re.compile(r"(?i)\&quot;")
-        
-        #Pattern for removing }} from end of string
-        #(used for cleanup)
-        self.patternCurlyBrackets = re.compile(r"\}\}$")
-        #Pattern for removing string if it starts with #
-        #(used for cleanup)
-        self.patternStartsWithSquare = re.compile(r"^\#")
-        #Pattern for removing everything on the right of the first pipe
-        #(used for cleanup)
-        self.patternRightOfPipe = re.compile(r"\|(?:.*)")
-        #Pattern for removing whitespaces from ends of strings
-        #and also trailing commas.
-        #(used for cleanup)
-        self.patternFixListEntries = re.compile("^[ ]*(.*?)[\, ]*$")
-        
-        #Pattern for replacing <br /> with " "
-        #or split string with it as separator
-        self.patternBr = re.compile("(?i)\<br[ ]*(?:[\/]*)[ ]*\>")
-        
-        #Pattern for checking if string is enclosed by parantheses
-        self.patternEnclosedByParentheses = re.compile("^\((?:[^\)\(]*)\)$")
-        
-        #Pattern for getting b from [[a|b]]
-        self.patternPipeLink = re.compile(r"\[\[(?:[ ]*)(?:[^\]]*?)(?:[ ]*)\|(?:[ ]*)(.*?)(?:[ ]*)\]\]")
-        #Pattern for removing wikipedia pictures
-        self.patternWikiPic = re.compile(r"(?i)\[\[file\:(.*?)\]\]")
-        #Pattern for getting a from [[a]]
-        self.patternLink = re.compile(r'\[\[(?:[ ]*)(.*?)(?:[ ]*)\]\]')
-        
-        #Pattern for extracting data from the "Longitem", "bigger",
-        #   "nowrap", "flagicon", "flag" and "flagcountry" environments
-        self.patternLongitem = re.compile(r'(?i)\{\{(?:[ ]*)(?:smaller|longitem|nowrap|bigger|flagicon|flag|flagcountry)(?:[ ]*)\|(?:(?:(?:[ ]*)(?:style|padding|line-height)(?:[^\|]+?)\|)*)(?:[ ]*)(.*?)(?:[ ]*)\}\}')
-        
-        #Gets death date and age out of a "death date and age" environment
-        self.patternDda = re.compile('(?i)\{\{(?:birth date and age|bda)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
-        #Gets death date and age out of a "death year and age" environment
-        self.patternDya = re.compile('(?i)\{\{(?:death year and age|dya)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:\d+)(?:[ ]*))*(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
-        #Gets date of birth out of a "birth date and age" environment (and NOT from a "birth date" environment)
-        self.patternBda = re.compile('(?i)\{\{(?:birth date and age|bda)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
-        #Gets date of birth out of a "birth date" environment
-        self.patternDob = re.compile('(?i)\{\{(?:birth date|dob)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
-        
-        #Pattern for extracting list name from {{list name| or {{list name}}
-        self.patternList = re.compile(r'\{\{([^|]+?)(?:[ ]*)(?:\||\})')
         
         ########################################################################
         #LIST NAME REGEX PATTERNS
@@ -141,7 +61,7 @@ class AttributeValueParser:
         #Pattern for getting entries from a "startflatlist"
         self.patternStartflatlist = re.compile(r"^(?i)\{\{(?:.*?)\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+)(?:[ ]*)(?=\*)|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+?)(?:[ ]*)\{\{(?:.*?)\}\}$")
         #Pattern for getting entries from an "endplainlist"
-        self.patternEndplainlist  = re.compile(r"^(?i)\{\{(?:.*?)\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+?)(?:[ ]*)(?=\*|$)|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+?)(?:[ ]*)\{\{(?:.*?)\}\}$")
+        self.patternEndplainlist  = re.compile(r"^(?i)\{\{(?:.*?)\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+?)(?:[ ]*)(?=\*|\{\{endplainlist\}\}$)(?:\{\{endplainlist\}\}$)*")
         #Pattern for getting entries from a "plainlist"
         self.patternPlainlist = re.compile("^(?i)(?:\{\{(?:.*?))(?=\|)|\|(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\||\})|(?:\*|\#)(?:[ ]*)([^\*\#]+)(?:[ ]*)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)([^\*\#\}]*?)(?:[ ]*)\}\}$")
         #Pattern for getting entries from an "endflowlist"
@@ -158,19 +78,119 @@ class AttributeValueParser:
         self.patternOrderedList = re.compile("^(?i)\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)list_style_type(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_value(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)start(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:(?:\||\*|\#)+)(?:[ ]*)(.*?)(?:[ ]*)(?=\|)|(?:(?:\||\*|\#)+)(?:[ ]*)(.*?)(?:[ ]*)\}\}$")
         #Pattern for getting entries from a "toolbar"
         self.patternToolbar = re.compile("^(?i)\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)separator(?:[ ]*)=(?:.*?)(?=\}\}|\|)|\|(?:[ ]*)(.*?)(?:[ ]*)(?=\|)|\|(?:[ ]*)([^\|]*?)(?:[ ]*)\}\}$")
+
+        ########################################################################
+        #MISC REGEX PATTERNS
+        #(For identifying/deleting/replacing/extracting content from 
+        #   various miscellaneous environments)
+        ########################################################################
         
+        #TODO: Pattern for creating dot-separated lists
+        self.patternDot = re.compile(u"(?i)\{\{\xb7\}\}")
+        #TODO: Pattern for replacing unicode hyphens (Why do this though???)
+        self.patternHyphen = re.compile(u"\\u2013")
+
+        #########################################
+        ##REGEX PATTERNS FOR REMOVING WIKI MARKUP
+
+        #Pattern for removing cref and contents
+        self.patternCref = re.compile(r"(?i)\{\{cref[^\}]*?(?:\}\}\}\}\}|\}\}(?!\}))")
+        #Pattern for removing comments
+        self.patternComment = re.compile(r"<!--(?:.*?)-->")
+        #Pattern for removing thinsp tag
+        self.patternThinsp = re.compile(r"(?i)\{\{thinsp\}\}")
+        #Pattern for removing sup environment
+        self.patternSup = re.compile(r"(?i)\{\{sup\|(?:.*?)\}\}")
+        #Pattern for removing references
+        self.patternReference = re.compile(r"(?i)<(?:span|ref|ref group(?:[^\>])*|ref name(?:[^\>])*)>(?:.*?)<\/(?:ref|span)>|<ref(?:.*?)\/>")
+        #Pattern for removing references of the type "(see: foobar)"
+        self.patternSeeRef = re.compile(r"(?i)(?: \- |[ ])*\(see[ |\: ](?:.*?)\)")
+        #Pattern for removing <small> and </small> tags
+        self.patternSmall = re.compile(r"(?i)\<[\/]*small\>")
+        #Pattern for removing {{*}}, and ndash, mdash andspaced ndash
+        self.patternCBDot = re.compile("(?i)\{\{(?:\*|ndash|mdash|spaced ndash)\}\}")
+        #Pattern for removing sfn, refn, cite journal, sfnp and pad
+        self.patternSfn = re.compile(r"(?i)\{\{(?:sfn|refn|cite journal|citation needed|dn|disambiguation needed|pad)(?:.*?)\}\}")
+        #Pattern for removing list sub-titles encased as '''title'''
+        self.patternTitle = re.compile("'''(.*?)'''")
+        #Pattern for removing Wiki markup picture links
+        self.patternWikiPic = re.compile(r"(?i)\[\[file\:(.*?)\]\]")
+        
+        ##########################################
+        ##REGEX PATTERNS FOR REPLACING WIKI MARKUP
+        
+        #Pattern for replacing nbsp with whitespaces
+        self.patternNbsp = re.compile(r"(?i)(?:(\&amp;)*(\&)*nbsp;)|\{\{dot\}\}|\{\{int\:dot\-separator\}\}|\{\{nbsp\}\}")
+        #Pattern for replacing &amp;ndash; with "-"
+        self.patternNdash = re.compile(r"(?i)\&amp\;ndash\;")
+        #Pattern for replacing &quot; with a '
+        self.patternQuote = re.compile(r"(?i)\&quot;")
+        #Pattern for replacing <br /> with " "
+        #or split string with it as separator
+        self.patternBr = re.compile("(?i)\<br[ ]*(?:[\/]*)[ ]*\>")
+        
+        #######################################
+        ##REGEX PATTERNS FOR EXTRACTING CONTENT
+        
+        #Pattern for getting b from [[a|b]]
+        self.patternPipeLink = re.compile(r"\[\[(?:[ ]*)(?:[^\]]*?)(?:[ ]*)\|(?:[ ]*)(.*?)(?:[ ]*)\]\]")
+        #Pattern for getting a from [[a]]
+        self.patternLink = re.compile(r'\[\[(?:[ ]*)(.*?)(?:[ ]*)\]\]')
+        
+        #Pattern for extracting contents from the "Longitem", "bigger",
+        #   "nowrap", "flagicon", "flag" and "flagcountry" environments
+        self.patternLongitem = re.compile(r'(?i)\{\{(?:[ ]*)(?:smaller|longitem|nowrap|bigger|flagicon|flag|flagcountry)(?:[ ]*)\|(?:(?:(?:[ ]*)(?:style|padding|line-height)(?:[^\|]+?)\|)*)(?:[ ]*)(.*?)(?:[ ]*)\}\}')
+        #Pattern for extracting contents of the "small" environment
+        #and replacing a <br /> directly preceding it, if there is one.
+        self.patternSmallEnv = re.compile("(?i)(?:<br(?:[ ]*)(?:[\/]*)>)*\{\{(?:[ ]*)small(?:[ ]*)\|(?:[\']*)(.*?)(?:[\']*)\}\}")
+        
+        #Gets death date and age out of a "death date and age" environment
+        self.patternDda = re.compile('(?i)\{\{(?:birth date and age|bda)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
+        #Gets death date and age out of a "death year and age" environment
+        self.patternDya = re.compile('(?i)\{\{(?:death year and age|dya)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:\d+)(?:[ ]*))*(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
+        #Gets date of birth out of a "birth date and age" environment (and NOT from a "birth date" environment)
+        self.patternBda = re.compile('(?i)\{\{(?:birth date and age|bda)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
+        #Gets date of birth out of a "birth date" environment
+        self.patternDob = re.compile('(?i)\{\{(?:birth date|dob)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
+        
+        #Pattern for extracting list name from {{list name| or {{list name}}
+        self.patternList = re.compile(r'\{\{([^|]+?)(?:[ ]*)(?:\||\})')
+        
+        #############################################
+        ##REGEX PATTERNS FOR CLEANING UP FINAL RESULT
+        
+        #Pattern for removing }} from end of string
+        #(used for cleanup)
+        self.patternCurlyBrackets = re.compile(r"\}\}$")
+        #Pattern for removing string if it starts with #
+        #(used for cleanup)
+        self.patternStartsWithSquare = re.compile(r"^\#")
+        #Pattern for removing everything on the right of the first pipe
+        #(used for cleanup)
+        self.patternRightOfPipe = re.compile(r"\|(?:.*)")
+        #Pattern for removing whitespaces from ends of strings
+        #and also trailing commas.
+        #(used for cleanup)
+        self.patternFixListEntries = re.compile("^[ ]*(.*?)[\, ]*$")
+        
+        ################################################
+        ##REGEX PATTERNS FOR IDENTIFYING SPECIAL STRINGS
+        
+        #Pattern for checking if string is enclosed by parantheses
+        self.patternEnclosedByParentheses = re.compile("^\((?:[^\)\(]*)\)$")
+
         if verbose:
             print "AttributeValueParser has compiled all regex patterns"
     
                       
     def parseAttributeValue(self, value, verbose=False, logFileName=None):
-        """Takes an attribute value as a string in un-edited wikiUML format 
+        """Takes an attribute value as a string in un-edited Wiki markup format 
         and parses it into either a string value or a tuple of string values.
         
         Arguments:
-        If verbose is True, statements will be printed
+        If verbose is True, current operations will be printed
         If logFileName is a string, anything happenening (including errors)
-            will be logged to the filename logFileName 
+            will be logged to the filename logFileName.
         
         Return value:
         If no value was found, "" is returned.
@@ -186,8 +206,15 @@ class AttributeValueParser:
         value = "Barack Obama signature.svg"
         parseAttributeValue(value) == ""
         """
+        
+        ########################################################################
+        #INITIAL CLEANUP
+        #(We remove all small tags and similar so that they will not mess up the
+        #more complicated environments later on)
+        ########################################################################
+        
         if verbose:
-            print "\nNew parse initiated."
+            print "\nPARSE OF ATTRIBUTE VALUE INITIATED"
             
         #The whole entry could be an image: ignore these before trying to parse
         #TODO: Might better be contains, not endswith, and a regex for filenames
@@ -196,10 +223,8 @@ class AttributeValueParser:
                 print "File extension found - attribute value", value, "was purged from records."
             return ""
             
-        #Replaces these with real < and > signs
+        #Replaces &lt; and &gt; with actual < and > signs
         value = value.replace("&lt;","<").replace("&gt;",">")
-        
-        #TODO: convert environment (Ex: {{convert|550|ft|m|0}})
         
         #Removes the {{*}} stuff
         if verbose:
@@ -238,8 +263,9 @@ class AttributeValueParser:
             print "    Value after became: '%s'" % str(value)
             
         #Remove all "small" environments (Ex: {{small|(April 21, 1832 - July 10, 1832)}})
-        #Plus, if these are preceeded by a <br />, this means that we should
-        #remove that break before creating a list out of break-separated values.
+        #Plus, if these are preceeded immediately by a <br />, this means that
+        #we should remove that break before creating a list out of
+        #break-separated values.
         if verbose:
             print "Entering removal of 'small' environment, checking for preceding br-tags and replacing them with whitespace."
             print "    Value before was: '%s'" % str(value)
@@ -303,7 +329,6 @@ class AttributeValueParser:
             print "    Value after became: '%s'" % str(value)
             
         #Replaces some birthdate environments (Ex: {{birth date|1809|2|12}})
-        #TODO: Handle more environments: http://en.wikipedia.org/wiki/Template:Birth_date
         #with plain text describing the same thing.
         #If the person in question is living, you get their age as well.
         if verbose:
@@ -425,28 +450,28 @@ class AttributeValueParser:
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
-        #Remove all Wiki pictures
+        #Remove all Wiki markup picture links
         if verbose:
-            print "Entering removal of Wikipedia pictures of format [[file: asdasd|asdasdasd]]."
+            print "Entering removal of Wiki markup pictures of format [[file: picture|text]]."
             print "    Value before was: '%s'" % str(value)
         value = self.patternWikiPic.sub(r"", value)
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
         
-        #Replace all Wiki article links in the string.
-        #    Step 1: Stuff of the form [[blabla|derpderp]] should become derpderp
+        #Replace all Wiki markup article links in the string.
+        #    Step 1: Stuff of the form [[link|example]] should become example
         if verbose:
-            print "Entering link conversion of type 1 ([[a|b]])."
+            print "Entering link conversion of type 1 ([[link|example]])."
             print "    Value before was: '%s'" % str(value)
         value = self.patternPipeLink.sub(r"\g<1>", value)
         
         if verbose:
             print "    Value after became: '%s'" % str(value)
                 
-        #    Step 2: Stuff of the form [[derpderp]] should become derpderp
+        #    Step 2: Stuff of the form [[example]] should become example
         if verbose:
-            print "Entering link conversion of type 2 ([[a]])."
+            print "Entering link conversion of type 2 ([[example]])."
             print "    Value before was: '%s'" % str(value)
         
         value = self.patternLink.sub(r"\g<1>", value)
@@ -463,7 +488,6 @@ class AttributeValueParser:
         
         #Now that we're done with that, we want to check if the attribute value
         #is a list.
-        #TODO: "plain list" on wikipedia might redirect to "plainlist". Fix this?
         if verbose:
                 print "Checking if attribute value is a list..."
         match = self.patternList.match(value) #We can actually use match since we are only explicitly looking for matches at the beginning.
@@ -509,7 +533,6 @@ class AttributeValueParser:
                 if verbose:
                     print '    some type of plainlist detected...'
                 #A subcase for endplainlist environment:
-                #TODO: There can occur a third case: a plainlist environment which does not close (See: article with Abraham Lincoln)
                 if value.endswith("{{endplainlist}}"):
                     if verbose:
                         print '    "endplainlist" detected.'
@@ -602,7 +625,6 @@ class AttributeValueParser:
             #<br />-separated or dot ({{.}})-separated. If that is the case, split it using that as a
             #separator. Otherwise, return the value as it is.
             
-            
             #Remove everything on the right of first pipe, to compensate for bad Wikipedia formatting
             if verbose:
                 print "Entering removal of right-of-pipe elements."
@@ -650,7 +672,12 @@ class AttributeValueParser:
         
         
 def test(verbose=False):
+    """Tests the functionality of attribute_value_paser. Will crash with an
+    AssertionError if something is not working correctly.
     
+    Arguments:
+    If verbose is True, current operations will be printed.
+    """
     def asserter(inValue, outValue):
         if (isinstance(inValue, str) or isinstance(inValue, unicode)) \
                 and (isinstance(outValue, str), isinstance(outValue, unicode)):
@@ -684,7 +711,7 @@ def test(verbose=False):
         ('{{bulleted list |class=sdfsdf|list_style=adfsdf|style=asdfsdf|item_style=sdfsdf |item2_style=sdfsdf| We only need this |information }}', ['We only need this', 'information']),
         ('{{flatlist|     class   =    asdfasd|style=      asdfsdfs|        indent   =asdfsdfsd|* [[cat]]* [[dog]]* [[horse]]* [[cow]]* [[sheep]]* [[pig]]}}', ['cat', 'dog', 'horse', 'cow', 'sheep', 'pig']),
         ('{{startflatlist}}* [[All]]* [[your]]* [[base]]* [[are]]* [[belong]]* [[to]]* [[us]]{{endflatlist}}', ['All','your','base','are','belong','to','us']),
-        #('{{plainlist}}* [[These   ]]* [[not visible | wonky   ]]* [[lists]]* are   * [[hard]]* [[to]]* [[you cant see me|parse]]{{endplainlist}}',['These','wonky','lists','are','hard','to','parse']),
+        ('{{plainlist}}* [[These   ]]* [[not visible | wonky   ]]* [[lists]]* are   * [[hard]]* [[to]]* [[you cant see me|parse]]{{endplainlist}}',['These','wonky','lists','are','hard','to','parse']),
         ('{{plainlist|class=sdfsdf|style=border:solid 1px silver; background:lightyellow|indent=2|* [[congo]]* [[niger]]* [[zululand]]}}', ['congo', 'niger', 'zululand']),
         ('{{flowlist}}*   [[Mao Zedong]]*    [[Ho Chi Minh]]    * [[Lars Ohly]]     {{endflowlist}}', ['Mao Zedong','Ho Chi Minh','Lars Ohly']),
         ('{{flowlist |class  =asdfasdf |style  =asdas |* [[platypus]]   * [[iguana]]  *  [[zorse]]   }}',['platypus','iguana','zorse']),
@@ -697,7 +724,7 @@ def test(verbose=False):
         ('{{unbulleted list |[[peripatetic school]] |[[aristotelianism]]}}', ['peripatetic school', 'aristotelianism']),
         ('{{unbulleted list |[[golden mean (philosophy)|golden mean]] |[[aristotelian logic]] |[[syllogism]] |[[hexis]] |[[hylomorphism]] |[[on the soul|theory of the soul]]}}', ['golden mean', 'aristotelian logic', 'syllogism', 'hexis', 'hylomorphism', 'theory of the soul']),
         ('{{hlist |[[parmenides]] |[[socrates]] |[[plato]] |[[heraclitus]] |[[democritus]]}}', ['parmenides', 'socrates', 'plato', 'heraclitus', 'democritus']),
-        #NESTED AND/OR MULTIPLE LISTS: DANGER WILL ROBINSON DANGER
+        #TODO: Nested and/or multiple lists
         #('{{hlist|[[biology]]|[[zoology]]}} {{hlist|[[physics]]|[[metaphysics]]}}', ['biology', 'zoology', 'physics', 'metaphysics']),
     ]
 
