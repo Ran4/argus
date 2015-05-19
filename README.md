@@ -35,4 +35,3 @@ Python modules:
 
 Java JDK >6
 ```
-## Additional
