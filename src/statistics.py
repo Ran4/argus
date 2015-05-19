@@ -29,6 +29,18 @@ class Statistics:
         print "Loaded JSON and emptied statistics output file (%s)" % \
             self.statisticsOutputFileName
             
+    def performQuery(self, queryInput):
+        """
+        
+        Returns True on success
+        """
+        print "In Statistics, got queryInput:", queryInput
+        
+        
+        
+        
+        return True
+            
     def statOutput(self, s, verboseOverride=None):
         if verboseOverride is not None:
             verbose = verboseOverride
