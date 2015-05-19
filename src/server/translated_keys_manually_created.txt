@@ -1,0 +1,1587 @@
+active_since activesince
+cause -death cause_death
+knownfor known_for
+birth year birth_year
+prize prizes
+married to married_to
+grand children grandchildren
+color_code colorcode
+zh-dungan zh_dungan
+notable songs notable_songs
+clubupdate club_update
+stage wins stagewins
+death-place death_place
+| death_place death_place
+term end2 term_end2
+term end1 term_end1
+nickname. nickname
+a-side a_side
+bowl_games bowlgames
+height ft height_ft
+| genre genre
+|known_for known_for
+current team currentteam
+state senate state_senate
+reign1-type reign1_type
+schools school
+data of birth birth_date
+childen children
+|region region
+spouses-type spouses_type
+'''labels''' label
+| image image
+mother name othername
+religion r religion
+memberships &lt;!--not implemented in {{infobox architect}}--&gt; memberships &lt;!__not implemented in {{infobox architect}}__&gt;
+years_of_service serviceyears
+death date death_date
+honorific-title honorific_title
+height 7-foot 7 inches height 7_foot 7 inches
+prime-minister primeminister
+signatures signature
+nominater nominator
+began skating beganskating
+result results
+data 4 data4
+data 5 data5
+|position position
+work institution work_institution
+alt_names altname
+runningmate4 running mate4
+house-type house_type
+birthyear birth_year
+played player
+feast_days feast_day
+signature_quote signature quote
+suc-type suc_type
+|signature signature
+service-years serviceyears
+spouse. spouse
+| honorific-prefix honorific_prefix
+born_name born name
+school tradition school_tradition
+honorifix-suffix honorifix_suffix
+web_site website
+co-consecrator co_consecrator
+| spouse spouse
+father' name father name
+citizenship &lt;!--not implemented in {{infobox architect}}--&gt; citizenship &lt;!__not implemented in {{infobox architect}}__&gt;
+label_names label_name
+|spouse spouse
+date_of_burial burial_date
+images_size image_size
+retiored retired
+ex-label ex_label
+| t20idebutdate t20idebutdate
+alma _mater alma_mater
+''[[alma mater]]'' [[alma mater]]
+- || - || - || - || madis || talis || tarmo || ?? || tarmo || ingrid || ''none'' || ''none'' || colspan _ || _ || _ || _ || madis || talis || tarmo || ?? || tarmo || ingrid || ''none'' || ''none'' || colspan
+unit_cost unit cost
+lives_in lives in
+extra-hdr extra_hdr
+ex-fiancee ex_fiancee
+original_name original name
+city-served city_served
+years:active years_active
+place_of_death death_place
+era names era name
+birt_name birth_name
+nationalcaps (goals) nationalcaps(goals)
+ethnic_origin ethnic origin
+spouse-type spouse_type
+web page webpage
+other information other_information
+notable students notable_students
+img capt img_capt
+advised and co-advised doctoral_students advised and co_advised doctoral_students
+childeren children
+nationateam-update nationateam_update
+body_style bodystyle
+| awards awards
+|branch branch
+othernam othername
+naturalbust natural bust
+coachyears7 coach_years7
+coachyears6 coach_years6
+coachyears4 coach_years4
+coachyears3 coach_years3
+coachyears2 coach_years2
+coachyears1 coach_years1
+married name married_name
+finateam finalteam
+multi-year wsop winner multi_year wsop winner
+num episodes num_episodes
+web site website
+vice mayor vicemayor
+school_tradition| school_tradition
+coachteams coach_teams
+coachteam9 coach_team9
+coachteam8 coach_team8
+image_suze image_size
+nicknae nickname
+coachteam5 coach_team5
+coachteam4 coach_team4
+coachteam7 coach_team7
+coachteam6 coach_team6
+|other_names other_names
+|field field
+ethnicty ethnicity
+locations location
+webalias web alias
+statsweek statweek
+note notes
+birthp_lace birth_place
+street-address streetaddress
+otherinfo other info
+cause_of_death death_cause
+latin_name latin name
+chief_minister chiefminister
+other_work other work
+imdbid imdb_id
+birtname birth_name
+birth-name birth_name
+residencr residence
+youth years1 youthyears1
+youth years2 youthyears2
+motives motive
+alma mata alma_mata
+best_known_for best known for
+birth- birth_
+caption. caption
+w image image
+state end statsend
+birthvname birth_name
+last team last_team
+_date date
+| predecessor predecessor
+highest-ranking highestranking
+eyecolor eye_color
+chartposition chart position
+alternative_name alternative name
+saint title saint_title
+generalsecretary general secretary
+voice type voicetype
+f-flights f_flights
+notablerole notable role
+| years_active years_active
+'''image''' image
+origine origin
+r1-length-m r1_length_m
+arrest_place place_of_arrest
+year of birth birth_year
+all black id allblackid
+hair colour hair_color
+stagename stage name
+father's_name father's name
+time slot timeslot
+military_service military service
+party leader party_leader
+work_place workplace
+- || - || - || - || style style
+club-update club_update
+latest album latest_album
+| memorials memorials
+- || style style
+|1blankname4 1blankname4
+pseudonyms pseudonym
+othername (s) othername(s)
+||nationality nationality
+launch date launch_date
+nationalteamupdate nationalteam_update
+height_cm heightcm
+states state
+img alt img_alt
+current status currentstatus
+mccune-reishauer mccune_reishauer
+religious_affiliation religious affiliation
+|residence residence
+oc-bs oc_bs
+ancenstry ancestry
+originalname original name
+domestic partner domesticpartner
+criminal status criminal_status
+nationaltemplate-update nationaltemplate_update
+term start term_start
+img_copt img_capt
+first flight date first_flight_date
+| bgcolour bgcolour
+draft_round draftround
+photocaption photo_caption
+placeofburiallabel placeofburial_label
+team_link. team_link
+|suppressed_date suppressed_date
+debut date debutdate
+signature-alt signature_alt
+spouce spouse
+brith name brith_name
+signature_phrase signature phrase
+play plays
+|monarch2 monarch2
+writer write
+mothers name mother's name
+academy-awards academyawards
+nomenhiero nomen_hiero
+image-size image_size
+children v children
+distric t district
+birth_nsme birth_name
+hair_colour hair_color
+signatur signature
+|occupation occupation
+notable_role notable role
+childten children
+co-consecrator1 co_consecrator1
+co-consecrator2 co_consecrator2
+&lt;!--imagesize &lt;!__imagesize
+death place death_place
+current_team currentteam
+co-consecrators co_consecrators
+years 11 years11
+probowl probowls
+retited retired
+world_ranking worldranking
+binding bindings
+captio caption
+| ru_nationalyears ru_nationalyears
+notable instruments notable_instruments
+lat_m latm
+lat_d latd
+issue-pipe issue_pipe
+levels level
+lat_s lats
+|img_capt img_capt
+eye_colour eye_color
+prime minister primeminister
+| predecessor1 predecessor1
+final_year finalyear
+imagecapt image_capt
+order_2 order2
+order_1 order1
+|hopmancupresult hopmancupresult
+service years serviceyears
+elevation-f elevation_f
+elevation-m elevation_m
+hometown home_town
+ru_national years ru_nationalyears
+| occupation occupation
+|stat1value stat1value
+imag_size image_size
+team link team_link
+draft team draft_team
+pmoy-year pmoy_year
+national caps2 nationalcaps2
+first album first_album
+italic_title italic title
+home_page homepage
+head-chef head_chef
+full name fullname
+coach_team1 coachteam1
+coach_team3 coachteam3
+coach_team2 coachteam2
+race races
+nt-update ntupdate
+|profession profession
+know_for known_for
+club number clubnumber
+officially-recognized father officially_recognized father
+real name realname
+main interests main_interests
+domestic_partner domesticpartner
+nationalteam 1 nationalteam1
+preceded by preceded_by
+| caps(points) caps(points)
+|awards awards
+youth years youthyears
+known-for known_for
+date of burial burial_date
+image1-width image1_width
+[[1st k-drama star awards|1st]] [[apan star awards|k-drama star awards]]&lt;ref&gt;{{cite web|title [[1st k_drama star awards|1st]] [[apan star awards|k_drama star awards]]&lt;ref&gt;{{cite web|title
+penname pen_name
+image width imagewidth
+image_sie image_size
+term_end 2 term_end2
+term_end 3 term_end3
+term_end 1 term_end1
+star_sign starsign
+national _team nationalteam
+small| image smallimage
+-&lt;ref&gt;{{cite web|title _&lt;ref&gt;{{cite web|title
+editor-first editor_first
+dress-code dress_code
+b-sides link b_sides link
+'''number''' number
+h1-number h1_number
+service_years serviceyears
+given name given_name
+fathers name father's name
+service number servicenumber
+contect context
+|influences influences
+'''name ''' name
+1 || 1 || align 11 || align
+other titles othertitles
+marital_status marital status
+venerated in venerated_in
+currentcity current_city
+&lt;!-- image &lt;!__ image
+beati'''fied'''_date beatified_date
+zodiacsign zodiac sign
+national-fn3 national_fn3
+national-fn2 national_fn2
+academy_awards academyawards
+deathp_lace death_place
+fullnam e fullname
+'''genres''' genre
+|imgsize img_size
+| religion religion
+time-end time_end
+colour color
+command commands
+reign-type2 reign_type2
+coachyears13 coach_years13
+coachyears12 coach_years12
+coachyears11 coach_years11
+coachyears10 coach_years10
+coachyears14 coach_years14
+reincarnation_of reincarnation of
+hanjaa hanja
+hanjab hanja
+years-active years_active
+other party otherparty
+imgsize img_size
+| imagesize image_size
+others name othername
+|background background
+| shoots shoots
+ru_am update ru_amupdate
+|birth_date birth_date
+skin color skin_color
+goya awards goyaawards
+residences residence
+chapter-url chapter_url
+| associated_acts associated_acts
+weight_lbs weight_lb
+almamatter alma_mater
+notable works notableworks
+oc-bs4 oc_bs4
+oc-bs2 oc_bs2
+oc-bs3 oc_bs3
+academy awards academyawards
+tenunre tenure
+current-owner current_owner
+sibling siblings
+father-in-law father_in_law
+voice_type(s) voice type(s)
+doctoral advisor doctoral_advisor
+test debut against testdebutagainst
+alma meter alma_mater
+lpgawins pgawins
+birth_nam birth_name
+successor 4 successor4
+ru _clubupdate ru_clubupdate
+state house state_house
+vice_president1 vicepresident1
+married_ to married_to
+rehttp://en.wikipedia.org/skins-1.5/common/images/button_italic.pngsting_place rehttp://en.wikipedia.org/skins_1.5/common/images/button_italic.pngsting_place
+englishname english name
+[[governor-general]]2 [[governor_general]]2
+| charge charge
+governor_general 1 governor_general1
+mapsize map_size
+work works
+childre children
+birth _name birth_name
+maritalstatus marital status
+career position career_position
+known+for known_for
+mother_language mother language
+pen-name pen_name
+img size img_size
+birth-year birth_year
+medal_template medaltemplate
+net_worth networth
+not outs2 notouts2
+not outs1 notouts1
+imagesite image_size
+origin_place originplace
+girl friend girlfriend
+constituency - constituency _
+'''death_date death_date
+top-5 top_5
+|children children
+l relatives relatives
+mother_name othername
+trainers trainer
+subject name subject_name
+predecessor 4 predecessor4
+predecessor 3 predecessor3
+micyears icyears
+ex-spouse ex_spouse
+fdeath_date death_date
+landscace landscape
+prime minister8 primeminister8
+prime minister1 primeminister1
+prime minister3 primeminister3
+prime minister2 primeminister2
+subjects subject
+death+cause death_cause
+years active years_active
+mmakowins mma_kowin
+arrest_date date_of_arrest
+religion. religion
+christening-date christening_date
+| nationalyears1 nationalyears1
+profle profile
+b-side b_side
+signture signature
+governor-general governor_general
+ntupate ntupdate
+mmasubwins mma_subwin
+h1-surface h1_surface
+haircolor hair_color
+contact contract
+amateur years amateuryears
+goldenhiero golden_hiero
+quotes quote
+victim victims
+othernames other_names
+board boards
+footnote_a footnotes
+alma_ater alma_mater
+imag _size image_size
+| current_members current_members
+honorific prefix honorific_prefix
+fan-site fansite
+vice president vicepresident
+pinyin_chinese_name pinyinchinesename
+logo_width logowidth
+other name(s) othername(s)
+wade-gileschinesename wade_gileschinesename
+| employer employer
+deputy 1 deputy1
+academic degree academic_degree
+| website website
+major works major_works
+criminal charge criminal_charge
+| year year
+notable_awards notable awards
+year 1 year1
+webstite website
+update updated
+consecrated by consecrated_by
+associatedacts associated_acts
+date of current ranking date_of_current_ranking
+battle battles
+other_namew othername
+height (inch) height(inch)
+strikerate3 strike rate3
+strikerate1 strike rate1
+networth. networth
+bi&lt;ref&gt;http://www.historycommons.org/events-images/a232_satam_al_suqami_2050081722-15966.jpg&lt;/ref&gt; rth_place bi&lt;ref&gt;http://www.historycommons.org/events_images/a232_satam_al_suqami_2050081722_15966.jpg&lt;/ref&gt; rth_place
+air force air_force
+death_dat death_date
+known_ for known_for
+| image_size image_size
+vice_governor vicegovernor
+fighting out of fighting_out_of
+goals 6 goals6
+birthnames birth_name
+known for known_for
+knownas known as
+food-type food_type
+imagecaption image_caption
+alma_mmater alma_mater
+former_partner formerpartner
+yearcend yearaend
+term_en term_end
+spourse spouse
+shoe size shoesize
+medaltemplates-title medaltemplates_title
+top-10 top_10
+notable-role notable role
+childrean children
+imagesixe image_size
+teamb teams
+national nationals
+ru_triesb ru_triesa
+ru_triesc ru_triesa
+current position currentposition
+ru_triesd ru_triesa
+ru_triese ru_triesa
+current rank currentrank
+nativename-r nativename_r
+korean_name koreanname
+nativename-a nativename_a
+birth _place birth_place
+|date date
+||caption caption
+| background background
+disability class disability_class
+deathplace death_place
+honours honors
+honorific-suffix2 honorific_suffix2
+pre-nhl pre_nhl
+chinesezodiac chinese zodiac
+dresssize dress size
+work_places workplaces
+'''attributes attributes
+fathe father
+|title title
+resided resides
+nebtyhiero nebty_hiero
+test debut date testdebutdate
+begin year beginyear
+b-sides b_sides
+years _active years_active
+show-updates show_updates
+datedenaissance date de naissance
+english_name english name
+no_contests no contests
+img caption img_caption
+|pastteams pastteams
+charges charge
+[[genres]] ''[[genres]]''
+yearactive year_active
+l| birth_name birth_name
+showmedals show_medals
+death cause death_cause
+portrayed by portrayedby
+national years nationalyears
+former school(s) former_school(s)
+alma matar alma_mater
+fontcolour fontcolor
+birthnmame birth_name
+height inch heightinch
+almamater alma_mater
+|canonized_by canonized_by
+start starts
+deathdate death_date
+best_known best known
+imagesize image_size
+first_ aired first_aired
+| odidebutdate odidebutdate
+|party party
+- || - || style style
+life partner life_partner
+- || - || - || - || - || - || - || - || - || - || style style
+podium podiums
+notable instrument notable_instrument
+nation-update nation_update
+mll team mll_team
+release_date date_of_release
+born in born_in
+height_ins height_in
+former teams former_teams
+chinese name chinesename
+national-update national_update
+|image_size image_size
+|realname realname
+monastic name monastic_name
+zip code zipcode
+successors successor
+trained trainer
+[[houston chronicle]] &lt;ref&gt;http://www.houstonchronicle.com/entertainment/music/article/some-albums-demand-to-be-listened-to-5963106.php?t [[houston chronicle]] &lt;ref&gt;http://www.houstonchronicle.com/entertainment/music/article/some_albums_demand_to_be_listened_to_5963106.php?t
+medal_templates medaltemplates
+oc-zz4 oc_zz4
+honorifix-prefix honorifix_prefix
+goalsf goalsa
+goalsd goalsa
+goalse goalsa
+goalsb goalsa
+goalsc goalsa
+tries triesa
+birth_country country of birth
+place of death death_place
+image size image_size
+playeryears player_years
+pcupdte pcupdate
+death place. death_place.
+heightft height_ft
+cfl-rushing cfl_rushing
+spouses. spouse/s
+houses house
+former coach formercoach
+image2-width image2_width
+horse horses
+notable_works notableworks
+christening-place christening_place
+above-style abovestyle
+beatified place beatified_place
+footnote footnotes
+ratings rating
+offices held offices_held
+|term_start term_start
+age_at_death age at death
+ru_pointse ru_pointsa
+ru_pointsd ru_pointsa
+ru_pointsc ru_pointsa
+ru_pointsb ru_pointsa
+imagem_size image_size
+youthyears1 -1989 youthyears1 _1989
+| style style
+doctoral students| doctoral_students
+| birth_date birth_date
+|total total
+image_site image_size
+birth_name. birth_name
+caps 1 caps1
+caps 3 caps3
+2012 || 4th japan-korea friendship festival || korean representative&lt;ref&gt;{{cite web|last 2012 || 4th japan_korea friendship festival || korean representative&lt;ref&gt;{{cite web|last
+'''instruments''' instruments
+active_years active years
+imag image
+| height height
+| fullname fullname
+small| honorific-suffix small| honorific_suffix
+start of term term_start
+place_of_birth birth_place
+release_place place_of_release
+imagealt image_alt
+draft_pick draftpick
+doctoral adviser doctoral_adviser
+end year endyear
+- || - || - || style style
+myears years
+| nationality nationality
+fullaname fullname
+father: father
+criminal penalty criminal_penalty
+birth date birth_date
+draftyear draft_year
+general_secretary general secretary
+record records
+mmadecwins mma_decwin
+klpgawins jlpgawins
+alma mater alma_mater
+ewc podiums wcpodiums
+small image smallimage
+ru_amateur clubs ru_amateurclubs
+| notable_instruments notable_instruments
+net-worth networth
+term start5 term_start5
+term start6 term_start6
+grand child grandchild
+picture format picture_format
+coachwins 4 coachwins4
+positions position
+| office office
+facebook_page facebook page
+married_date marrieddate
+suc-type1 suc_type1
+suc-type3 suc_type3
+suc-type2 suc_type2
+bloodtype blood_type
+genr genre
+mawards awards
+related_artists related artists
+appointer appointed
+ru_goalsc ru_goalsa
+ru_goalsb ru_goalsa
+ru_goalse ru_goalsa
+ru_goalsd ru_goalsa
+pa rty party
+r1-length-f r1_length_f
+notablework notable_work
+| instrument instrument
+super_bowls superbowls
+yeareend yearaend
+chinese_name chinesename
+artist name artist_name
+|birthname birth_name
+logo_caption logocaption
+date_of_birth birth_date
+lat_ns latns
+place of cremation cremation_place
+legal name legal_name
+imagename image name
+pmoy-preceded pmoy_preceded
+time_slot timeslot
+weightlb weight_lb
+natonalteam-update natonalteam_update
+| origin origin
+party_position party position
+eyecolour eye_color
+final finals
+years of service serviceyears
+f avouriteclub favouriteclub
+artists web-pages artists web_pages
+notable_works december, 1960, &quot;the westerner&quot; he played a mexican wrangler and pal of brian keith (the star of the short-lived series created by sam peckinpaugh notable_works december, 1960, &quot;the westerner&quot; he played a mexican wrangler and pal of brian keith (the star of the short_lived series created by sam peckinpaugh
+border order
+medal_templates-expand medal_templates_expand
+awarded_by awardedby
+short_description short description
+restingplacecoordinates resting_place_coordinates
+image''size image_size
+b-v b_v
+partners partner
+other-names other_names
+employee employer
+allstarsf allstars
+currently resides currentlyresides
+resting place resting_place
+years 4 years4
+| office2 office2
+stats state
+box width box_width
+small_image smallimage
+ru_team ru_teama
+alternate name alternate_name
+term end term_end
+know for known_for
+birth-place birth_place
+work institutions work_institutions
+test debut year testdebutyear
+stat1-header stat1_header
+voice types voicetype
+regularrecord regular_record
+residenc residence
+parti party
+|||| name name
+| partner partner
+image_sixe image_size
+pen name pen_name
+coachyears8 coach_years8
+draftteam draft_team
+coachyears5 coach_years5
+deathdate. death_date
+k-1 k_1
+owner-oper owner_oper
+career_wins career wins
+chief minister2 chiefminister2
+cause of death death_cause
+birth name birth_name
+city of residence city_of_residence
+crewchief crew chief
+e-mail email
+yeardend yearaend
+nationality2 nationality_2
+former team former_team
+current city current_city
+yearfend yearaend
+birth__place birth_place
+artists artist
+world cup worldcup
+co-leader co_leader
+clubn umber2 clubnumber2
+goals goalsa
+caps 10 caps10
+film_industry film industry
+other names other_names
+non-profit_slogan non_profit_slogan
+mapwidth map_width
+2014- 2014_
+beatified date beatified_date
+domestic teams domesticteams
+stat state
+signature size signature_size
+wusopen usopen
+lstatus status
+father_name father name
+imagefile image_file
+spouses spouse
+birth-place. birth_place.
+spouse1 spouse 1
+spouse2 spouse 2
+spouse3 spouse 3
+first flight aircraft first_flight_aircraft
+term_start 7 term_start7
+county country
+alt_name altname
+resting place coordinates resting_place_coordinates
+skincolor skin_color
+also_known_as also known as
+'''birth_date''' birth_date
+captaion caption
+captions caption
+notable ideas notable_ideas
+draft pick draftpick
+cityofbi rth cityofbirth
+coachingteams coaching_teams
+signaturealt signature_alt
+currently_resides currentlyresides
+place of_death death_place
+death date. death_date
+reign-type reign_type
+death_cause--&gt; death_cause__&gt;
+fullmame fullname
+| relations relations
+&lt;!-- image_size &lt;!__imagesize
+catch_phrase catchphrase
+along_side alongside
+place of christening christening_place
+show medals show_medals
+nick_name(s) nickname(s)
+points pointsa
+year of retirement retirementyear
+hair color hair_color
+posthumousname posthumous name
+birth_dates birth_date
+birth_datel birth_date
+term_3 term3
+consorts consort
+formerskating club former skating club
+fields field
+|education education
+burial_place place of burial
+term-start term_start
+cposition position
+|university university
+other_posts other_post
+number of films number_of_films
+deathcause death_cause
+| sport sport
+name of artist artist_name
+info-hdr info_hdr
+main_work main work
+other_ names other_names
+resting-place resting_place
+ccareer_end career_end
+birth place birth_place
+formerskatingclub former skating club
+officialwebsite official website
+education ) education
+religious_views religious views
+high school highschool
+| mixed mixed
+honorary_title honorary title
+namedafter named after
+educations education
+known for. known_for
+retire retired
+positio position
+naionalteam-update naionalteam_update
+award awards
+termstart7 term_start7
+born / died born/died
+followedby followed_by
+total caps totalcaps
+native-name native_name
+contract. contract
+olympic olympics
+alma_matter alma_mater
+ru_national team ru_nationalteam
+birthhame birth_name
+youth clubs youthclubs
+magnum opus magnum_opus
+term-end1 term_end1
+birth_ date birth_date
+stage_name stage name
+vbox_width box_width
+datebirth date_birth
+playing style playingstyle
+|heightft height_ft
+prenomenhiero prenomen_hiero
+current members current_members
+spouses-link spouses_link
+currentowner current_owner
+- || - || - || - || - || - || style style
+subject&lt;!-- designed for nonfiction --&gt; subject&lt;!__ designed for nonfiction __&gt;
+honorific-prefix2 honorific_prefix2
+imagge image
+allstarsh allstars
+clubs 8 clubs8
+clubs 4 clubs4
+pic_size picsize
+political_party political party
+heighft height
+| profession profession
+secretary general secretary_general
+| label label
+nativename native_name
+pseudonim pseudonym
+careerrecord career_record
+disability classification disability_classification
+haircolour hair_color
+date_of death death_date
+| birthname birth_name
+cnumber number
+birth_place: birth_place
+vicechancellor vice_chancellor
+pcuptdate pcupdate
+star sign starsign
+license date license_date
+ittf-id ittf_id
+personalname personal name
+alma mater. alma_mater
+alma maters alma_mater
+mmadraws mma_draw
+|placeofburial placeofburial
+image :http://www.mahalmovies.com/wp-content/uploads/2014/03/pk-nair.jpg image :http://www.mahalmovies.com/wp_content/uploads/2014/03/pk_nair.jpg
+pre-type pre_type
+low resolution low_resolution
+origin country country_of_origin
+honorific suffix honorific_suffix
+employers employer
+|order order
+half-brothers half_brothers
+| pb pb
+relationship_status relationship status
+dress_size dress size
+relative relatives
+nameorigin name origin
+officesheld offices_held
+parent parents
+past members past_members
+img-size img_size
+|website website
+|nickname nickname
+literary_works literary works
+notable albums notable_albums
+officialname official_name
+|imagewidth imagewidth
+|currentnumber currentnumber
+languages spoken languagesspoken
+former_club formerclub
+other name othername
+movements movement
+image http://i2.listal.com/image/3136190/200full-.jpg| caption image http://i2.listal.com/image/3136190/200full_.jpg| caption
+|allegiance allegiance
+residency residence
+weight_ib weight_lb
+|death_place death_place
+death_ date death_date
+yearsactive years_active
+horus_hiero horushiero
+img_cape img_capt
+daughter-in-law daughter_in_law
+imagen image
+images image
+imagew image
+| children children
+image_ image
+high_school highschool
+patriarch of patriarch_of
+image. image
+death-date death_date
+alternative_names alternative names
+weight_ weight
+| years15 years15
+sufi order sufi_order
+nomecompleto nome_completo
+post-name post_name
+term start1 term_start1
+|career wins career wins
+genres genre
+image_ size image_size
+based_on based on
+world ranking worldranking
+colleges college
+former club formerclub
+'''children''' children
+stat-year statyear
+titlen title
+titles title
+r1-surface r1_surface
+coroner coronet
+term end5 term_end5
+|nationality nationality
+birthplace birth_place
+head_coach headcoach
+title: title
+posthumous_name posthumous name
+published publisher
+| favorite_maneuvers favorite_maneuvers
+networtk networth
+sister's sisters
+first_award first award
+place_of_burial place of burial
+cor-type2 cor_type2
+nick names nickname
+death?date death_date
+| residence residence
+manageryears1 ????- manageryears1 ????_
+|successor successor
+followed by followed_by
+precededby preceded_by
+|term_end term_end
+|imagesize image_size
+- style style
+nick-name nickname
+current place current_place
+| school school
+- || - || - || - || - || - || - || - || - || style style
+positionn position
+official_residence official residence
+successor 2 successor2
+heights height
+part party
+significant buildings significant_buildings
+iwebsite website
+orders order
+famous_for famous for
+relation relations
+alma matter alma_mater
+- || - || - || - || - || - || - || - || style style
+religon religion
+|office office
+doctoral students doctoral_students
+image http://www.edgemagazine.net/wp-content/uploads/2013/06/linda_moulton_howe_05.jpg image http://www.edgemagazine.net/wp_content/uploads/2013/06/linda_moulton_howe_05.jpg
+| position position
+known_as known as
+_image_size image_size
+main interest main_interest
+raised_in raised in
+date of marriage marriage_date
+date of christening christening_date
+lieudenaissance lieu de naissance
+|alma mater alma_mater
+eye color eye_color
+- || - || - || - || - || style style
+best finish: best finish
+&quot;[[moment 4 life]]&quot; &lt;br /&gt;&lt;span style &quot;[[moment 4 life]]&quot;&lt;br /&gt;&lt;span style
+placebirth place_birth
+previous post previous_post
+nickname_(s) nickname(s)
+sun-sign sun_sign
+blank 5 blank5
+capti on caption
+domesticpartners domestic_partners
+altnames altname
+time-begin time_begin
+eyes color eyes_color
+| image name image name
+termend term_end
+home-town home_town
+opponent opponents
+r1-number r1_number
+[[los angeles times]]&lt;ref&gt;http://www.latimes.com/entertainment/music/la-et-ms-los-angeles-times-music-critics-consensus-top-10-list-20141223-story.html#page [[los angeles times]]&lt;ref&gt;http://www.latimes.com/entertainment/music/la_et_ms_los_angeles_times_music_critics_consensus_top_10_list_20141223_story.html#page
+native place native_place
+artistas relacionados artistas_relacionados
+cor-type cor_type
+madhhab madh'hab
+imagezsize image_size
+height_inch heightinch
+alma-mater alma_mater
+termend7 term_end7
+termend6 term_end6
+termend5 term_end5
+termend4 term_end4
+termend3 term_end3
+termend2 term_end2
+termend1 term_end1
+alias_name alias name
+champ_wins champwins
+honor honors
+_cause cause
+image_soze image_size
+presidents president
+websit website
+political_views political views
+origins origin
+regions region
+conviction status conviction_status
+[[abc news]]&lt;ref&gt;http://abcnews.go.com/entertainment/year-review-50-best-albums-2014/story?id [[abc news]]&lt;ref&gt;http://abcnews.go.com/entertainment/year_review_50_best_albums_2014/story?id
+| url url
+year active year_active
+well-known movies well_known movies
+'''associated acts''' associated_acts
+yearend yearaend
+reign-type4 reign_type4
+reign-type3 reign_type3
+reign-type1 reign_type1
+coachyears9 coach_years9
+image 1 width image1_width
+heightin height_in
+|parents parents
+imagee_size image_size
+vice_president3 vicepresident3
+notable work notable_work
+restingplace resting_place
+| known_for known_for
+official_website official website
+teamlink team_link
+start date start_date
+pre-name pre_name
+cupdate tupdate
+| birth_name birth_name
+chief minister of khyber-pakhtunkhwa chief minister of khyber_pakhtunkhwa
+car numbers car number
+zh-dungan2 zh_dungan2
+|label label
+image [[file:photo-33.jpg]] image [[file:photo_33.jpg]]
+other_party otherparty
+|country country
+seating-capacity seating_capacity
+1 || 3 || align 13 || align
+place of residence place_of_residence
+teamd teams
+teame teams
+teamf teams
+teama teams
+teamc teams
+''align align
+brother's brothers
+mma_dqwins mmadqwins
+other-locations other_locations
+eductation education
+notable_films notable films
+alt name altname
+games (goals) games(goals)
+ru_teamc ru_teama
+ru_teamb ru_teama
+ru_teame ru_teama
+ru_teamd ru_teama
+image_width imagewidth
+| title title
+party_colour party colour
+fathername father name
+titleyears title years
+caps (goals) caps(goals)
+band_name band name
+current television co-host current television co_host
+weapon weapons
+year_end yearaend
+governor-general2 governor_general2
+governor-general3 governor_general3
+governor-general1 governor_general1
+governor-general6 governor_general6
+governor-general4 governor_general4
+governor-general5 governor_general5
+_place| place
+nicknames nickname
+nicknamed nickname
+iso_code isoCode
+weightlbs weight_lb
+work_ works
+worldw worlds
+end of term term_end
+mgender gender
+small caption small| caption
+weight class weight_class
+{height|ft height_ft
+spouses-pipe spouses_pipe
+service_number servicenumber
+associate_acts associate acts
+childrens children
+| order order
+childrenx children
+current_location current location
+last _aired last_aired
+show-medals show_medals
+|alongside3 alongside3
+|alongside2 alongside2
+country: country
+children. children
+burial-place place of burial
+birthdate birth_date
+player name playername
+&lt;!--area &lt;!__area
+coachlosses coach_losses
+term _start2 term_start2
+signature alt signature_alt
+death_ death
+son / daughter-in-law son / daughter_in_law
+imdb-no imdb_no
+majorwin majorwins
+other-information other_information
+leader. leader
+mcaption caption
+current club currentclub
+https://www.facebook.com/pages/chacha-cricket-official-fan-page/196971430320781 https://www.facebook.com/pages/chacha_cricket_official_fan_page/196971430320781
+| matches4 matches4
+| birth_place birth_place
+prior term prior_term
+clcountyf clcounty
+clcountyh clcounty
+succ essor successor
+salary: salary
+| successor2 successor2
+termstart1 term_start1
+termstart2 term_start2
+termstart3 term_start3
+termstart4 term_start4
+termstart5 term_start5
+termstart6 term_start6
+net worth networth
+nick_name nickname
+birth_names birth_name
+alternate names alternate_names
+estate state
+img_width imgwidth
+native name native_name
+death style deathstyle
+natioanlteam-update natioanlteam_update
+religio religion
+spous spouse
+tvb_anniversary_awards tvbanniversaryawards
+pencile pencil
+writing writings
+origen origin
+grand_sons grandsons
+|battles battles
+eye colour eye_color
+related acts related_acts
+honorific-prfix honorific_prfix
+coat of arms coat_of_arms
+birth+name birth_name
+imag size image_size
+maiden name maidenname
+cor-type3 cor_type3
+cor-type1 cor_type1
+sooteam pre-1980 sooteam pre_1980
+height_ height
+image |caption image_caption
+burial place place of burial
+other_name othername
+heightm height
+|venerated_in venerated_in
+home town home_town
+heightmt height_ft
+shoe_size shoesize
+labels label
+colors color
+birthhdate birth_date
+real_name realname
+- bgcolor bgcolour
+disciple of disciple_of
+nationalcompetitions national competitions
+grandmother grand mother
+record_label record label
+image title image_title
+olympics result olympicsresult
+image_ssize image_size
+term_ended term ended
+ru_amateur years ru_amateuryears
+license place license_place
+issue-link issue_link
+issue-line issue_link
+feast day feast_day
+term-type term_type
+[[bruce jenner]] {{small|(step-father)}}}}| relatives [[bruce jenner]] {{small|(step_father)}}}}| relatives
+teachers teacher
+| ru_position ru_position
+-class class
+notableawards notable awards
+alma_master alma_mater
+state_head head of state
+leagues league
+''happy women''&lt;ref&gt;{{cite web|script-title ''happy women''&lt;ref&gt;{{cite web|script_title
+last_line-up last_line_up
+office. office
+highest_ranking highestranking
+alma_maters alma_mater
+offices office
+cluba clubs
+pmoy-succeeded pmoy_succeeded
+net _ worth networth
+spouse (s) spouse(s)
+civil_partner civil partner
+original team originalteam
+deliveries 5 deliveries5
+[[professional wrestling match types#series variations|two out of three falls]] [[professional wrestling match types#hardcore-based variations|dress up wild fight]] for the [[oz academy openweight championship]]&lt;ref&gt;{{cite web | archiveurl [[professional wrestling match types#series variations|two out of three falls]] [[professional wrestling match types#hardcore_based variations|dress up wild fight]] for the [[oz academy openweight championship]]&lt;ref&gt;{{cite web | archiveurl
+|term_start1 term_start1
+end date end_date
+anthem-type anthem_type
+alma_meter alma_mater
+|width width
+personal_life personal life
+imhttps://encrypted-tbn3.gstatic.com/images?q imhttps://encrypted_tbn3.gstatic.com/images?q
+|born born
+| alma_mater alma_mater
+longew long_ew
+turned pro turnedpro
+cl allireland clallireland
+thumb|150px|{{deletable image-caption|date thumb|150px|{{deletable image_caption|date
+facebook_fan_page facebook fan page
+fightingoutof fighting_out_of
+country of origin country_of_origin
+sponsors sponsor
+| caption caption
+stat1-data stat1_data
+current ranking current_ranking
+chief minister chiefminister
+debut_date debutdate
+drafteam draft_team
+'''years active''' years_active
+viceprincipal vice principal
+sports sport
+height (ft) height(ft)
+given-name given_name
+reg-type reg_type
+kickboxdecloss kickbox_decloss
+playingteams playing_teams
+stroke strokes
+|term_start3 term_start3
+debut_team debutteam
+current residence current_residence
+| patrons patrons
+prime_minister2 primeminister2
+prime_minister3 primeminister3
+prime_minister5 primeminister5
+&lt;!-- caption &lt;!__ caption
+birthname birth_name
+current occupation current_occupation
+|order2 order2
+- valign valign
+term-end term_end
+image-width imagewidth
+mothertongue mother tongue
+parent's parents
+'''occupation''' occupation
+influenced_by influenced by
+font_color fontcolor
+debut works debut_works
+n| image image
+img _capt img_capt
+h-index h_index
+| dress size dress size
+best result best_result
+great-grandchildren great grandchildren
+great-grandchildrem great_grandchildrem
+cause-ofdeath causeofdeath
+image alt image_alt
+honorific-prefix honorific_prefix
+medaltemplates-expand medal_templates_expand
+-style style
+voice_type voicetype
+nationalteam-update nationalteam_update
+prime_minister primeminister
+fullnsme fullname
+imgage_size imgagesize
+languages_spoken languagesspoken
+place of birth birth_place
+| years1 years1
+bg color bgcolour
+era_name era name
+missions mission
+citizen_ship citizenship
+politicalparty political party
+|death_date death_date
+map caption map_caption
+b g colour bgcolour
+img_cap img_capt
+club 7 club7
+events event
+junior club1 junior_club1
+death reason reason_of_death
+global-id global_id
+birth_dat birth_date
+birth_day birthday
+pastmembers past_members
+birth day birthday
+styles style
+years pro yearpro
+sun sign sun_sign
+national caps1 nationalcaps1
+- || - || - || - || &lt;span style &lt;span style
+coachingrecords coaching_records
+weightclass weight_class
+- || - || - || - || - || - || - || style style
+signature type signature_type
+date of birth birth_date
+image_2 image2
+|birth name birth_name
+website2 website 2
+club-cupdate club_cupdate
+nationalcaps 1 nationalcaps1
+|predecessor predecessor
+influencedby influenced by
+| allstars allstars
+websites website
+heir-type heir_type
+major wins majorwins
+small| office small_| office
+debut work debut_work
+grandfather grand father
+jersey # jersey
+other wins otherwins
+|office2 office2
+|office3 office3
+order 4 order4
+current_position currentposition
+current_number currentnumber
+end_year endyear
+pre-nhl_league pre_nhl_league
+h1-length-m h1_length_m
+h1-length-f h1_length_f
+martial_status martial status
+|color color
+post-production&lt;ref&gt;{{cite web |url post_production&lt;ref&gt;{{cite web |url
+resting+place resting_place
+suppressed date suppressed_date
+web-site website
+husband_name husband name
+hai_rcolor hair_color
+bornname born name
+see also seealso
+editor-last editor_last
+height_m height
+|highestsinglesranking highestsinglesranking
+debutworks debut_works
+all egiance allegiance
+co-leader4 co_leader4
+associated acts associated_acts
+|statlabel1 statlabel1
+currentmembers current_members
+wallabyno wallaby no
+|grandslamsdoublesresults grandslamsdoublesresults
+pointsr pointsa
+pointsb pointsa
+pointsc pointsa
+pointsd pointsa
+pointse pointsa
+pointsf pointsa
+nick name nickname
+metric-elev metric_elev
+alma+mater alma_mater
+domestic_partner(s) domestic partner(s)
+image caption image_caption
+| death_date death_date
+imag_esize image_size
+other_titles othertitles
+sources source
+|birth_place birth_place
+death_ cause death_cause
+facebookpage facebook page
+birth_nme birth_name
+later work laterwork
+_place place
+imagesze image_size
+born_place born place
+long_d longd
+long_m longm
+walk-on music walk_on music
+long_s longs
+past-positions past_positions
+metric-rwy metric_rwy
+lives-at lives_at
+boxwidth box_width
+- align align
+notableroles notable roles
+debut_year debutyear
+imgcaption img_caption
+native name lang native_name_lang
+alt_text alt text
+nationalcom petition nationalcompetition
+death _ cause death_cause
+nationalteam-tupdate nationalteam_tupdate
+major_titles major titles
+chief minister1 chiefminister1
+date_of_death death_date
+elimination_half-life elimination_half_life
+u-b u_b
+yearbend yearaend
+|name name
+current_club currentclub
+| name name
+step-mom step_mom
+style http://www.guardian.co.uk/lifeandstyle/wordofmouth/2008/nov/28/heston-blumenthal-little-chef-menupoph style http://www.guardian.co.uk/lifeandstyle/wordofmouth/2008/nov/28/heston_blumenthal_little_chef_menupoph
+|height height
+| notableworks notableworks
+us open usopen
+services service
+spouese spouse
+| notable role notable role
+last_album last album
+almameter alma_mater
+famil family
+year of active active year
+otherwork other work
+weights weight
+primeminister 2 primeminister2
+| alias alias
+current teams current_teams
+url 2 url2
+issues issue
+languages language
+formerteams former_teams
+||image image
+fullnam fullname
+- class class
+national competition nationalcompetition
+|alma_mater alma_mater
+weightkg weight_kg
+natural_bust natural bust
+death_ place death_place
+triesc triesa
+triesb triesa
+triesf triesa
+triese triesa
+triesd triesa
+|birth_name birth_name
+sooteam sooteams
+postalcode postal_code
+|image image
+best known_for best known for
+patron patrons
+image 1 image1
+image 2 image2
+zodiac_sign zodiac sign
+notable_roles notable roles
+family-name family_name
+|caption caption
+signarure signature
+office 2 office2
+mmancs mma_nc
+otheryears other_years
+worldn worlds
+full_name fullname
+majority 2 majority2
+photos photo
+career highlights careerhighlights
+other_occupation otheroccupation
+co-founded co_founded
+termstart term_start
+first_race first race
+prime_minister1 primeminister1
+career_highlights careerhighlights
+height m height
+- || - || - || - || - || - || - || - || - || - || - || style style
+vice-president of the iranian resistance vice_president of the iranian resistance
+hangulb hangul
+hangula hangul
+publishers publisher
+other post other_post
+dharma_name dharma name
+'''name''' name
+associated_act associatedact
+'''birth_place''' birth_place
+date of death death_date
+charte charge
+wanted by wanted_by
+voice_types voicetype
+order 2 order2
+birth_ place birth_place
+student students
+death_place_ death_place
+notable credits notable_credits
+nick_names nickname
+notable idea notable_idea
+death_place| death_place
+constituency_2 constituency2
+reg-type4 reg_type4
+reg-type1 reg_type1
+reg-type2 reg_type2
+reg-type3 reg_type3
+successor 1 successor1
+national years1 nationalyears1
+family name family_name
+body class bodyclass
+vice_president vicepresident
+coachyears coach_years
+nationalteam- nationalteam_
+image_name image name
+co-driver codriver
+honorific-suffix honorific_suffix
+worldchamp world champ
+oc-zz oc_zz
+pre-type1 pre_type1
+pre-type3 pre_type3
+pre-type2 pre_type2
+grand_children grandchildren
+bgcolor bgcolour
+relatedacts related_acts
+small|caption small| caption
+assumed_office assumed office
+nombre de nacimiento nombre_de_nacimiento
+previous occupation previous_occupation
+mother_tongue mother tongue
+president 3 president3
+height cm heightcm
+| deliveries deliveries
+&lt;!--ethnicity &lt;!__ethnicity
+-bgcolor bgcolour
+ru_current club ru_currentclub
+term-start2 term_start2
+other_name(s) othername(s)
+step-children stepchildren
