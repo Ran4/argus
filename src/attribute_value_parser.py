@@ -23,16 +23,16 @@ class AttributeValueParser:
         }
         
         #Pattern for removing <small> and </small>
-        self.patternSmall = re.compile(r"\<[\/]*small\>")
+        self.patternSmall = re.compile(r"(?i)\<[\/]*small\>")
         
         #Pattern for creating dot-separated lists
-        self.patternDot = re.compile(u"\{\{\xB7\}\}")
+        self.patternDot = re.compile(u"(?i)\{\{\xb7\}\}")
         
         #Pattern for tidying up list entries
         self.patternFixListEntries = re.compile("^[ ]*(.*?)[\, ]*$")
         
         #Pattern for removing {{*}}
-        self.patternCBDot = re.compile("\{\{(?:\*|ndash|mdash|spaced ndash)\}\}")
+        self.patternCBDot = re.compile("(?i)\{\{(?:\*|ndash|mdash|spaced ndash)\}\}")
         
         #Pattern for removing titles encased as '''title'''
         self.patternTitle = re.compile("'''(.*?)'''")
@@ -41,39 +41,39 @@ class AttributeValueParser:
         self.patternEnclosedByParentheses = re.compile("^\((?:[^\)\(]*)\)$")
         
         #Pattern for removing cref and contents
-        self.patternCref = re.compile(r"\{\{cref[^\}]*?(?:\}\}\}\}\}|\}\}(?!\}))")
+        self.patternCref = re.compile(r"(?i)\{\{cref[^\}]*?(?:\}\}\}\}\}|\}\}(?!\}))")
         
         #Pattern for removing sfn, refn, cite journal and sfnp
         #Also flagicon, pad, 
-        self.patternSfn = re.compile(r"\{\{(?:sfn|refn|cite journal|citation needed|flagicon|pad)(?:.*?)\}\}")
+        self.patternSfn = re.compile(r"(?i)\{\{(?:sfn|refn|cite journal|citation needed|flagicon|pad)(?:.*?)\}\}")
         
         #Pattern for removing the "small" environment and replacing a <br />
         #directly before it, if there is one.
-        self.patternSmallEnv = re.compile("(?:<br(?:[ ]*)(?:[\/]*)>)*\{\{(?:[ ]*)small(?:[ ]*)\|(?:[\']*)(.*?)(?:[\']*)\}\}")
+        self.patternSmallEnv = re.compile("(?i)(?:<br(?:[ ]*)(?:[\/]*)>)*\{\{(?:[ ]*)small(?:[ ]*)\|(?:[\']*)(.*?)(?:[\']*)\}\}")
         
         #Pattern for removing comments
         self.patternComment = re.compile(r"<!--(?:.*?)-->")
         
-        #Pattern for removing thinsp environment
-        self.patternThinsp = re.compile(r"\{\{thinsp\}\}|\{\{dot\}\}")
+        #Pattern for removing thinsp tag
+        self.patternThinsp = re.compile(r"(?i)\{\{thinsp\}\}")
         
         #Pattern for removing sup environment
-        self.patternSup = re.compile(r"\{\{sup\|(?:.*?)\}\}")
+        self.patternSup = re.compile(r"(?i)\{\{sup\|(?:.*?)\}\}")
         
         #Pattern for removing references
-        self.patternReference = re.compile(r"<(?:span|ref|ref group(?:[^\>])*|ref name(?:[^\>])*)>(?:.*?)<\/(?:ref|span)>|<ref(?:.*?)\/>")
+        self.patternReference = re.compile(r"(?i)<(?:span|ref|ref group(?:[^\>])*|ref name(?:[^\>])*)>(?:.*?)<\/(?:ref|span)>|<ref(?:.*?)\/>")
         
         #Pattern for removing references of the type "(see: foobar)"
-        self.patternSeeRef = re.compile(r"(?: \- |[ ])*\(see[ |\: ](?:.*?)\)")
+        self.patternSeeRef = re.compile(r"(?i)(?: \- |[ ])*\(see[ |\: ](?:.*?)\)")
         
         #Pattern for replacing nbsp with whitespaces
-        self.patternNbsp = re.compile(r"(\&amp;)*(\&)*nbsp;")
+        self.patternNbsp = re.compile(r"(?i)(?:(\&amp;)*(\&)*nbsp;)|\{\{dot\}\}|\{\{int\:dot\-separator\}\}|\{\{nbsp\}\}")
         
         #Pattern for replacing &amp;ndash; with "-"
-        self.patternNdash = re.compile(r"\&amp\;ndash\;")
+        self.patternNdash = re.compile(r"(?i)\&amp\;ndash\;")
         
         #Pattern for replacing &quot;
-        self.patternQuote = re.compile(r"\&quot;")
+        self.patternQuote = re.compile(r"(?i)\&quot;")
         
         #Pattern for seeing if string ends with }}
         self.patternCurlyBrackets = re.compile(r"\}\}$")
@@ -85,76 +85,95 @@ class AttributeValueParser:
         self.patternRightOfPipe = re.compile(r"\|(?:.*)")
         
         #Pattern for replacing <br />
-        self.patternBr = re.compile("\<br[ ]*(?:[\/]*)[ ]*\>")
+        self.patternBr = re.compile("(?i)\<br[ ]*(?:[\/]*)[ ]*\>")
         
-        #Pattern for replacing unicode hyphens
+        #TODO: Pattern for replacing unicode hyphens
         self.patternHyphen = re.compile(u"\\u2013")
         
         #Pattern for getting b from [[a|b]]
         self.patternPipeLink = re.compile(r"\[\[(?:[ ]*)(?:[^\]]*?)(?:[ ]*)\|(?:[ ]*)(.*?)(?:[ ]*)\]\]")
         
         #Pattern for removing wikipedia pictures
-        self.patternWikiPic = re.compile(r"\[\[file\:(.*?)\]\]")
+        self.patternWikiPic = re.compile(r"(?i)\[\[file\:(.*?)\]\]")
         
         #Pattern for getting a from [[a]]
         self.patternLink = re.compile(r'\[\[(?:[ ]*)(.*?)(?:[ ]*)\]\]')
         
         #Pattern for removing the "Longitem", "bigger" or "nowrap" environments
-        self.patternLongitem = re.compile(r'\{\{(?:[ ]*)(?:smaller|longitem|nowrap|bigger)(?:[ ]*)\|(?:(?:(?:[ ]*)(?:style|padding|line-height)(?:[^\|]+?)\|)*)(?:[ ]*)(.*?)(?:[ ]*)\}\}')
+        self.patternLongitem = re.compile(r'(?i)\{\{(?:[ ]*)(?:smaller|longitem|nowrap|bigger)(?:[ ]*)\|(?:(?:(?:[ ]*)(?:style|padding|line-height)(?:[^\|]+?)\|)*)(?:[ ]*)(.*?)(?:[ ]*)\}\}')
         
         #Gets death date and age out of a "death date and age" environment
-        self.patternDda = re.compile('\{\{(?:birth date and age|bda)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
+        self.patternDda = re.compile('(?i)\{\{(?:birth date and age|bda)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
         
         #Gets death date and age out of a "death year and age" environment
-        self.patternDya = re.compile('\{\{(?:death year and age|dya)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:\d+)(?:[ ]*))*(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
+        self.patternDya = re.compile('(?i)\{\{(?:death year and age|dya)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:\d+)(?:[ ]*))*(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
         
         #Gets date of birth out of a "birth date and age" environment (and NOT from a "birth date" environment)
-        self.patternBda = re.compile('\{\{(?:birth date and age|bda)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
+        self.patternBda = re.compile('(?i)\{\{(?:birth date and age|bda)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
         
         #Gets date of birth out of a "birth date" environment
-        self.patternDob = re.compile('\{\{(?:birth date|dob)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
+        self.patternDob = re.compile('(?i)\{\{(?:birth date|dob)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
         
         #Pattern for getting list name from {{list name| or {{list name}}
         self.patternList = re.compile(r'\{\{([^|]+?)(?:[ ]*)(?:\||\})')
+        
+        ########################################################################
+        #LIST NAME REGEXES
+        ########################################################################
+        
+        self.patternBulletedListName = re.compile("(?i)bulleted[ ]*list|blist")
+        self.patternFlatlistName = re.compile("(?i)flat[ ]*list") #flist?
+        self.patternStartflatlistName = re.compile("(?i)start[ ]*flat[ ]*list|sflist")
+        self.patternPlainlistName = re.compile("(?i)plain[ ]*list") #plist?
+        self.patternFlowlistName = re.compile("(?i)flow[ ]*list") #flist?
+        self.patternHlistName = re.compile("(?i)hlist")
+        self.patternUnbulletedListName = re.compile("(?i)unbulleted[ ]*list|ublist")
+        self.patternPagelistName = re.compile("(?i)page[ ]*list") #plist?
+        self.patternOrderedListName = re.compile("(?i)ordered[ ]*list|olist")
+        self.patternToolbarName = re.compile("(?i)tool[ ]*bar|toolbar")
+        
+        ########################################################################
+        #LIST REGEXES
+        ########################################################################
         
         #TODO: Do lists starting with a {{tag}} have list attributes similar to
         #other lists? In which format?
         
         #Pattern for getting entries from a "bulleted list"
-        self.patternBulletedList = re.compile("^(?:\{\{(?:.*?))(?=\|)|\|(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)(.*?)(?:[ ]*)(?=\|)|\|(?:[ ]*)([^\|]*?)(?:[ ]*)\}\}$")
+        self.patternBulletedList = re.compile("^(?i)(?:\{\{(?:.*?))(?=\|)|\|(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)(.*?)(?:[ ]*)(?=\|)|\|(?:[ ]*)([^\|]*?)(?:[ ]*)\}\}$")
         
         #Pattern for getting entries from a "flatlist"
-        self.patternFlatlist= re.compile("^(?:\{\{(?:.*?))(?=\|)|\|(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\||\})|(?:\|*)(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\||\})|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\||\})|(?:\|*)(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\||\})|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\||\})|(?:\*|\#)(?:[ ]*)([^\*\#]+)(?:[ ]*)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)([^\*\#\}]+?)(?:[ ]*)\}\}$")
+        self.patternFlatlist= re.compile("^(?i)(?:\{\{(?:.*?))(?=\|)|\|(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\||\})|(?:\|*)(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\||\})|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\||\})|(?:\|*)(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\||\})|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\||\})|(?:\*|\#)(?:[ ]*)([^\*\#]+)(?:[ ]*)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)([^\*\#\}]+?)(?:[ ]*)\}\}$")
     
         #Pattern for getting entries from a "startflatlist"
-        self.patternStartflatlist = re.compile(r"^\{\{(?:.*?)\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+)(?:[ ]*)(?=\*)|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+?)(?:[ ]*)\{\{(?:.*?)\}\}$")
+        self.patternStartflatlist = re.compile(r"^(?i)\{\{(?:.*?)\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+)(?:[ ]*)(?=\*)|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+?)(?:[ ]*)\{\{(?:.*?)\}\}$")
         
         #Pattern for getting entries from an "endplainlist"
-        self.patternEndplainlist  = re.compile(r"^\{\{(?:.*?)\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+?)(?:[ ]*)(?=\*)|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+?)(?:[ ]*)\{\{(?:.*?)\}\}$")
+        self.patternEndplainlist  = re.compile(r"^(?i)\{\{(?:.*?)\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+?)(?:[ ]*)(?=\*)|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+?)(?:[ ]*)\{\{(?:.*?)\}\}$")
 
         #Pattern for getting entries from a "plainlist"
-        self.patternPlainlist = re.compile("^(?:\{\{(?:.*?))(?=\|)|\|(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\||\})|(?:\*|\#)(?:[ ]*)([^\*\#]+)(?:[ ]*)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)([^\*\#\}]*?)(?:[ ]*)\}\}$")
+        self.patternPlainlist = re.compile("^(?i)(?:\{\{(?:.*?))(?=\|)|\|(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\||\})|(?:\*|\#)(?:[ ]*)([^\*\#]+)(?:[ ]*)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)([^\*\#\}]*?)(?:[ ]*)\}\}$")
         
         #Pattern for getting entries from an "endflowlist"
-        self.patternEndflowlist = re.compile("^\{\{(?:.*?)\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*\#\|]+?)(?:[ ]*)(?=\||\*|\#)|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*\#\|]+?)(?:[ ]*)\{\{(?:.*?)\}\}$")
+        self.patternEndflowlist = re.compile("^(?i)\{\{(?:.*?)\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*\#\|]+?)(?:[ ]*)(?=\||\*|\#)|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*\#\|]+?)(?:[ ]*)\{\{(?:.*?)\}\}$")
         
         #Pattern for getting entries from a "flowlist"
-        self.patternFlowlist = re.compile("^(?:\{\{(?:.*?))(?=\|)|\|(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\||\})|(?:\*|\#|\|)(?:[ ]*)([^\*\#\|]+?)(?:[ ]*)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)([^\*\#\}]*?)(?:[ ]*)\}\}$")
+        self.patternFlowlist = re.compile("^(?i)(?:\{\{(?:.*?))(?=\|)|\|(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\||\})|(?:\*|\#|\|)(?:[ ]*)([^\*\#\|]+?)(?:[ ]*)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)([^\*\#\}]*?)(?:[ ]*)\}\}$")
 
         #Pattern for getting entries from a "hlist"
-        self.patternHlist = re.compile("^\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=*(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)list_style(?:[ ]*)=*(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\|)|(?:\||\*|\#)*(?:[ ]*)([^\|\*\#]+?)(?:[ ]*)(?=(?:\||\#|\*))|(?:\||\*|\#)*(?:[ ]*)([^\|\*\#]+?)(?:[ ]*)\}\}$")
+        self.patternHlist = re.compile("^(?i)\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=*(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)list_style(?:[ ]*)=*(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\|)|(?:\||\*|\#)*(?:[ ]*)([^\|\*\#]+?)(?:[ ]*)(?=(?:\||\#|\*))|(?:\||\*|\#)*(?:[ ]*)([^\|\*\#]+?)(?:[ ]*)\}\}$")
            
         #Pattern for getting entries from an "unbulleted list"
-        self.patternUnbulletedList = re.compile("^\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=*(?:.*?)(?=\||\})|(?:\|*)(?:[ ]*)list_style(?:[ ]*)=*(?:.*?)(?=\||\})|(?:\|*)(?:[ ]*)style(?:[ ]*)=*(?:.*?)(?=\||\})|(?:\|*)(?:[ ]*)indent(?:[ ]*)=*(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=*(?:.*?)(?=\||\})|(?:\||\*|\#)*(?:[ ]*)([^\|\*\#]+?)(?:[ ]*)(?=(?:\||\#|\*))|(?:\||\*|\#)(?:[ ]*)([^\|\*\#]+?)(?:[ ]*)\}\}$")
+        self.patternUnbulletedList = re.compile("^(?i)\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=*(?:.*?)(?=\||\})|(?:\|*)(?:[ ]*)list_style(?:[ ]*)=*(?:.*?)(?=\||\})|(?:\|*)(?:[ ]*)style(?:[ ]*)=*(?:.*?)(?=\||\})|(?:\|*)(?:[ ]*)indent(?:[ ]*)=*(?:.*?)(?:\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=*(?:.*?)(?=\||\})|(?:\||\*|\#)*(?:[ ]*)([^\|\*\#]+?)(?:[ ]*)(?=(?:\||\#|\*))|(?:\||\*|\#)(?:[ ]*)([^\|\*\#]+?)(?:[ ]*)\}\}$")
 
         #Pattern for getting entries from a "pagelist"
-        self.patternPagelist = re.compile("^\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)nspace(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)delim(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:(?:\||\*|\#)+)(?:[ ]*)(.*?)(?:[ ]*)(?=\||\*|\#)|(?:(?:\||\*|\#)+)(?:[ ]*)(.*?)(?:[ ]*)\}\}$")
+        self.patternPagelist = re.compile("^(?i)\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)nspace(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)delim(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:(?:\||\*|\#)+)(?:[ ]*)(.*?)(?:[ ]*)(?=\||\*|\#)|(?:(?:\||\*|\#)+)(?:[ ]*)(.*?)(?:[ ]*)\}\}$")
 
         #Pattern for getting entries from an "ordered list"
-        self.patternOrderedList = re.compile("^\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)list_style_type(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_value(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)start(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:(?:\||\*|\#)+)(?:[ ]*)(.*?)(?:[ ]*)(?=\|)|(?:(?:\||\*|\#)+)(?:[ ]*)(.*?)(?:[ ]*)\}\}$")
+        self.patternOrderedList = re.compile("^(?i)\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)list_style_type(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)item(?:\d*)_value(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)start(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:(?:\||\*|\#)+)(?:[ ]*)(.*?)(?:[ ]*)(?=\|)|(?:(?:\||\*|\#)+)(?:[ ]*)(.*?)(?:[ ]*)\}\}$")
 
         #Pattern for getting entries from a "toolbar"
-        self.patternToolbar = re.compile("^\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)separator(?:[ ]*)=(?:.*?)(?=\}\}|\|)|\|(?:[ ]*)(.*?)(?:[ ]*)(?=\|)|\|(?:[ ]*)([^\|]*?)(?:[ ]*)\}\}$")
+        self.patternToolbar = re.compile("^(?i)\{\{(?:.*?)(?=\|)|(?:\|*)(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\}\}|\|)|(?:\|*)(?:[ ]*)separator(?:[ ]*)=(?:.*?)(?=\}\}|\|)|\|(?:[ ]*)(.*?)(?:[ ]*)(?=\|)|\|(?:[ ]*)([^\|]*?)(?:[ ]*)\}\}$")
         
         if verbose:
             print "AttributeValueParser has compiled all regex patterns"
@@ -293,7 +312,7 @@ class AttributeValueParser:
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
-        #Replaces all unicode hyphens
+        #TODO: Replaces all unicode hyphens
         if verbose:
             print "Entering removal of hyphens."
             print "    Value before was: '%s'" % str(value)
@@ -485,27 +504,27 @@ class AttributeValueParser:
                 print "        Value after became: '%s'" % str(value)
             
             #Now that we have obtained the list type, we want to do different things depending on which list type it is.
-            if listType == "bulleted list":
+            if self.patternBulletedListName.match(listType):
                 if verbose:
                     print '    "bulleted list" detected.'
 
                 #Returns a list of tuples with all matches, where each group corresponds to one tuple.
                 returnList = filter(None, list(itertools.chain.from_iterable(self.patternBulletedList.findall(value))))
                 
-            elif listType == "flatlist" or listType == "flat list":
+            elif self.patternFlatlistName.match(listType):
                 if verbose:
                     print '    "flatlist" detected.'
                 #Note: We do NOT need to have a subcase for endflatlist environment, since that is initiated by {{startflatlist}}
                 returnList = filter(None, list(itertools.chain.from_iterable(self.patternFlatlist.findall(value))))
                 
-            elif listType == "startflatlist":
+            elif self.patternStartflatlistName.match(listType):
                 if verbose:
                     print '    "startflatlist" detected.'
                 
                 #Returns a list of tuples with all matches, where each group corresponds to one tuple.
                 returnList = filter(None, list(itertools.chain.from_iterable(self.patternStartflatlist.findall(value))))
                 
-            elif listType == "plainlist" or listType == "plain list":
+            elif self.patternPlainlistName.match(listType):
                 if verbose:
                     print '    some type of plainlist detected...'
                 #A subcase for endplainlist environment:
@@ -519,7 +538,7 @@ class AttributeValueParser:
                         print '    "plainlist" detected.'
                 returnList = filter(None, list(itertools.chain.from_iterable(self.patternPlainlist.findall(value))))
             
-            elif listType == "flowlist" or listType == "flow list":
+            elif self.patternFlowlistName.match(listType):
                 if verbose:
                     print '    some type of flowlist detected...'
                 #A subcase for endflowlist environment:
@@ -532,35 +551,35 @@ class AttributeValueParser:
                             print '    "flowlist" detected.'
                     returnList = filter(None, list(itertools.chain.from_iterable(self.patternFlowlist.findall(value))))
                 
-            elif listType == "hlist":
+            elif self.patternHlistName.match(listType):
                 if verbose:
                     print '    "hlist" detected.'
 
                 #Returns a list of tuples with all matches, where each group corresponds to one tuple.
                 returnList = filter(None, list(itertools.chain.from_iterable(self.patternHlist.findall(value))))
                 
-            elif listType == "unbulleted list" or listType == "ublist":
+            elif self.patternUnbulletedListName.match(listType):
                 if verbose:
                     print '    "unbulleted list" detected.'
 
                 #Returns a list of tuples with all matches, where each group corresponds to one tuple.
                 returnList = filter(None, list(itertools.chain.from_iterable(self.patternUnbulletedList.findall(value))))
                 
-            elif listType == "pagelist" or listType == "page list":
+            elif self.patternPagelistName.match(listType):
                 if verbose:
                     print '    "pagelist" detected.'
 
                 #Returns a list of tuples with all matches, where each group corresponds to one tuple.
                 returnList = filter(None, list(itertools.chain.from_iterable(self.patternPagelist.findall(value))))
                 
-            elif listType == "ordered list":
+            elif self.patternOrderedListName.match(listType):
                 if verbose:
                     print '    "ordered list" detected.'
 
                 #Returns a list of tuples with all matches, where each group corresponds to one tuple.
                 returnList = filter(None, list(itertools.chain.from_iterable(self.patternOrderedList.findall(value))))
                 
-            elif listType == "toolbar":
+            elif self.patternToolbarName.match(listType):
                 if verbose:
                     print '    "toolbar" detected.'
 
