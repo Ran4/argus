@@ -84,6 +84,7 @@ class Server:
         inSearch = bool(request.GET.get("in_search"))
         
         print "Got queryInput = '%s'" % queryInput
+        print "inSearch:", inSearch
         
         textResponse = "Statistics query crashed..."
         searchType = None
