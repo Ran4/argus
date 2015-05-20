@@ -1,8 +1,10 @@
 <html>
 <head>
+	<link rel="stylesheet" type="text/css" href="static/stylesheet.css">
 	<title>Argus server</title>
+</head>
 <body>
-
+<p>
 <form action="submit_query" method="get">
 	Query: <input type="text" name="query_input" 
 		value="{{default_query_value}}" autofocus>
@@ -13,6 +15,7 @@
 	<input type="radio" name="query_type" value="all_values">All values
 <input type="submit" value="Submit">
 </form>
+</p>
 
 {{imagetemplate}}
 <p>{{textresponse}}</p>

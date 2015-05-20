@@ -78,13 +78,16 @@ class Statistics:
                 print s
             return s, False
         
-        s += "<p style='font-weight:bold;'>Found %s people with the attribute '%s'</p>" % \
-            (len(values), key)
+        print "in statistics, searchType:", searchType
+        
+        s += "<p style='font-weight:bold;'>Found %s people with the attribute %s'%s'</p>" % (len(values),
+            "containing " if searchType=="in_search" else "",
+            key)
         if verbose:
             print s
         
         if queryType == "most_common":
-            numMostCommonvalues = 30
+            numMostCommonvalues = 50
             s += "<p style='font-weight:bold;'>" + \
                 "Showing the %s most common values</p>" % \
                 numMostCommonvalues
@@ -98,9 +101,27 @@ class Statistics:
             ##Example: self.commonNames = [("john", 1877), ("william", 987)]
             yy = map(itemgetter(1), mostCommonValues)
             
-            plt.plot(range(len(yy)), yy)
+            #plt.plot(range(len(yy)), yy)
             
-            plt.title("Most common occurances of attribute '%s'" % key)
+            
+            #plt.bar(range(len(yy)), yy) #just the few most common
+            
+            
+            #Only values that are at least 1% of the original value
+            allCommonValues = sorted(Counter(values).values(), reverse=True)
+            commonValuesNotTooSmall = []
+            for value in allCommonValues:
+                if value < 0.01*allCommonValues[0]:
+                    break
+                commonValuesNotTooSmall.append(value)
+            
+            plt.bar(range(len(commonValuesNotTooSmall)),
+                commonValuesNotTooSmall)
+            
+            
+            
+            plt.title("Most common occurances of attribute %s'%s'" % \
+                ("containing "*(searchType=="in_search"), key))
             
             plt.savefig(imageOutputPath)
             print "Saved figure to %s" % imageOutputPath
