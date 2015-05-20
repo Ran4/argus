@@ -4,6 +4,21 @@ body {
 }
 
 p {
-	color: black;
-	
+	color: black;	
+}
+
+.textfield {
+	width: 500px;
+}
+
+.table_even {
+	background-color: #BDD8F6;
+	color: #000000
+	border: 1px solid black;
+}
+
+.table_odd {
+	background-color: #BDD8F6;
+	color: #606060
+	border: 1px solid black;
 }

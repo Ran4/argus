@@ -89,24 +89,25 @@ class Server:
         
     def index(self):
         self.loadTemplates()
-        return template(self.template,
-            default_query_value="",
-            in_search_checked="",
-            imagetemplate="",
-            textresponse="")
+        
+        return self.submit_search_query()
             
     def submit_search_query(self):
+        self.loadTemplates()
+        
         def getReturnTemplate(textResponse):
             return template(self.searchTemplate,
                 default_query_value1=userInput1 or "",
                 default_query_value2=userInput2 or "",
-                in_search_checked="checked",
+                in_search_checked="checked"*bool(inSearch),
+                case_sensitive_checked="checked"*bool(caseSensitive),
                 textresponse=textResponse).replace("&lt;","<").replace("&gt;",">").replace('&quot;','"').replace("&#039;",'"')
         
         userInput1 = request.GET.get("query_search_input1")
         userInput2 = request.GET.get("query_search_input2")
         useSmartTranslation = not bool(request.GET.get("no_smart_translation"))
         inSearch = bool(request.GET.get("in_search"))
+        caseSensitive = bool(request.GET.get("case_sensitive"))
         
         print "in server.submit_search_query, inputs:"
         print userInput1
@@ -120,17 +121,16 @@ class Server:
         requestedValuesKeys = []
         if userInput1:
             for req in map(lambda x: x.strip(), userInput1.split(",")):
-                if "=" not in req:
-                    resp = "Problems parsing required keys! "
-                    resp += "No '=' found in '%s'" % req
-                    return getReturnTemplate(resp)
-                elif req.count("=") > 1:
+                if req.count("=") > 1:
                     resp = "Problems parsing required keys!  "
                     resp += "More than one '=' found in '%s'" % req
                     return getReturnTemplate(resp)
                 
-                reqKey, reqValue = req.split("=")
-                requiredKeyValues.append((reqKey, reqValue))
+                if "=" in req:
+                    reqKey, reqValue = req.split("=")
+                    requiredKeyValues.append((reqKey, reqValue))
+                else:
+                    requiredKeyValues.append((req, ""))
                 
         if userInput2:
             for outKey in map(lambda x: x.strip(), userInput2.split(",")):
@@ -141,6 +141,9 @@ class Server:
                 return getReturnTemplate(resp)
         
         if requiredKeyValues and requestedValuesKeys:
+            #~ if "url" in requestedValuesKeys:
+                #~ requestedValuesKeys.replace
+            
             #perform search here
             if inSearch:
                 searchType = "in_search"
@@ -148,7 +151,9 @@ class Server:
                 searchType = None
                 
             searchRet = self.statistics.search(requiredKeyValues,
-                requestedValuesKeys, searchType)
+                requestedValuesKeys, searchType, caseSensitive)
+                
+            searchRet = searchRet[:150000]
             
             ##AS LONG TABLE
             #~ textResponseList = []
@@ -194,17 +199,34 @@ class Server:
                 map("<th>{}</th>".format, requestedValuesKeys)))
             table.append("</tr>")
             
+            i = 0
             for article in searchRet:
-                table.append("<tr>")
+                i += 1
+                
+                if i % 2 == 0:
+                    table.append("<tr class='table_even'>")
+                else:
+                    table.append("<tr class='table_odd'>")
                 
                 for key, value in article:
                     if isinstance(value, list):
                         value = "; ".join(value)
                             
-                    if key.lower == "wikiurl": #remove http:/.../ part
-                        value = value.split("/")[-1]
                     
-                    table.append("<th>%s</th>" % value)
+                    if key.lower() == "wikiurl": #remove http:/.../ part
+                        shownValue = value.split("/")[-1].replace("_", " ")
+                            
+                        url = "http://en.wikipedia.org/w/index.php?search=%s" %\
+                            value.split("/")[-1].replace(" ", "%20")
+                            
+                        value = "<a href=%s>%s</a>" % (url, shownValue)
+                    else:
+                        #Don't show really long lines
+                        characterLengthLimit = 90
+                        if len(value) > characterLengthLimit:
+                            value = value[:characterLengthLimit-3] + "..."
+                    
+                    table.append('<th>%s</th>' % value)
                     
                 table.append("</tr>")
             
@@ -216,13 +238,6 @@ class Server:
             textResponse = "Not enough values to perform search."
         
         return getReturnTemplate(textResponse)
-        """
-        template(self.searchTemplate,
-            default_query_value1="",
-            default_query_value2="",
-            in_search_checked="checked",
-            textresponse=textResponse)
-        """
         
     def submit_query(self):
         queryInput = request.GET.get("query_input")

@@ -692,14 +692,13 @@ class AttributeValueParser:
             #to one long list, then return.
             resultList = []
             subStrings = self.patternListNoCatchGroups.findall(value)
-            print "Number of substrings in " + str(value.encode("utf-8")) + " is " + str(len(subStrings))
             for string in subStrings:
                 print "Value is: " + value
                 print "String is: " + string
             for i, listType in enumerate(self.patternList.findall(value)):
                 if listType not in ["endflatlist", "endplainlist", "endflowlist"]:
                     resultList.extend(self.parseList(subStrings[i], listType, verbose))
-            print "Entire string was parsed..."    
+                
             if verbose:
                 print "Returning: %s" % str(resultList) 
             return resultList    
@@ -815,13 +814,10 @@ def test(verbose=False):
         ('{{hlist|[[biology]]|[[zoology]]}} {{hlist|[[physics]]|[[metaphysics]]}}', ['biology', 'zoology', 'physics', 'metaphysics']),
         #Marriage environment
         ('{{Unbulleted list|class=nowrap |{{marriage|Maria Nys|()=smaller|1919|1955}} |{{marriage|[[Laura Huxley]]|()=smaller|1956|1963}}}}', ['Maria Nys (m. 1919-1955)', 'Laura Huxley (m. 1956-1963)']),
-        ('{{hlist|list_style=line-height:1.3em; |[[Abu Rayhan Biruni|Biruni]] |[[Omar Khayyam]]}}',['Biruni','Omar Khayyam']),
-        ('{{hlist|list_style=line-height:1.3em; |[[Quran|the Quran]]}}', ['the Quran']),
-        ('{{hlist|list_styleline-height:1.3em; |the Quran |Hippocrates |Aristotle |Galen |Neoplatonism |al-Kindi |al-Farabi |Rhazes |Biruni |al-Masihi}}',['the Quran','Hippocrates','Aristotle','Galen','Neoplatonism','al-Kindi','al-Farabi','Rhazes','Biruni','al-Masihi']),
-        ('{{birth date|1889|4|20|df=yes}}','20 April 1889')
-        ]
+    ]
+
     attributeValueParser = AttributeValueParser()
-   
+    
     print "Testing",
     print "attribute_value_parser.AttributeValueParser.parseAttributeValue()"
     
@@ -837,4 +833,3 @@ def test(verbose=False):
 
 if __name__ == "__main__":
     test(verbose=True)
-

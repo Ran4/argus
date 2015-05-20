@@ -1,0 +1,29 @@
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="static/stylesheet.css">
+	<title>Argus server search</title>
+</head>
+<body>
+<p>
+<form action="submit_search_query" method="get">
+	Attribute values required: <input type="text" name="query_search_input1" 
+		class="textfield" value="{{default_query_value1}}" autofocus>
+	<input type="checkbox" name="in_search" value="1" {{in_search_checked}}>
+		Use "in" search
+	<input type="checkbox" name="case_sensitive" value="1" {{case_sensitive_checked}}>
+		Case sensitive<br>
+		<p style='color: #505050'>
+			(e.g. "nationality=british, occupation=actor")</p>
+	
+	Requested output keys: <input type="text" name="query_search_input2" 
+		class="textfield" value="{{default_query_value2}}" autofocus>
+	<br>
+	
+<input type="submit" value="Submit">
+</form>
+</p>
+
+<p>{{textresponse}}</p>
+
+</body>
+</html>

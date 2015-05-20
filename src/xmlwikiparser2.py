@@ -2,6 +2,7 @@
 import sys
 import os
 import time
+import copy
 from pprint import pprint as pp
 from collections import Counter
 import json
@@ -9,6 +10,7 @@ import json
 from termcolor import colored
 import logger
 from logger import writeToFile
+import category_handler
 
 global atLine
 
@@ -25,6 +27,8 @@ class InfoBox(object):
             countInArticle, verbose=False):
         self.articleTitle = articleTitle
         self.infoBoxType = infoBoxType
+        
+        self.categoryList = []
         
         if verbose: 
             print "Is in InfoBox.__init__ of article %s" % articleTitle
@@ -222,6 +226,10 @@ class InfoBox(object):
         d = self.getPropertiesDict()
         d["wikiurl"] = wikiUrl
         d["isocode"] = isoCode
+        d["__categories__"] = self.categoryList
+        
+        for category in self.categoryList:
+            category_handler.handleCategory(d, category)
         
         """
         if self.isInArticleWithPersonBox and self.countInArticle == 0:
@@ -259,6 +267,7 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
     recordInfoBox = False
     recordInfoBoxList = []
     infoBoxList = []
+    categoryList = []
     infoBoxType = ""
     numArticlesFound = 0
     numInfoBoxesFound = 0
@@ -269,6 +278,10 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
         line = f.readline()
         #~ print "line {}: {}".format(atLine, line)
         atLine += 1
+        
+        if line.startswith("[[Category:") and line.endswith("]]\n"):
+            category = line[len("[[Category:"):-len("]]\n")]
+            categoryList.append(category)
         
         #TODO: What is mediawiki??????
         #Found end of the mediawiki xml
@@ -283,6 +296,7 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
         
         if "<page>" in line: #start of an article
             record = True
+            categoryList = []
             
         ####################
         # Handle <page>
@@ -345,11 +359,14 @@ def getInfoBoxGenerator(f, seekStart=0, requestedNumberOfInfoBoxes=1e99):
             if isInArticleWithPersonBox:
                 for ib in infoBoxList:
                     ib.isInArticleWithPersonBox = isInArticleWithPersonBox
+                    ib.categoryList = copy.copy(categoryList)
                 
             yield infoBoxList
             
             isInArticleWithPersonBox = False
             infoBoxList = []
+            
+            categoryList = []
     
     print "Successfully finished parsing the entire Wikipedia!"
         
@@ -368,7 +385,17 @@ def main():
         filePath = os.path.abspath(sys.argv[1])
         outputFileName = os.path.abspath(sys.argv[2])
     else:
-        if "windows" in sys.argv:
+        if "small" in sys.argv:
+            filePath = os.path.abspath("../debug/enwiki_first35klines.txt")
+            outputFileName = os.path.abspath(
+                    "../raw_output/ibs_person_raw_small.json")
+        elif "full" in sys.argv:
+            filePath = os.path.abspath(
+                "../enwiki-20150304-pages-articles-multistream.xml")
+            outputFileName = os.path.abspath(
+                    "../raw_output/ibs_person_raw.json")
+                    
+        elif "windows" in sys.argv:
             fileName = "enwiki-20150304-pages-articles-multistream.xml"
             filePath = "C:\\ovrigt\\ovrigt\\wp\\" + fileName
             outputFileName = os.path.abspath(
