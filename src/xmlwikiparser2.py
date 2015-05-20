@@ -371,7 +371,8 @@ def main():
         if "windows" in sys.argv:
             fileName = "enwiki-20150304-pages-articles-multistream.xml"
             filePath = "C:\\ovrigt\\ovrigt\\wp\\" + fileName
-            outputFileName = "ibs_person_raw.json"
+            outputFileName = os.path.abspath(
+                    "../raw_output/ibs_person_raw.json")
         else:
             print "Usage: xmlwikiparser2 inputXMLFileName outputJSONFileName"
             sys.exit()

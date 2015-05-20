@@ -195,7 +195,7 @@ DEBUG = False
 #print getCategoriesReverse("dirty",data)
 
 
-#pprint(search([("birth_date","1942")], ["name","wikiURL", "birth_date"], data)[:20])
+pprint(search([("birth_date","194")], ["name","wikiURL", "birth_date"], data)[:40])
 # michael bloomberg, missing name and wikiURL waaah
 
 #pprint(search([("hair_color","dirty blond")], ["name","wikiURL"], data))
@@ -203,7 +203,7 @@ DEBUG = False
 #pprint(search([("birth_date","1956"),("birth_place","london")], ["name","wikiURL"], data))
 #pprint(search([("birth_date","195"),("birth_place","london")], ["name","wikiURL"], data))
 
-pprint(getStatistics("height",data)[0:100])
+#pprint(getStatistics("height",data)[0:100])
 
 #print "WOOP"
 """
