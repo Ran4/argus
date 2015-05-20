@@ -195,7 +195,7 @@ DEBUG = False
 #print getCategoriesReverse("dirty",data)
 
 
-pprint(search([("birth_date","194")], ["name","wikiURL", "birth_date"], data)[:40])
+#pprint(search([("birth_date","194")], ["name","wikiURL", "birth_date"], data)[:40])
 # michael bloomberg, missing name and wikiURL waaah
 
 #pprint(search([("hair_color","dirty blond")], ["name","wikiURL"], data))
@@ -206,7 +206,7 @@ pprint(search([("birth_date","194")], ["name","wikiURL", "birth_date"], data)[:4
 #pprint(getStatistics("height",data)[0:100])
 
 #print "WOOP"
-"""
+
 print "BORN:",getAverageWikipedianBirthYear(data)
 print "DIED:",getAverageWikipedianDeathYear(data)
 print "HEIGHT:",getAverageWikipedianHeight(data)
@@ -269,7 +269,6 @@ print "MOVEMENT:",getStatistics("movement",data)[0][0].title().encode("utf-8")
 print "SUCCESSION:",getStatistics("succession",data)[0][0].title().encode("utf-8")
 print "PC UPDATE:",getStatistics("pcupdate",data)[0][0].title().encode("utf-8")
 print getStatistics("native_name_lang",data)[0:30]
-"""
 
 #print 
 #print search([("relations","nehru")],("name","wikiURL"),data)
