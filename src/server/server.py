@@ -50,12 +50,12 @@ class Server:
             with open("template.html") as f:
                 self.template = f.read()
             
-            with open("query_template.html") as f:
-                self.queryTemplate = f.read()
+            with open("image_template.html") as f:
+                self.imageTemplate = f.read()
         except:
             print "Problem opening template"
             self.template = "PROBLEM LOADING TEMPLATE"
-            self.queryTemplate = "PROBLEM LOADING QUERYTEMPLATE"
+            self.imageTemplate = "PROBLEM LOADING IMAGE TEMPLATE"
         
     def start(self):
         self.app.run(host=self.host, port=self.port)
@@ -75,20 +75,25 @@ class Server:
     def index(self):
         self.loadTemplates()
         return template(self.template,
-            textresponse="",
-            queryform="<b>BIG</b>")
+            default_query_value="",
+            in_search_checked="",
+            imagetemplate="",
+            textresponse="")
         
     def submit_query(self):
         queryInput = request.GET.get("query_input")
         useSmartTranslation = not bool(request.GET.get("no_smart_translation"))
         inSearch = bool(request.GET.get("in_search"))
+        queryType = request.GET.get("query_type")
         
         print "Got queryInput = '%s'" % queryInput
         print "inSearch:", inSearch
         
         textResponse = "Statistics query crashed..."
-        searchType = None
-        queryType = "mostcommon"
+        if inSearch:
+            searchType = "in_search"
+        else:
+            searchType = None
         
         textResponse, imageWasSaved = self.statistics.performQuery(
             queryInput, self.queryImageOutputFilePath,
@@ -117,9 +122,10 @@ class Server:
         #Return things
         self.loadTemplates()
         return template(self.template,
-            textresponse=textResponse,
-            queryform=template(
-                self.queryTemplate, imagename=(imageName))
+            default_query_value=queryInput,
+            in_search_checked="checked"*inSearch,
+            imagetemplate=template(self.imageTemplate, imagename=(imageName)),
+            textresponse=textResponse
         ).replace("&lt;","<").replace("&gt;",">").replace('&quot;','"').replace("&#039;",'"')
         
         

@@ -63,14 +63,6 @@ class Statistics:
         """
         s = "" #return string
         
-        ##REMOVE ME!
-        #~ d = self.translationDict 
-        #~ notSameList = ["%s %s" % (key, d[key]) for key in d if key != d[key]]
-        #~ open("outfile_removeme.txt", "w").write("\n".join(notSameList))
-        
-        #~ exit()
-        
-        
         key = queryInput.lower()
         if key in self.translationDict and useSmartTranslation:
             if key != self.translationDict[key]:
@@ -90,10 +82,8 @@ class Statistics:
             (len(values), key)
         if verbose:
             print s
-            
-        #s += "Values: %s" % map(lambda x: x.encode("utf-8"), values)
         
-        if queryType == "mostcommon":
+        if queryType == "most_common":
             numMostCommonvalues = 30
             s += "<p style='font-weight:bold;'>" + \
                 "Showing the %s most common values</p>" % \
@@ -122,7 +112,19 @@ class Statistics:
             
             return s, True
             
+        elif queryType == "all_values":
+            maxValuesToShow = 15000
+            s += "<p style='font-weight:bold;'>" + \
+                "Showing %s%s values:</p>" % \
+                    ("the first " if len(values) > maxValuesToShow else "",
+                    min(len(values), maxValuesToShow))
+            
+            s += "\n".join(values[:maxValuesToShow])
+            
+            return s, False
+            
         else: #just return all values
+            s += "Unknown query type, returns all values"
             s += "\n".join(values)
             return s, False
             

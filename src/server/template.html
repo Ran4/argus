@@ -4,14 +4,17 @@
 <body>
 
 <form action="submit_query" method="get">
-	Query: <input type="text" name="query_input">
-	<input type="checkbox" name="in_search" value="1">
+	Query: <input type="text" name="query_input" 
+		value="{{default_query_value}}" autofocus>
+	<input type="checkbox" name="in_search" value="1" {{in_search_checked}}>
 		Use "in" search<br>
+	Query type:
+	<input type="radio" name="query_type" value="most_common" checked="checked">Most common
+	<input type="radio" name="query_type" value="all_values">All values
 <input type="submit" value="Submit">
 </form>
 
-<p><b>Response: </b></p>
-{{queryform}}
+{{imagetemplate}}
 <p>{{textresponse}}</p>
 
 </body>
