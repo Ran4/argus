@@ -65,9 +65,13 @@ class Server:
         r("/", callback=self.index)
         r("/submit_query", method="GET", callback=self.submit_query)
         r('/static/:filename', callback=self.serveStatic)
-        
+        r('/image/:filename', callback=self.serveImage)
     
     def serveStatic(self, filename):
+        root = os.path.abspath(".")
+        return static_file(filename, root=root)
+    
+    def serveImage(self, filename):
         root = os.path.abspath("../../stats/plots/")
         return static_file(filename,
             root=root)
