@@ -89,11 +89,8 @@ class Server:
         
     def index(self):
         self.loadTemplates()
-        return template(self.template,
-            default_query_value="",
-            in_search_checked="",
-            imagetemplate="",
-            textresponse="")
+        
+        return self.submit_search_query()
             
     def submit_search_query(self):
         self.loadTemplates()
@@ -102,7 +99,8 @@ class Server:
             return template(self.searchTemplate,
                 default_query_value1=userInput1 or "",
                 default_query_value2=userInput2 or "",
-                in_search_checked="checked",
+                in_search_checked="checked"*bool(inSearch),
+                case_sensitive_checked="checked"*bool(caseSensitive),
                 textresponse=textResponse).replace("&lt;","<").replace("&gt;",">").replace('&quot;','"').replace("&#039;",'"')
         
         userInput1 = request.GET.get("query_search_input1")
@@ -123,17 +121,16 @@ class Server:
         requestedValuesKeys = []
         if userInput1:
             for req in map(lambda x: x.strip(), userInput1.split(",")):
-                if "=" not in req:
-                    resp = "Problems parsing required keys! "
-                    resp += "No '=' found in '%s'" % req
-                    return getReturnTemplate(resp)
                 if req.count("=") > 1:
                     resp = "Problems parsing required keys!  "
                     resp += "More than one '=' found in '%s'" % req
                     return getReturnTemplate(resp)
                 
-                reqKey, reqValue = req.split("=")
-                requiredKeyValues.append((reqKey, reqValue))
+                if "=" in req:
+                    reqKey, reqValue = req.split("=")
+                    requiredKeyValues.append((reqKey, reqValue))
+                else:
+                    requiredKeyValues.append((req, ""))
                 
         if userInput2:
             for outKey in map(lambda x: x.strip(), userInput2.split(",")):
@@ -144,6 +141,9 @@ class Server:
                 return getReturnTemplate(resp)
         
         if requiredKeyValues and requestedValuesKeys:
+            #~ if "url" in requestedValuesKeys:
+                #~ requestedValuesKeys.replace
+            
             #perform search here
             if inSearch:
                 searchType = "in_search"
@@ -215,16 +215,13 @@ class Server:
                     
                     if key.lower() == "wikiurl": #remove http:/.../ part
                         shownValue = value.split("/")[-1].replace("_", " ")
-                        
-                        #~ value = "/".join(value.split("/")[:-1]) + \
-                            #~ "/" + value.split("/")[-1].capitalize()
-                            
                             
                         url = "http://en.wikipedia.org/w/index.php?search=%s" %\
                             value.split("/")[-1].replace(" ", "%20")
                             
                         value = "<a href=%s>%s</a>" % (url, shownValue)
                     else:
+                        #Don't show really long lines
                         characterLengthLimit = 90
                         if len(value) > characterLengthLimit:
                             value = value[:characterLengthLimit-3] + "..."

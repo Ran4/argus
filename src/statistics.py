@@ -210,7 +210,7 @@ class Statistics:
         
 
     def search(self, requiredKeyValues, requestedValuesKeys,
-            searchType=None):
+            searchType=None, caseSensitive=False):
         """ Returns a list of keyvalue-pairs from articles containing certain key-values
         requiredKeyValues: ((key, value))   # Note: uses "in_search searching"
         queryOut: (key)
@@ -225,15 +225,22 @@ class Statistics:
         results = []
         for pageDict in self.j:
             wasMatch = True
+            
             for key, value in requiredKeyValues:
-                if key not in pageDict or value not in pageDict[key]:
-                    wasMatch = False
+                if caseSensitive:
+                    if key not in pageDict or value not in pageDict[key]:
+                        wasMatch = False
+                else:
+                    if key not in pageDict or isinstance(pageDict[key], list):
+                        wasMatch = False
+                    else:
+                        pageDictValue = pageDict[key].lower()
+                    
+                        if value.lower() not in pageDictValue:
+                            wasMatch = False
             
             if not wasMatch:
                 continue
-            
-            #print "\n"*3
-            #print "Found match with pageDict: %s" % str(pageDict)[:500]
             
             r = []
             for requestedKey in requestedValuesKeys:
