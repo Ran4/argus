@@ -207,6 +207,30 @@ class Statistics:
         
         ##
         
+
+    def search(self, requiredKeyValues, requestedValuesKeys):
+        """ Returns a list of keyvalue-pairs from articles containing certain key-values
+        requiredKeyValues: ((key, value))   # Note: uses "in_search searching"
+        queryOut: (key)
+        data: json data
+        returns: list of (key, value)
+        """
+        
+        results = []
+        for pageDict in self.j:
+            for key, value in requiredKeyValues:
+                if not(key in pageDict and value in pageDict[key]):
+                    continue
+                
+            r = []
+            for requestedKey in requestedValuesKeys:
+                if requestedKey in pageDict:
+                    r.append((requestedKey, pageDict[k]))
+                else:
+                    r.append((requestedKey, ""))
+            results.append(r)
+        return results
+        
     def doPlots(self, showPlots=True):
         import matplotlib.pyplot as plt #use matplotlib to plot stuff
         opj = os.path.join
