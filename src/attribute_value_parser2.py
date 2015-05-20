@@ -1,7 +1,7 @@
 import re
 import itertools
 from datetime import date
-
+import copy
 from termcolor import colored
 
 class AttributeValueParser:
@@ -155,8 +155,14 @@ class AttributeValueParser:
         #Gets date of birth out of a "birth date" environment
         self.patternDob = re.compile('(?i)\{\{(?:birth date|dob)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
         
+        #Gets name and dates of marriage from a "marriage" environment as the three first capture groups
+        self.patternMarriage = re.compile('^(?i)(?:\{\{marriage(?:.*?))(?=\|)|\|(?:[ ]*)\(\)(?:\=)*small(?:er)*(?:[ ]*)(?=\||\})|(?:\|*)(?:[ ]*)end(?:[ ]*)=*(?:.*?)(?=\||\})|(?:\||\*|\#)(?:[ ]*)(.+?)(?:[ ]*)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)(.*?)(?:[ ]*)\}\}$')
+        #self.patternMarriage = re.compile('(?i)\{\{(?:marriage)(?:[ ]*)(?=\|)(?:\|(?:(?:[ ]*)\((?:[ ]*)\)(?:[ ]*)\=*(?:[ ]*)small(?:er)*[ ]*)(?=\|)|\|(?:[ ]*)end(?:[ ]*)\=*(?:.*?)(?=\|)|\|(.+?)(?=\|))(?:\|(?:(?:[ ]*)\((?:[ ]*)\)(?:[ ]*)\=*(?:[ ]*)small(?:er)*[ ]*)|\|(?:[ ]*)end(?:[ ]*)\=*(?:.*?)(?=\|)|\|(.+?)(?=\|))(?:\|(?:(?:[ ]*)\((?:[ ]*)\)(?:[ ]*)\=*(?:[ ]*)small(?:er)*[ ]*)(?=\|)|\|(?:[ ]*)end(?:[ ]*)\=*(?:.*?)(?=\|)|\|(.+?)(?=\||\}))(?:\|(?:(?:[ ]*)\((?:[ ]*)\)(?:[ ]*)\=*(?:[ ]*)small(?:er)*[ ]*)(?=\|)|\|(?:[ ]*)end(?:[ ]*)\=*(?:.*?)(?=\||\})|\|(.+?)(?=\||\}))*(?:\|(?:(?:[ ]*)\((?:[ ]*)\)(?:[ ]*)\=*(?:[ ]*)small(?:er)*[ ]*)(?=\|)|\|(?:[ ]*)end(?:[ ]*)\=*(?:.*?)(?=\||\})|\|(.+?)(?=\||\}))*\}\}')
+        
+        
         #Pattern for extracting list name from {{list name| or {{list name}}
-        self.patternList = re.compile(r'\{\{([^|]+?)(?:[ ]*)(?:\||\})')
+        #Match starts at start of list and ends at end.
+        self.patternList = re.compile(r'\{\{(?:[ ]*)([^|]+?)(?:[ ]*)(?=\||\})(?:.*?)\}\}')
         
         #############################################
         ##REGEX PATTERNS FOR CLEANING UP FINAL RESULT
@@ -173,7 +179,7 @@ class AttributeValueParser:
         #Pattern for removing whitespaces from ends of strings
         #and also trailing commas.
         #(used for cleanup)
-        self.patternFixListEntries = re.compile("^[ ]*(.*?)(?:\,| )*$")
+        self.patternWhitespaces = re.compile("^[ ]*(.*?)(?: )*$")
         
         ################################################
         ##REGEX PATTERNS FOR IDENTIFYING SPECIAL STRINGS
@@ -181,6 +187,11 @@ class AttributeValueParser:
         #Pattern for checking if string is enclosed by parantheses
         #(possibly also by double quotation marks)
         self.patternEnclosedByParentheses = re.compile("^(\'\')*\((?:[^\)\(]*)\)(\'\')*$")
+        self.patternEndsWithComma = re.compile("(?:.*)\,$")
+        #Identifies a "marriage" environment
+        self.patternIdentifyMarriage = re.compile('(?i)(\{\{marriage(?:.*?)\}\})')
+        #Identifies a list with a match
+        self.patternListNoCatchGroups = re.compile(r'\{\{(?:[\w ]+?)(?:\|class(?:\=*)[^\}]*)*(?:(?=\|)(?:.*?)\}\}|\}\}(?:.*)(?:\{\{end(?:[^\}]*)\}\})*)')
 
         if verbose:
             print "AttributeValueParser has compiled all regex patterns"
@@ -202,9 +213,9 @@ class AttributeValueParser:
         if aList != "":
             assert(isinstance(aList, list))
             if verbose:
-                print '    Removing whitespaces on both ends and trailing commas...'  
+                print '    Removing whitespaces on both ends...'  
             for i, string in enumerate(aList):
-                match = self.patternFixListEntries.match(string)
+                match = self.patternWhitespaces.match(string)
                 if match:
                     if verbose:
                         print "        " + string + ' being fixed to ' + match.group(1)
@@ -212,56 +223,45 @@ class AttributeValueParser:
                 else:
                     if verbose:
                         print colored("WARNING: Fixing of list entries has failed.", "magenta")
-            if verbose:
-                print "    Fixed strings are: "
-                for string in aList:
-                    print "        " + string
-            #Try to concatenate all elements enclosed in parantheses to the previous element
+                    
+            #Try to concatenate the next element to all elements ending with a comma
             if len(aList) > 1:
+                newList = [aList[0]]
+                if verbose:
+                    print '    Concatenating subceding entries to entries ending with commas...'
+                for i, string in enumerate(aList[1:]):
+                    if self.patternEndsWithComma.match(aList[i]):
+                        newList[-1] += " " + string
+                        if verbose:
+                            print "        Appending " + string + " to previous. Result is: " + newList[i-1]
+                    else:
+                        newList.append(string)
+                aList = copy.deepcopy(newList)
+                 
+                #Try to concatenate all elements enclosed in parantheses to the previous element
                 newList = [aList[0]]
                 if verbose:
                     print '    Concatenating entries in parentheses to previous entries...'
                 for i, string in enumerate(aList[1:]):
                     if self.patternEnclosedByParentheses.match(string):
                         newList[-1] += " " + self.patternDoubleQuotes.match(string).group(1)
+                        if verbose:
+                            print "        Appending " + self.patternDoubleQuotes.match(string).group(1) + " to previous. Result is: " + newList[-1]
                     else:
                         newList.append(string)
                 aList = newList
         return aList
-                      
-    def parseAttributeValue(self, value, verbose=False, logFileName=None):
-        """Takes an attribute value as a string in un-edited Wiki markup format 
-        and parses it into either a string value or a tuple of string values.
+      
+      
+    def initialParsing(self, value, verbose=False):
+        """Does the initial part of the parsing, which should be done for all
+        inputs. Please note that the order you parse things in might have
+        and impact on the end results.
         
-        Arguments:
-        If verbose is True, current operations will be printed
-        If logFileName is a string, anything happenening (including errors)
-            will be logged to the filename logFileName.
+        Arguments: a string to be parsed.
         
-        Return value:
-        If no value was found, "" is returned.
-        If the value is not considered to be relevant text, ""  is returned.
-        
-        Examples:
-        value = "{{br separated values|entry1|entry2}}"
-        parseAttributeValue(value) == (entry1, entry2)
-
-        value = "Germany"
-        parseAttributeValue(value) == "Germany"
-
-        value = "Barack Obama signature.svg"
-        parseAttributeValue(value) == ""
+        Return value: a parsed string.
         """
-        
-        ########################################################################
-        #INITIAL CLEANUP
-        #(We remove all small tags and similar so that they will not mess up the
-        #more complicated environments later on)
-        ########################################################################
-        
-        if verbose:
-            print "\nPARSE OF ATTRIBUTE VALUE INITIATED"
-            
         #The whole entry could be an image: ignore these before trying to parse
         #TODO: Might better be contains, not endswith, and a regex for filenames
         if any([value.endswith(fileExt) for fileExt in (".svg",)]):
@@ -277,7 +277,6 @@ class AttributeValueParser:
             print colored("Entering removal of {{*}}.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternCBDot.sub(r"", value)
-        
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
@@ -286,7 +285,6 @@ class AttributeValueParser:
             print colored("Entering removal of encased titles.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternTitle.sub(r"", value)
-        
         if verbose:
             print "    Value after became: '%s'" % str(value)
         
@@ -295,7 +293,6 @@ class AttributeValueParser:
             print colored("Entering removal of cref environment and contents.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternCref.sub(r"", value)
-        
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
@@ -304,7 +301,6 @@ class AttributeValueParser:
             print colored("Entering removal of sfn environment and contents.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternSfn.sub(r"", value)
-        
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
@@ -316,7 +312,6 @@ class AttributeValueParser:
             print colored("Entering removal of 'small' environment, checking for preceding br-tags and replacing them with whitespace.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternSmallEnv.sub(r" \g<1>", value)
-        
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
@@ -325,7 +320,6 @@ class AttributeValueParser:
             print colored("Entering removal of ndash.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternNdash.sub(r"-", value)
-        
         if verbose:
             print "    Value after became: '%s'" % str(value)
         
@@ -334,7 +328,6 @@ class AttributeValueParser:
             print colored("Entering removal of nbsps.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternNbsp.sub(r" ", value)
-        
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
@@ -343,7 +336,6 @@ class AttributeValueParser:
             print colored("Entering removal of thinsp.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternThinsp.sub(r"", value)
-        
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
@@ -352,7 +344,6 @@ class AttributeValueParser:
             print colored("Entering removal of sup.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternSup.sub(r"", value)
-        
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
@@ -361,7 +352,6 @@ class AttributeValueParser:
             print colored("Entering removal of quot.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternQuote.sub(r"'", value)
-        
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
@@ -370,7 +360,6 @@ class AttributeValueParser:
             print colored("Entering removal of hyphens.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternHyphen.sub(r"-", value)
-        
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
@@ -465,7 +454,6 @@ class AttributeValueParser:
             print colored("Entering removal of <small> tags.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternSmall.sub(r"", value)
-        
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
@@ -474,7 +462,6 @@ class AttributeValueParser:
             print colored("Entering removal of comments.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternComment.sub(r"", value)
-        
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
@@ -483,7 +470,6 @@ class AttributeValueParser:
             print colored("Entering removal of references.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternReference.sub(r"", value)
-        
         if verbose:
             print "    Value after became: '%s'" % str(value)
         
@@ -492,7 +478,6 @@ class AttributeValueParser:
             print colored("Entering removal of references of type '(see: foo)'.", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternSeeRef.sub(r"", value)
-        
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
@@ -501,7 +486,6 @@ class AttributeValueParser:
             print colored("Entering removal of Wiki markup pictures of format [[file: picture|text]].", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternWikiPic.sub(r"", value)
-        
         if verbose:
             print "    Value after became: '%s'" % str(value)
         
@@ -511,7 +495,6 @@ class AttributeValueParser:
             print colored("Entering link conversion of type 1 ([[link|example]]).", "blue")
             print "    Value before was: '%s'" % str(value)
         value = self.patternPipeLink.sub(r"\g<1>", value)
-        
         if verbose:
             print "    Value after became: '%s'" % str(value)
                 
@@ -519,8 +502,27 @@ class AttributeValueParser:
         if verbose:
             print colored("Entering link conversion of type 2 ([[example]]).", "blue")
             print "    Value before was: '%s'" % str(value)
-        
         value = self.patternLink.sub(r"\g<1>", value)
+        if verbose:
+            print "    Value after became: '%s'" % str(value)
+            
+        #Replaces the marriage environment with text describing the marriage in
+        #natural language.
+        if verbose:
+            print colored("Entering replacement of marriage environment.", "blue")
+            print "    Value before was: '%s'" % str(value)
+        marriageEnvironments = self.patternIdentifyMarriage.findall(value)
+        for i in range(len(marriageEnvironments)):
+            match = filter(None, list(itertools.chain.from_iterable(self.patternMarriage.findall(marriageEnvironments[i]))))
+            replacementValue = match[0] + " "
+            if len(match) == 2:
+                replacementValue += "(m. " + match[1] + ")"
+            elif len(match) == 3:
+                replacementValue += "(m. " + match[1] + "-" + match[2] + ")"
+            else:
+                print colored("WARNING: Illegal marriage detected!", "magenta")
+            value = self.patternIdentifyMarriage.sub(replacementValue, value, 1)
+
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
@@ -531,120 +533,175 @@ class AttributeValueParser:
         value = self.patternLongitem.sub(r"\g<1>", value)
         if verbose:
             print "    Value after became: '%s'" % str(value)
+            
+        return value
+    
+    def parseList(self, value, listType, verbose=False):
+        """Parses a list from a string - this is presumed to be a string
+        containing onyl one list. If you do not clean the string thoroughly
+        before feeding them to this function, you might encounter strange
+        behaviour.
+        
+        Arguments: A string with a list in Wiki markup to be parsed to a
+        list of strings.
+        
+        Return value: A list of strings.
+        """
+        
+        #Since we are in a list, we want to replace the <br />s with
+        #whitespaces. TODO: Really?
+        if verbose:
+            print "    Entering removal of <br />s, since we have discovered a list."
+            print "        Value before was: '%s'" % str(value)
+        value = self.patternBr.sub(r" ", value)
+        
+        if verbose:
+            print "        Value after became: '%s'" % str(value)
+        
+        #Now that we have obtained the list type, we want to do different things depending on which list type it is.
+        if self.patternBulletedListName.match(listType):
+            if verbose:
+                print '    "bulleted list" detected.'
+
+            #Returns a list of tuples with all matches, where each group corresponds to one tuple.
+            returnList = filter(None, list(itertools.chain.from_iterable(self.patternBulletedList.findall(value))))
+            
+        elif self.patternFlatlistName.match(listType):
+            if verbose:
+                print '    "flatlist" detected.'
+            #Note: We do NOT need to have a subcase for endflatlist environment, since that is initiated by {{startflatlist}}
+            returnList = filter(None, list(itertools.chain.from_iterable(self.patternFlatlist.findall(value))))
+            
+        elif self.patternStartflatlistName.match(listType):
+            if verbose:
+                print '    "startflatlist" detected.'
+            
+            #Returns a list of tuples with all matches, where each group corresponds to one tuple.
+            returnList = filter(None, list(itertools.chain.from_iterable(self.patternStartflatlist.findall(value))))
+            
+        elif self.patternPlainlistName.match(listType):
+            if verbose:
+                print '    some type of plainlist detected...'
+            #A subcase for endplainlist environment:
+            if value.endswith("{{endplainlist}}"):
+                if verbose:
+                    print '    "endplainlist" detected.'
+                returnList = filter(None, list(itertools.chain.from_iterable(self.patternEndplainlist.findall(value))))
+            else:
+                if verbose:
+                    print '    "plainlist" detected.'
+                returnList = filter(None, list(itertools.chain.from_iterable(self.patternPlainlist.findall(value))))
+        
+        elif self.patternFlowlistName.match(listType):
+            if verbose:
+                print '    some type of flowlist detected...'
+            #A subcase for endflowlist environment:
+            if value.endswith("{{endflowlist}}"):
+                if verbose:
+                    print '    "endflowlist" detected'
+                returnList = filter(None, list(itertools.chain.from_iterable(self.patternEndflowlist.findall(value))))
+            else:
+                if verbose:
+                        print '    "flowlist" detected.'
+                returnList = filter(None, list(itertools.chain.from_iterable(self.patternFlowlist.findall(value))))
+            
+        elif self.patternHlistName.match(listType):
+            if verbose:
+                print '    "hlist" detected.'
+
+            #Returns a list of tuples with all matches, where each group corresponds to one tuple.
+            returnList = filter(None, list(itertools.chain.from_iterable(self.patternHlist.findall(value))))
+            
+        elif self.patternUnbulletedListName.match(listType):
+            if verbose:
+                print '    "unbulleted list" detected.'
+
+            #Returns a list of tuples with all matches, where each group corresponds to one tuple.
+            returnList = filter(None, list(itertools.chain.from_iterable(self.patternUnbulletedList.findall(value))))
+            
+        elif self.patternPagelistName.match(listType):
+            if verbose:
+                print '    "pagelist" detected.'
+
+            #Returns a list of tuples with all matches, where each group corresponds to one tuple.
+            returnList = filter(None, list(itertools.chain.from_iterable(self.patternPagelist.findall(value))))
+            
+        elif self.patternOrderedListName.match(listType):
+            if verbose:
+                print '    "ordered list" detected.'
+
+            #Returns a list of tuples with all matches, where each group corresponds to one tuple.
+            returnList = filter(None, list(itertools.chain.from_iterable(self.patternOrderedList.findall(value))))
+            
+        elif self.patternToolbarName.match(listType):
+            if verbose:
+                print '    "toolbar" detected.'
+
+            #Returns a list of tuples with all matches, where each group corresponds to one tuple.
+            returnList = filter(None, list(itertools.chain.from_iterable(self.patternToolbar.findall(value))))
+        else:
+            if verbose:
+                print colored("WARNING: List of unknown type found!", "magenta")  
+            returnList = ""
+            
+        returnList = self.concatenateParenthesesEnclosedEntries(returnList, verbose)
+  
+        return returnList
+        
+        
+    def parseAttributeValue(self, value, verbose=False, logFileName=None):
+        """Takes an attribute value as a string in un-edited Wiki markup format 
+        and parses it into either a string value or a tuple of string values.
+        
+        Arguments:
+        If verbose is True, current operations will be printed
+        If logFileName is a string, anything happenening (including errors)
+            will be logged to the filename logFileName.
+        
+        Return value:
+        If no value was found, "" is returned.
+        If the value is not considered to be relevant text, ""  is returned.
+        
+        Examples:
+        value = "{{br separated values|entry1|entry2}}"
+        parseAttributeValue(value) == (entry1, entry2)
+
+        value = "Germany"
+        parseAttributeValue(value) == "Germany"
+
+        value = "Barack Obama signature.svg"
+        parseAttributeValue(value) == ""
+        """
+        
+        if verbose:
+            print "\nPARSE OF ATTRIBUTE VALUE INITIATED"
+        
+        #Do initial parsing
+        value = self.initialParsing(value, verbose)
         
         #Now that we're done with that, we want to check if the attribute value
         #is a list.
         if verbose:
-                print colored("Entering check for attribute value being a list...", "blue")
+            print colored("Entering check for attribute value being a list...", "blue")
         match = self.patternList.match(value) #We can actually use match since we are only explicitly looking for matches at the beginning.
+        
         if match:
             if verbose:
                 print "List detected."
-            listType = match.group(1)
+            #TODO: Get all list types here. Loop through them all and merge them
+            #to one long list, then return.
+            resultList = []
+            subStrings = self.patternListNoCatchGroups.findall(value)
+            for string in subStrings:
+                print "Value is: " + value
+                print "String is: " + string
+            for i, listType in enumerate(self.patternList.findall(value)):
+                if listType not in ["endflatlist", "endplainlist", "endflowlist"]:
+                    resultList.extend(self.parseList(subStrings[i], listType, verbose))
+                
             if verbose:
-                print "    List type:", listType
-                
-            #Since we are in a list, we want to replace the <br />s with
-            #whitespaces.
-            if verbose:
-                print "    Entering removal of <br />s, since we have discovered a list."
-                print "        Value before was: '%s'" % str(value)
-            value = self.patternBr.sub(r" ", value)
-            
-            if verbose:
-                print "        Value after became: '%s'" % str(value)
-            
-            #Now that we have obtained the list type, we want to do different things depending on which list type it is.
-            if self.patternBulletedListName.match(listType):
-                if verbose:
-                    print '    "bulleted list" detected.'
-
-                #Returns a list of tuples with all matches, where each group corresponds to one tuple.
-                returnList = filter(None, list(itertools.chain.from_iterable(self.patternBulletedList.findall(value))))
-                
-            elif self.patternFlatlistName.match(listType):
-                if verbose:
-                    print '    "flatlist" detected.'
-                #Note: We do NOT need to have a subcase for endflatlist environment, since that is initiated by {{startflatlist}}
-                returnList = filter(None, list(itertools.chain.from_iterable(self.patternFlatlist.findall(value))))
-                
-            elif self.patternStartflatlistName.match(listType):
-                if verbose:
-                    print '    "startflatlist" detected.'
-                
-                #Returns a list of tuples with all matches, where each group corresponds to one tuple.
-                returnList = filter(None, list(itertools.chain.from_iterable(self.patternStartflatlist.findall(value))))
-                
-            elif self.patternPlainlistName.match(listType):
-                if verbose:
-                    print '    some type of plainlist detected...'
-                #A subcase for endplainlist environment:
-                if value.endswith("{{endplainlist}}"):
-                    if verbose:
-                        print '    "endplainlist" detected.'
-                    returnList = filter(None, list(itertools.chain.from_iterable(self.patternEndplainlist.findall(value))))
-                else:
-                    if verbose:
-                        print '    "plainlist" detected.'
-                    returnList = filter(None, list(itertools.chain.from_iterable(self.patternPlainlist.findall(value))))
-            
-            elif self.patternFlowlistName.match(listType):
-                if verbose:
-                    print '    some type of flowlist detected...'
-                #A subcase for endflowlist environment:
-                if value.endswith("{{endflowlist}}"):
-                    if verbose:
-                        print '    "endflowlist" detected'
-                    returnList = filter(None, list(itertools.chain.from_iterable(self.patternEndflowlist.findall(value))))
-                else:
-                    if verbose:
-                            print '    "flowlist" detected.'
-                    returnList = filter(None, list(itertools.chain.from_iterable(self.patternFlowlist.findall(value))))
-                
-            elif self.patternHlistName.match(listType):
-                if verbose:
-                    print '    "hlist" detected.'
-
-                #Returns a list of tuples with all matches, where each group corresponds to one tuple.
-                returnList = filter(None, list(itertools.chain.from_iterable(self.patternHlist.findall(value))))
-                
-            elif self.patternUnbulletedListName.match(listType):
-                if verbose:
-                    print '    "unbulleted list" detected.'
-
-                #Returns a list of tuples with all matches, where each group corresponds to one tuple.
-                returnList = filter(None, list(itertools.chain.from_iterable(self.patternUnbulletedList.findall(value))))
-                
-            elif self.patternPagelistName.match(listType):
-                if verbose:
-                    print '    "pagelist" detected.'
-
-                #Returns a list of tuples with all matches, where each group corresponds to one tuple.
-                returnList = filter(None, list(itertools.chain.from_iterable(self.patternPagelist.findall(value))))
-                
-            elif self.patternOrderedListName.match(listType):
-                if verbose:
-                    print '    "ordered list" detected.'
-
-                #Returns a list of tuples with all matches, where each group corresponds to one tuple.
-                returnList = filter(None, list(itertools.chain.from_iterable(self.patternOrderedList.findall(value))))
-                
-            elif self.patternToolbarName.match(listType):
-                if verbose:
-                    print '    "toolbar" detected.'
-
-                #Returns a list of tuples with all matches, where each group corresponds to one tuple.
-                returnList = filter(None, list(itertools.chain.from_iterable(self.patternToolbar.findall(value))))
-            else:
-                if verbose:
-                    print colored("WARNING: List of unknown type found!", "magenta")  
-                returnList = ""
-                
-            returnList = self.concatenateParenthesesEnclosedEntries(returnList, verbose)
-            if verbose:
-                print "Returning: %s" % str(returnList)   
-            return returnList
-                
+                print "Returning: %s" % str(resultList) 
+            return resultList    
         else:
             #No list was found... Check if the attribute value is
             #<br />-separated or dot ({{.}})-separated. If that is the case, split it using that as a
@@ -752,9 +809,11 @@ def test(verbose=False):
         ('{{unbulleted list |[[peripatetic school]] |[[aristotelianism]]}}', ['peripatetic school', 'aristotelianism']),
         ('{{unbulleted list |[[golden mean (philosophy)|golden mean]] |[[aristotelian logic]] |[[syllogism]] |[[hexis]] |[[hylomorphism]] |[[on the soul|theory of the soul]]}}', ['golden mean', 'aristotelian logic', 'syllogism', 'hexis', 'hylomorphism', 'theory of the soul']),
         ('{{hlist |[[parmenides]] |[[socrates]] |[[plato]] |[[heraclitus]] |[[democritus]]}}', ['parmenides', 'socrates', 'plato', 'heraclitus', 'democritus']),
-        ('[[Milan|Mediolanum]],<br />[[Italy (Roman Empire)|Italia annonaria]], [[Roman Empire]]<br />''[[Italy|(present-day Italy)]]''', ['Mediolanum', 'Italia annonaria, Roman Empire (present-day Italy)'])
+        ('[[Milan|Mediolanum]],<br />[[Italy (Roman Empire)|Italia annonaria]], [[Roman Empire]]<br />''[[Italy|(present-day Italy)]]''', ['Mediolanum, Italia annonaria, Roman Empire (present-day Italy)']),
         #TODO: Nested and/or multiple lists
-        #('{{hlist|[[biology]]|[[zoology]]}} {{hlist|[[physics]]|[[metaphysics]]}}', ['biology', 'zoology', 'physics', 'metaphysics']),
+        ('{{hlist|[[biology]]|[[zoology]]}} {{hlist|[[physics]]|[[metaphysics]]}}', ['biology', 'zoology', 'physics', 'metaphysics']),
+        #Marriage environment
+        ('{{Unbulleted list|class=nowrap |{{marriage|Maria Nys|()=smaller|1919|1955}} |{{marriage|[[Laura Huxley]]|()=smaller|1956|1963}}}}', ['Maria Nys (m. 1919-1955)', 'Laura Huxley (m. 1956-1963)']),
     ]
 
     attributeValueParser = AttributeValueParser()
@@ -774,4 +833,3 @@ def test(verbose=False):
 
 if __name__ == "__main__":
     test(verbose=True)
-
