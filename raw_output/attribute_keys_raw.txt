@@ -1,23 +1,22 @@
-290549 wikiURL
-290549 isoCode
-290549 isFirstInArticleWithPersonBox
-276121 birth_date
+290549 isocode
+290549 wikiurl
+276120 birth_date
 271273 name
-266410 birth_place
+266409 birth_place
 261535 image
 182509 caption
-168984 death_date
-150026 death_place
+168983 death_date
+150025 death_place
 110914 occupation
 84904 birth_name
-80000 spouse
+80002 spouse
 77594 height
 73523 nationality
-72455 website
+72457 website
 69865 fullname
 68984 image_size
 67706 position
-47819 children
+47820 children
 47184 years1
 44486 years_active
 43080 alma_mater
@@ -28,7 +27,7 @@
 38442 youthyears1
 37726 currentclub
 35962 years3
-35651 awards
+35652 awards
 35502 nickname
 33732 alt
 33147 genre
@@ -42,7 +41,7 @@
 28891 clubs1
 28635 youthclubs1
 28390 caps1
-27717 signature
+27718 signature
 27112 goals1
 26074 nationalcaps1
 25975 known_for
@@ -71,7 +70,7 @@
 17595 clubs4
 17452 education
 17202 relations
-17149 parents
+17150 parents
 17047 ntupdate
 16877 rank
 16577 caps4
@@ -82,18 +81,18 @@
 15617 profession
 15583 office
 15094 title
-14834 influenced
+14836 influenced
 14508 clubs5
-14315 partner
-13950 allegiance
+14316 partner
+13951 allegiance
 13905 serviceyears
 13811 term_start2
 13757 relatives
-13713 branch
+13714 branch
 13686 term_end2
 13659 caps5
 13610 battles
-13603 influences
+13606 influences
 13210 goals5
 12468 years8
 12434 commands
@@ -203,7 +202,7 @@
 5214 heightft
 5205 family
 5179 highlights
-5178 father
+5177 father
 5159 doctoral_students
 5119 discipline
 5076 majorwins
@@ -214,7 +213,7 @@
 4995 nationalteam2
 4965 draft
 4954 manageryears2
-4940 mother
+4939 mother
 4910 turnedpro
 4878 networth
 4846 stat1label
@@ -292,7 +291,7 @@
 3292 works
 3277 finaldate
 3263 nfl
-3252 prizes
+3253 prizes
 3237 reign
 3231 club3
 3224 landscape
@@ -365,7 +364,7 @@
 2376 coaching
 2373 statvalue3
 2366 statlabel3
-2363 portaldisp
+2364 portaldisp
 2337 plays
 2335 heightweight
 2326 succession
@@ -418,7 +417,7 @@
 2097 servicenumber
 2096 heightm
 2095 parliament
-2082 place of burial
+2081 place of burial
 2071 monarch
 2057 consecration
 2050 ordination
@@ -495,7 +494,7 @@
 1537 usopendoublesresult
 1536 frenchopendoublesresult
 1524 high_school
-1511 work_institution
+1512 work_institution
 1477 lieutenant
 1460 notable role
 1449 new
@@ -593,10 +592,10 @@
 1154 eye_color
 1148 term_start6
 1145 term_end6
-1142 thesis_title
+1143 thesis_title
 1137 monarch2
 1133 grandslamsdoublesresults
-1130 thesis_year
+1131 thesis_year
 1130 reach
 1119 goals13
 1109 currentsinglesranking
@@ -640,7 +639,7 @@
 1015 primeminister3
 1014 lasttestfor
 1012 governor
-999 thesis_url
+1000 thesis_url
 990 era
 989 blank1
 981 team4
@@ -648,8 +647,8 @@
 974 nationalteam4
 972 points4
 966 data1
+965 main_interests
 965 strokes
-964 main_interests
 963 billed
 962 formercoach
 962 ru_coachclubs
@@ -725,7 +724,7 @@
 806 ru_currentclub
 806 clapps(points)
 806 monarch1
-805 notable_ideas
+804 notable_ideas
 801 icprovince
 800 clprovince
 800 team5
@@ -811,8 +810,8 @@
 625 president1
 625 conviction_status
 624 appointer
+623 conviction_penalty
 622 fighting_out_of
-622 conviction_penalty
 621 blank2
 618 succeeding
 617 significant_buildings
@@ -846,9 +845,9 @@
 587 triesc
 586 dynasty
 585 pointsc
-584 royal house
 584 ru_currentteam
 584 yearcend
+583 royal house
 578 clubnumber4
 577 manageryears12
 577 statvalue4
@@ -3215,6 +3214,7 @@
 18 termstart1
 18 britishcomedyawards
 18 coachyear6end
+18 doctoral_advisors
 18 latd
 18 minister
 18 blog
@@ -3277,7 +3277,6 @@
 17 proyears9
 17 color1
 17 league6
-17 doctoral_advisors
 17 champ_poles
 17 norwegianleague
 17 1blankname4
@@ -3512,8 +3511,8 @@
 13 equity
 13 major titles
 13 bowl_list
-13 consecration date 2
 13 minister7
+13 consecration date 2
 13 clallirelandf
 13 home_station
 13 years29
@@ -3581,7 +3580,6 @@
 12 primeminister12
 12 cflstatlabel5
 12 label12
-12 label11
 12 wimbledondoublejuniorsresult
 12 appointed4
 12 dynastyname
@@ -3595,6 +3593,7 @@
 12 3option name
 12 bill status 6
 12 hanja1
+12 label11
 12 license
 12 succeeding1
 12 ru_amateurpoints
@@ -4444,7 +4443,6 @@
 5 successo2r
 5 small| order
 5 vicegovernor4
-5 relationships
 5 worth
 5 ru_appearances7
 5 2ndhand
@@ -4504,6 +4502,7 @@
 5 image_border
 5 father_name
 5 team26
+5 relationships
 5 kickboxingdraws
 5 bill link 8
 5 obverse
@@ -5188,6 +5187,7 @@
 3 | school
 3 bill status 11
 3 sa podiums
+3 all black id
 3 repyears7
 3 data28
 3 data27
@@ -5362,7 +5362,6 @@
 3 coat
 3 |imagesize
 3 coachteams1
-3 all black id
 3 leader10
 3 hommage
 3 funding

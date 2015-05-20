@@ -1,6 +1,11 @@
 #Antipattern attack! TODO: Fix this...
 import os
 import sys
+import time
+from operator import itemgetter
+
+from pprint import pprint
+
 sys.path.append(os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..")))
 
@@ -52,10 +57,14 @@ class Server:
             
             with open("image_template.html") as f:
                 self.imageTemplate = f.read()
+                
+            with open("search_template.html") as f:
+                self.searchTemplate = f.read()
         except:
             print "Problem opening template"
             self.template = "PROBLEM LOADING TEMPLATE"
             self.imageTemplate = "PROBLEM LOADING IMAGE TEMPLATE"
+            self.searchTemplate = "PROBLEM LOADING SEARCH TEMPLATE"
         
     def start(self):
         self.app.run(host=self.host, port=self.port)
@@ -64,6 +73,8 @@ class Server:
         r = self.app.route
         r("/", callback=self.index)
         r("/submit_query", method="GET", callback=self.submit_query)
+        r("/submit_search_query", method="GET",
+            callback=self.submit_search_query)
         r('/static/:filename', callback=self.serveStatic)
         r('/image/:filename', callback=self.serveImage)
     
@@ -83,6 +94,135 @@ class Server:
             in_search_checked="",
             imagetemplate="",
             textresponse="")
+            
+    def submit_search_query(self):
+        def getReturnTemplate(textResponse):
+            return template(self.searchTemplate,
+                default_query_value1=userInput1 or "",
+                default_query_value2=userInput2 or "",
+                in_search_checked="checked",
+                textresponse=textResponse).replace("&lt;","<").replace("&gt;",">").replace('&quot;','"').replace("&#039;",'"')
+        
+        userInput1 = request.GET.get("query_search_input1")
+        userInput2 = request.GET.get("query_search_input2")
+        useSmartTranslation = not bool(request.GET.get("no_smart_translation"))
+        inSearch = bool(request.GET.get("in_search"))
+        
+        print "in server.submit_search_query, inputs:"
+        print userInput1
+        print userInput2
+        
+        textResponse = ""
+        requiredKeyValues = None
+        requestedValuesKeys = None
+        
+        requiredKeyValues = []
+        requestedValuesKeys = []
+        if userInput1:
+            for req in map(lambda x: x.strip(), userInput1.split(",")):
+                if "=" not in req:
+                    resp = "Problems parsing required keys! "
+                    resp += "No '=' found in '%s'" % req
+                    return getReturnTemplate(resp)
+                elif req.count("=") > 1:
+                    resp = "Problems parsing required keys!  "
+                    resp += "More than one '=' found in '%s'" % req
+                    return getReturnTemplate(resp)
+                
+                reqKey, reqValue = req.split("=")
+                requiredKeyValues.append((reqKey, reqValue))
+                
+        if userInput2:
+            for outKey in map(lambda x: x.strip(), userInput2.split(",")):
+                requestedValuesKeys.append(outKey)
+                
+            if not requestedValuesKeys:
+                resp = "No requested values found!"
+                return getReturnTemplate(resp)
+        
+        if requiredKeyValues and requestedValuesKeys:
+            #perform search here
+            if inSearch:
+                searchType = "in_search"
+            else:
+                searchType = None
+                
+            searchRet = self.statistics.search(requiredKeyValues,
+                requestedValuesKeys, searchType)
+            
+            ##AS LONG TABLE
+            #~ textResponseList = []
+            #~ for article in searchRet:
+                #~ lineList = []
+                #~ for kv in article:
+                    
+                    #~ if kv[0].lower() == "wikiurl":
+                        #~ attributeKey = "WP URL:"
+                    #~ else:
+                        #~ attributeKey = kv[0]
+                        
+                    #~ values = list(kv[1:])
+                    #~ if len(values) > 1:
+                        #~ respValue = "; ".join(values)
+                    #~ else:
+                        #~ if kv[0].lower() == "wikiurl":
+                            #~ respValue = "<a href=%s>%s</a>" % \
+                                #~ (values[0], values[0].split("/")[-1])
+                        #~ else:
+                            #~ if isinstance(values[0], list):
+                                #~ values[0] = "; ".join(values[0])
+                                
+                            #~ respValue = values[0]
+                        
+                    #~ lineList.append("<tr><th>%s</th> <th>%s</th></tr>" % \
+                        #~ (attributeKey, respValue))
+                        
+                #~ textResponseList.append("\n".join(lineList))
+            
+            #~ textResponse = "<table>\n" + \
+                #~ "\n".join(textResponseList) + \
+                #~ "\n</table>"
+                
+            ##AS SHORT TABLE
+            textResponseList = []
+            
+            table = ["<table>"]
+            table.append("<tr>")
+            
+            #column names
+            table.append("".join(
+                map("<th>{}</th>".format, requestedValuesKeys)))
+            table.append("</tr>")
+            
+            for article in searchRet:
+                table.append("<tr>")
+                
+                for key, value in article:
+                    if isinstance(value, list):
+                        value = "; ".join(value)
+                            
+                    if key.lower == "wikiurl": #remove http:/.../ part
+                        value = value.split("/")[-1]
+                    
+                    table.append("<th>%s</th>" % value)
+                    
+                table.append("</tr>")
+            
+            table.append("</table>")
+            textResponse = "\n".join(table)
+            
+            
+        else:
+            textResponse = "Not enough values to perform search."
+        
+        return getReturnTemplate(textResponse)
+        """
+        template(self.searchTemplate,
+            default_query_value1="",
+            default_query_value2="",
+            in_search_checked="checked",
+            textresponse=textResponse)
+        """
         
     def submit_query(self):
         queryInput = request.GET.get("query_input")

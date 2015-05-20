@@ -5,6 +5,7 @@ import collections
 from collections import Counter
 from pprint import pprint as pp
 from operator import itemgetter, attrgetter
+import time
 
 from termcolor import colored
 import logger
@@ -208,7 +209,8 @@ class Statistics:
         ##
         
 
-    def search(self, requiredKeyValues, requestedValuesKeys):
+    def search(self, requiredKeyValues, requestedValuesKeys,
+            searchType=None):
         """ Returns a list of keyvalue-pairs from articles containing certain key-values
         requiredKeyValues: ((key, value))   # Note: uses "in_search searching"
         queryOut: (key)
@@ -216,19 +218,33 @@ class Statistics:
         returns: list of (key, value)
         """
         
+        print "Starting search with",
+        print "requiredKeyValues=%s and requestedValuesKeys = %s" % \
+            (requiredKeyValues, requestedValuesKeys)
+        
         results = []
         for pageDict in self.j:
+            wasMatch = True
             for key, value in requiredKeyValues:
-                if not(key in pageDict and value in pageDict[key]):
-                    continue
-                
+                if key not in pageDict or value not in pageDict[key]:
+                    wasMatch = False
+            
+            if not wasMatch:
+                continue
+            
+            #print "\n"*3
+            #print "Found match with pageDict: %s" % str(pageDict)[:500]
+            
             r = []
             for requestedKey in requestedValuesKeys:
+                #print "requestedKey:", requestedKey
                 if requestedKey in pageDict:
-                    r.append((requestedKey, pageDict[k]))
+                    r.append((requestedKey, pageDict[requestedKey]))
                 else:
-                    r.append((requestedKey, ""))
+                    r.append((requestedKey, "(not found)"))
+                    
             results.append(r)
+                    
         return results
         
     def doPlots(self, showPlots=True):
