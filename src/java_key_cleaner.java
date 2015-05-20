@@ -64,6 +64,8 @@ public class java_key_cleaner{
 		String orgVoc[] = null;
 		int numOcc[] = null;
 		
+		long timer = System.currentTimeMillis();
+		
 		try{
 			FileReader fr = new FileReader(infile);
 			
@@ -83,6 +85,14 @@ public class java_key_cleaner{
 				if(Integer.parseInt(mult[0])<ignore_occurance){
 					ignore++;
 				}
+				
+				
+				
+				
+				//Pattern p = Pattern.compile("\t+");
+				
+				//Matcher m = p.matcher(line);
+				
 				vocabulary.add(line);
 				num_of_occurences.add(Integer.parseInt(mult[0]));
 				//System.out.println(line);
@@ -171,7 +181,7 @@ public class java_key_cleaner{
 		//attributes_to_compare = 3;
 		int c=0;
 		
-		int changes = 0;
+		int changes = 0;//changes due to misspellings
 		//check for similar terms
 		for(int i=0;i<attributes_to_compare;i++){
 			String att = voc[i];
@@ -186,7 +196,7 @@ public class java_key_cleaner{
 			
 			if(att.length()<number_of_char && att.length()>4 && !m3.find()){
 			
-			for(int j=0;j<wordNum;j++){
+			for(int j=i;j<wordNum;j++){
 				String check = voc[j];
 				
 				String first4 = "";
@@ -226,6 +236,7 @@ public class java_key_cleaner{
 			}
 			c++; //:P
 			//System.out.println(c+"/"+wordNum+" translate: "+translate.size()+" # to test: "+attributes_to_compare);
+			//System.out.println(c+"/"+attributes_to_compare+" done");
 			//System.out.println(att);
 			//System.out.println(sortedCommon);
 		}/**/
@@ -253,25 +264,68 @@ public class java_key_cleaner{
 			voc[i] = translationToken.get(att);
 		}
 		
+		int change=0;//words changed
+		
+		for(int i=0;i<wordNum;i++){
+			if(!orgVoc[i].equals(voc[i])){
+				change++;
+			}
+		}
+		
+		
+		
+		//System.out.println("changes total: "+change);
+		
+		
+		
+		long timeTaken = System.currentTimeMillis() - timer;
+		
+		//System.out.println("Time taken "+(timeTaken/1000)+" seconds");
+		
 		/*System.out.println(translationToken);*/
 		
 		if(outputStats){
 			try{
 				FileWriter fw = new FileWriter("../debug/attribute_changes.txt");
+				//FileWriter fw = new FileWriter("debug/attribute_changes.txt");
 				BufferedWriter out = new BufferedWriter(fw);
-				out.write("#A total of "+translate.size()+" keys where changed due to misspellings or formatting errors");
+				out.write("#A total of "+changes+" keys where changed due to misspellings or formatting errors");
 				out.newLine();
 				int numOfChangesInJSON = 0;
+				int totalNumJSON = 0;
 				for(int i=0;i<wordNum;i++){
+					if(i>2){
+						totalNumJSON+=numOcc[i];
+					}
 					if(!orgVoc[i].equals(voc[i])){
 						numOfChangesInJSON+=numOcc[i];
 					}
 				}
 				out.write("#A total of "+numOfChangesInJSON+" keys in the JSON file was corrected.\n#These words changed where the following:");
 				out.newLine();
-				out.write("#NUM_WORDS_CHANGED="+translate.size());
+				out.write("#NUM_WORDS_CHANGED="+change);
 				out.newLine();
 				out.write("#NUM_KEYS_CHANGED="+numOfChangesInJSON);
+				out.newLine();
+				out.write("#RUNTIME="+(timeTaken/1000));
+				out.newLine();
+				out.write("#NUM_WORDS_CHECKED="+attributes_to_compare);
+				out.newLine();
+				out.write("#NUM_WORDS="+wordNum);
+				out.newLine();
+				out.write("#MAX_WORD_LENGTH="+(number_of_char-1));
+				out.newLine();
+				out.write("#NUM_CHANGE_MISSPELLING="+changes);
+				out.newLine();
+				out.write("#PERCENT_OF_WORDS_CHECKED="+(double)((double)attributes_to_compare/(double)wordNum)*100);
+				out.newLine();
+				out.write("#PERCENT_OF_WORDS_CHANGED="+(double)((double)change/(double)wordNum)*100);
+				out.newLine();
+				out.write("#TOTAL_KEYS_IN_JSON="+totalNumJSON);
+				out.newLine();
+				out.write("#KEYS_CORRECTED_IN_JSON="+((double)numOfChangesInJSON/(double)totalNumJSON)*100);
+				out.newLine();
+				out.write("#NUM_PERSONS="+numOcc[0]);
 				out.newLine();
 				for(int i=0;i<wordNum;i++){
 					if(!orgVoc[i].equals(voc[i])){
@@ -286,11 +340,16 @@ public class java_key_cleaner{
 			}
 		}
 		
+		//change '_' and '-' to ' '
+		for(int i=0;i<wordNum;i++){
+			voc[i] = voc[i].replace("_"," ");
+			voc[i] = voc[i].replace("-"," ");
+		}
+		
 		try{
 			FileWriter fw = new FileWriter(outfile);
 			BufferedWriter out = new BufferedWriter(fw);
 			for(int i=0;i<wordNum;i++){
-				voc[i] = voc[i].replace("-","_");
 				out.write(orgVoc[i]+"\t"+voc[i]);
 				out.newLine();
 			}
