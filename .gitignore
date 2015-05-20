@@ -5,6 +5,7 @@
 
 raw_output/ibs_person_raw.json
 output/attribute_keys_cleaned.txt
+output/infobox_output_cleaned.json
 debug/attribute_changes.txt
 big_files/*
 
