@@ -173,7 +173,7 @@ def clean(inputFileName, outputFileName, outputKeysFileName,
 #defaultInputFileName = os.path.abspath("../raw_output/ibs_person_raw_76M.json")
 defaultInputFileName = os.path.abspath("../raw_output/ibs_person_raw.json")
 defaultOutputFileName = os.path.abspath("../output/infobox_output_cleaned.json")
-defaultOutputKeysFileName = os.path.abspath("../output/attribute_keys_cleaned.txt")
+defaultOutputKeysFileName = os.path.abspath("../debug/attribute_keys_cleaned.txt")
     
 def main():
     if len(sys.argv) != 3+1: #The right number of arguments wasn't given
@@ -197,6 +197,7 @@ def main():
         outputKeysFileName  = os.path.abspath(sys.argv[3])
     
     clean(inputFileName, outputFileName, outputKeysFileName, verbose=True)
+    print "End of main(), done!"
 
 if __name__ == "__main__":
     main()
