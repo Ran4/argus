@@ -45,6 +45,7 @@ def saveFiles(cleanedKeysCounter, cleanedInfoBoxList,
                 outputFileName)
         
 def cleanInfoBoxList(attributeKeyParser, infoBoxList, verbose):
+                
     if verbose: print "\nStarts cleaning up InfoBox data..."
     cleanedInfoBoxList = []
     counter = collections.Counter({
@@ -72,17 +73,34 @@ def cleanInfoBoxList(attributeKeyParser, infoBoxList, verbose):
                 continue
             
             #Handle values
-            newValue = attributeValueParser.parseAttributeValue(ib[key],
-                    verbose=False)
-            #~ if verbose: print "V: {} -> {}".format(ib[key], newValue)
-            if not newValue:
-                counter["ignored_new_values"] += 1
-                continue
             
-            #update our attribute dictionary
-            attributeDict[newKey] = newValue
-            if newKey != key or newValue != ib[key]:
-                counter["changed_infoboxes"] += 1
+#~          print "Trying value:",
+#~          print ib[key]
+            
+            if not isinstance(ib[key], list):
+                newValue = attributeValueParser.parseAttributeValue(ib[key],
+                    verbose=False)
+                if not newValue:
+                    counter["ignored_new_values"] += 1
+                    continue
+                
+                attributeDict[newKey] = newValue
+                if newKey != key or newValue != ib[key]:
+                    counter["changed_infoboxes"] += 1
+                    
+            else: #We've found a list, parse them each separately
+                attributeDict[newKey] = []
+                for value in ib[key]:
+                    newValue = attributeValueParser.parseAttributeValue(value,
+                        verbose=False)
+                
+                    if not newValue:
+                        counter["ignored_new_values"] += 1
+                    else:
+                        attributeDict[newKey].append(newValue)
+                        if newKey != key or newValue != value:
+                            counter["changed_infoboxes"] += 1
+                        
             
         cleanedInfoBoxList.append(attributeDict) 
         
@@ -141,7 +159,7 @@ def clean(inputFileName, outputFileName, outputKeysFileName,
     infoBoxList = loadInfoBoxList(inputFileName, verbose)
     keyCounter = getKeyCounter(infoBoxList)
     
-    assert(all(["\t" not in key for key in keyCounter.keys()]))
+    #assert(all(["\t" not in key for key in keyCounter.keys()]))
     
     keyTranslationFileName = os.path.abspath("../raw_output/attribute_keys_raw.txt")
     saveKeyCounterToFile(keyCounter, keyTranslationFileName, verbose)
@@ -167,7 +185,9 @@ def main():
         print "Default values:",
         print "attribute_cleaner {} {} {}".format(inputFileName,
                 outputFileName, outputKeysFileName)
-        response = raw_input("Use default values (y/n)? ")
+        #response = raw_input("Use default values (y/n)? ")
+        response = "y"
+        print "Using default values."
         
         if response.lower() not in ("y", "yes"):
             return

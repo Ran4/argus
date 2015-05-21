@@ -226,7 +226,7 @@ class InfoBox(object):
         d = self.getPropertiesDict()
         d["wikiurl"] = wikiUrl
         d["isocode"] = isoCode
-        d["__categories__"] = self.categoryList
+        d["categories"] = self.categoryList
         
         for category in self.categoryList:
             category_handler.handleCategory(d, category)

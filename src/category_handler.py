@@ -10,7 +10,7 @@ def handleCategory(d, category):
     """Takes a category, and a  dictionary that the
         category will be saved in.
     
-    ##TODO: If d has a key "__categories__", properly parsed categories
+    ##TODO: If d has a key "categories", properly parsed categories
     ##    will be removed from it.
     """
     

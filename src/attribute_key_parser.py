@@ -45,7 +45,7 @@ class AttributeKeyParser:
             cleanedKeysFileName
             
             
-        #Loads file
+        #Loads cleaned keys file
         self.translationDict = {}
         try:
             with open(cleanedKeysFileName) as f:
@@ -59,13 +59,20 @@ class AttributeKeyParser:
         
         if verbose: print "Loaded translation dictionary from file"
         
+        self.addSpecialCases()
+            
+    def addSpecialCases(self):
         #Ignore these keys completely
         self.ignoredKeys = ["image", "alt", "caption", "image_size",
             "footnotes", "background", "module", "bgcolor",
             "signature", "signature_alt",]
-            
-    def getTranslationDict(self):
-        pass
+        
+        specialCasesDict = [
+                "full name": "name",
+                "weight(kg)":"weight",
+                "spouse/s": "spouses",
+                ]
+        self.translationDict.update(specialCasesDict)
 
     def findNewKey(self, key, verbose=False):
         """Takes a key as a string, and changes it to be more generic
