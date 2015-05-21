@@ -517,7 +517,6 @@ class AttributeValueParser:
             print colored("Entering replacement of circa environment.", "blue")
             print "    Value before was: '%s'" % str(value)
         circaEnvironments = self.patternIdentifyCirca.findall(value)
-        for i in range(len(circaEnvironments)):
         for circaEnvironment in circaEnvironments:
             match = filter(None, list(itertools.chain.from_iterable(self.patternCirca.findall(circaEnvironment))))
             if len(match) >= 1:

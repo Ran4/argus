@@ -67,11 +67,11 @@ class AttributeKeyParser:
             "footnotes", "background", "module", "bgcolor",
             "signature", "signature_alt",]
         
-        specialCasesDict = [
+        specialCasesDict = {
                 "full name": "name",
                 "weight(kg)":"weight",
                 "spouse/s": "spouses",
-                ]
+                }
         self.translationDict.update(specialCasesDict)
 
     def findNewKey(self, key, verbose=False):
