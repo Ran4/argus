@@ -38,7 +38,7 @@ class AttributeValueParser:
         self.patternBulletedListName = re.compile("(?i)bulleted[ ]*list|blist")
         self.patternFlatlistName = re.compile("(?i)flat[ ]*list") #flist?
         self.patternStartflatlistName = re.compile("(?i)start[ ]*flat[ ]*list|sflist")
-        self.patternPlainlistName = re.compile("(?i)plain[ ]*list") #plist?
+        self.patternPlainlistName = re.compile("(?i)(?:start)*plain[ ]*list") #plist?
         self.patternFlowlistName = re.compile("(?i)flow[ ]*list") #flist?
         self.patternHlistName = re.compile("(?i)hlist")
         self.patternUnbulletedListName = re.compile("(?i)unbulleted[ ]*list|ublist")
@@ -61,7 +61,7 @@ class AttributeValueParser:
         #Pattern for getting entries from a "startflatlist"
         self.patternStartflatlist = re.compile(r"^(?i)\{\{(?:.*?)\}\}|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+)(?:[ ]*)(?=\*)|(?:(?:\||\*|\#)+)(?:[ ]*)([^\*]+?)(?:[ ]*)\{\{(?:.*?)\}\}$")
         #Pattern for getting entries from an "endplainlist"
-        self.patternEndplainlist  = re.compile(r"^(?i)(?:\{\{(?:.*?))(?=\|)|(?:\||\*|\#)(?:[ ]*)([^\*\#]+?)(?:[ ]*)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)([^\*\#\}]*?)(?:[ ]*)\{\{endplainlist\}\}$")
+        self.patternEndplainlist  = re.compile(r"^(?i)(?:\{\{(?:.*?))(?=\})|(?:\||\*|\#)(?:[ ]*)([^\*\#]+?)(?:[ ]*)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)([^\*\#\}]*?)(?:[ ]*)\{\{endplainlist\}\}$")
         #Pattern for getting entries from a "plainlist"
         self.patternPlainlist = re.compile("^(?i)(?:\{\{(?:.*?))(?=\|)|\|(?:[ ]*)class(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)list_style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)style(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)indent(?:[ ]*)=(?:.*?)(?=\||\})|\|(?:[ ]*)item(?:\d*)_style(?:[ ]*)=(?:.*?)(?=\||\})|(?:\*|\#)(?:[ ]*)([^\*\#]+)(?:[ ]*)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)([^\*\#\}]*?)(?:[ ]*)\}\}$")
         #Pattern for getting entries from an "endflowlist"
@@ -85,7 +85,7 @@ class AttributeValueParser:
         #   various miscellaneous environments)
         ########################################################################
         
-        #TODO: Pattern for creating dot-separated lists
+        #Pattern for creating dot-separated lists
         self.patternDot = re.compile(u"(?i)\{\{\u00b7\}\}")
         #TODO: Pattern for replacing unicode hyphens (Why do this though???)
         self.patternHyphen = re.compile(u"\\u2013")
@@ -109,8 +109,8 @@ class AttributeValueParser:
         self.patternSmall = re.compile(r"(?i)\<[\/]*small\>")
         #Pattern for removing {{*}}, and ndash, mdash andspaced ndash
         self.patternCBDot = re.compile("(?i)\{\{(?:\*|ndash|mdash|spaced ndash)\}\}")
-        #Pattern for removing sfn, refn, cite journal, sfnp and pad
-        self.patternSfn = re.compile(r"(?i)\{\{(?:sfn|refn|cite journal|citation needed|dn|disambiguation needed|pad)(?:.*?)\}\}")
+        #Pattern for removing sfn, refn, cite journal, sfnp, native phrase/name and pad
+        self.patternSfn = re.compile(r"(?i)\{\{(?:native(.*?)|sfn|refn|cite journal|citation needed|dn|disambiguation needed|pad)(?:.*?)\}\}")
         #Pattern for removing list sub-titles encased as '''title'''
         self.patternTitle = re.compile("'''(.*?)'''")
         #Pattern for removing Wiki markup picture links
@@ -155,10 +155,11 @@ class AttributeValueParser:
         #Gets date of birth out of a "birth date" environment
         self.patternDob = re.compile('(?i)\{\{(?:birth date|dob)(?:[ ]*)(?=\|)(?:(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=*(?:[^\|\}]*?)(?=\||\}))*\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)\|(?:[ ]*)(\d+)(?:[ ]*)(?:\|(?:[ ]*)(?:df|mf)(?:[ ]*)=(?:.*?)(?=\||\}))*\}\})')
         
+        #Pattern for extracting approximate dates from the circa environment
+        self.patternCirca = re.compile("(?i)\{\{(?:c\.|circa)[ ]*(?:\}\})*|(?:\|(\d+?)\}\})|\|(\d+?)(?=\|)")
         #Gets name and dates of marriage from a "marriage" environment as the three first capture groups
         self.patternMarriage = re.compile('^(?i)(?:\{\{marriage(?:.*?))(?=\|)|\|(?:[ ]*)\(\)(?:\=)*small(?:er)*(?:[ ]*)(?=\||\})|(?:\|*)(?:[ ]*)end(?:[ ]*)=*(?:.*?)(?=\||\})|(?:\||\*|\#)(?:[ ]*)(.+?)(?:[ ]*)(?=(?:\||\*|\#))|(?:\||\*|\#)(?:[ ]*)(.*?)(?:[ ]*)\}\}$')
         #self.patternMarriage = re.compile('(?i)\{\{(?:marriage)(?:[ ]*)(?=\|)(?:\|(?:(?:[ ]*)\((?:[ ]*)\)(?:[ ]*)\=*(?:[ ]*)small(?:er)*[ ]*)(?=\|)|\|(?:[ ]*)end(?:[ ]*)\=*(?:.*?)(?=\|)|\|(.+?)(?=\|))(?:\|(?:(?:[ ]*)\((?:[ ]*)\)(?:[ ]*)\=*(?:[ ]*)small(?:er)*[ ]*)|\|(?:[ ]*)end(?:[ ]*)\=*(?:.*?)(?=\|)|\|(.+?)(?=\|))(?:\|(?:(?:[ ]*)\((?:[ ]*)\)(?:[ ]*)\=*(?:[ ]*)small(?:er)*[ ]*)(?=\|)|\|(?:[ ]*)end(?:[ ]*)\=*(?:.*?)(?=\|)|\|(.+?)(?=\||\}))(?:\|(?:(?:[ ]*)\((?:[ ]*)\)(?:[ ]*)\=*(?:[ ]*)small(?:er)*[ ]*)(?=\|)|\|(?:[ ]*)end(?:[ ]*)\=*(?:.*?)(?=\||\})|\|(.+?)(?=\||\}))*(?:\|(?:(?:[ ]*)\((?:[ ]*)\)(?:[ ]*)\=*(?:[ ]*)small(?:er)*[ ]*)(?=\|)|\|(?:[ ]*)end(?:[ ]*)\=*(?:.*?)(?=\||\})|\|(.+?)(?=\||\}))*\}\}')
-        
         
         #Pattern for extracting list name from {{list name| or {{list name}}
         #Match starts at start of list and ends at end.
@@ -190,6 +191,10 @@ class AttributeValueParser:
         self.patternEndsWithComma = re.compile("(?:.*)\,$")
         #Identifies a "marriage" environment
         self.patternIdentifyMarriage = re.compile('(?i)(\{\{marriage(?:.*?)\}\})')
+        #Identifies a "circa" environment
+        self.patternIdentifyCirca = re.compile('(?i)(\{\{(?:circa|c\.)(?:.*?)\}\})')
+        #Identifies a "hlist" environment
+        self.patternIdentifyHlist = re.compile('(?i)\{\{hlist(?:.*?)\}\}')
         #Identifies a list with a match
         self.patternListNoCatchGroups = re.compile(r'\{\{(?:[\w ]+?)(?:\|class(?:\=*)[^\}]*)*(?:(?=\|)(?:.*?)\}\}|\}\}(?:.*)(?:\{\{end(?:[^\}]*)\}\})*)')
 
@@ -506,6 +511,23 @@ class AttributeValueParser:
         if verbose:
             print "    Value after became: '%s'" % str(value)
             
+        #Replaces the circa environment with text describing the approximate date.
+        if verbose:
+            print colored("Entering replacement of circa environment.", "blue")
+            print "    Value before was: '%s'" % str(value)
+        circaEnvironments = self.patternIdentifyCirca.findall(value)
+        for i in range(len(circaEnvironments)):
+            match = filter(None, list(itertools.chain.from_iterable(self.patternCirca.findall(circaEnvironments[i]))))
+            if len(match) == 1:
+                replacementValue = "c. " + match[0]
+            elif len(match) == 2:
+                replacementValue += "-" + match[1]
+            else:
+                print colored("WARNING: Illegal circa statement detected!", "magenta")
+                for i in range(len(circaEnvironments)):
+                    print "    More specifically: " + circaEnvironments[i]
+            value = self.patternIdentifyCirca.sub(replacementValue, value, 1)
+            
         #Replaces the marriage environment with text describing the marriage in
         #natural language.
         if verbose:
@@ -533,6 +555,42 @@ class AttributeValueParser:
         value = self.patternLongitem.sub(r"\g<1>", value)
         if verbose:
             print "    Value after became: '%s'" % str(value)
+        
+        #Replace nested hlists in start-tag end-tag lists
+        if value.endswith("{{endplainlist}}") or value.endswith("{{endflowlist}}") or value.endswith("{{endflatlist}}"):
+            #1. Find out what the list is delimited by (#, | or *)
+            hlistEnvironments = self.patternIdentifyHlist.findall(value)
+            if len(hlistEnvironments) > 0:
+                if "#" in value:
+                    #Sub all groups in match into #- separated string
+                    for i in range(len(hlistEnvironments)):
+                        match = filter(None, list(itertools.chain.from_iterable(self.patternHlist.findall(hlistEnvironments[i]))))
+                        if len(match) > 0:
+                            replacementValue = " # ".join(match)
+                        else:
+                            print colored("WARNING: Empty hlist statement detected!", "magenta")
+                            replacementValue = ""
+                        value = self.patternIdentifyHlist.sub(replacementValue, value, 1)
+                elif "*" in value:
+                    #Sub all groups in match into *- separated string
+                    for i in range(len(hlistEnvironments)):
+                        match = filter(None, list(itertools.chain.from_iterable(self.patternHlist.findall(hlistEnvironments[i]))))
+                        if len(match) > 0:
+                            replacementValue = " * ".join(match)
+                        else:
+                            print colored("WARNING: Empty hlist statement detected!", "magenta")
+                            replacementValue = ""
+                        value = self.patternIdentifyHlist.sub(replacementValue, value, 1)
+                else: #List must be |-separated then...
+                    #Sub all groups in match into |- separated string
+                    for i in range(len(hlistEnvironments)):
+                        match = filter(None, list(itertools.chain.from_iterable(self.patternHlist.findall(hlistEnvironments[i]))))
+                        if len(match) > 0:
+                            replacementValue = " | ".join(match)
+                        else:
+                            print colored("WARNING: Empty hlist statement detected!", "magenta")
+                            replacementValue = ""
+                        value = self.patternIdentifyHlist.sub(replacementValue, value, 1)
             
         return value
     
@@ -582,7 +640,7 @@ class AttributeValueParser:
         elif self.patternPlainlistName.match(listType):
             if verbose:
                 print '    some type of plainlist detected...'
-            #A subcase for endplainlist environment:
+            #A subcase for endplainlist/startplainlist environment:
             if value.endswith("{{endplainlist}}"):
                 if verbose:
                     print '    "endplainlist" detected.'
@@ -604,13 +662,6 @@ class AttributeValueParser:
                 if verbose:
                         print '    "flowlist" detected.'
                 returnList = filter(None, list(itertools.chain.from_iterable(self.patternFlowlist.findall(value))))
-            
-        elif self.patternHlistName.match(listType):
-            if verbose:
-                print '    "hlist" detected.'
-
-            #Returns a list of tuples with all matches, where each group corresponds to one tuple.
-            returnList = filter(None, list(itertools.chain.from_iterable(self.patternHlist.findall(value))))
             
         elif self.patternUnbulletedListName.match(listType):
             if verbose:
@@ -639,6 +690,13 @@ class AttributeValueParser:
 
             #Returns a list of tuples with all matches, where each group corresponds to one tuple.
             returnList = filter(None, list(itertools.chain.from_iterable(self.patternToolbar.findall(value))))
+                  
+        elif self.patternHlistName.match(listType):
+            if verbose:
+                print '    "hlist" detected.'
+
+            #Returns a list of tuples with all matches, where each group corresponds to one tuple.
+            returnList = filter(None, list(itertools.chain.from_iterable(self.patternHlist.findall(value))))
         else:
             if verbose:
                 print colored("WARNING: List of unknown type found!", "magenta")  
@@ -692,13 +750,19 @@ class AttributeValueParser:
             #to one long list, then return.
             resultList = []
             subStrings = self.patternListNoCatchGroups.findall(value)
-            for string in subStrings:
-                print "Value is: " + value
-                print "String is: " + string
+            #TEST: Lots of prints here:
+            #print "Number of substrings in " + str(value.encode("utf-8")) + " is " + str(len(subStrings))
+            #for string in subStrings:
+            #    print "Value is: " + value
+            #    print "String is: " + string
             for i, listType in enumerate(self.patternList.findall(value)):
+                #print "List type is: " + listType
+                if i == len(subStrings):
+                    print colored("WARNING: Degenerate list environment found!", "magenta")
+                    return resultList
                 if listType not in ["endflatlist", "endplainlist", "endflowlist"]:
                     resultList.extend(self.parseList(subStrings[i], listType, verbose))
-                
+            #print "Entire string was parsed..."    
             if verbose:
                 print "Returning: %s" % str(resultList) 
             return resultList    
@@ -810,14 +874,14 @@ def test(verbose=False):
         ('{{unbulleted list |[[golden mean (philosophy)|golden mean]] |[[aristotelian logic]] |[[syllogism]] |[[hexis]] |[[hylomorphism]] |[[on the soul|theory of the soul]]}}', ['golden mean', 'aristotelian logic', 'syllogism', 'hexis', 'hylomorphism', 'theory of the soul']),
         ('{{hlist |[[parmenides]] |[[socrates]] |[[plato]] |[[heraclitus]] |[[democritus]]}}', ['parmenides', 'socrates', 'plato', 'heraclitus', 'democritus']),
         ('[[Milan|Mediolanum]],<br />[[Italy (Roman Empire)|Italia annonaria]], [[Roman Empire]]<br />''[[Italy|(present-day Italy)]]''', ['Mediolanum, Italia annonaria, Roman Empire (present-day Italy)']),
-        #TODO: Nested and/or multiple lists
+        #Nested and/or multiple lists
         ('{{hlist|[[biology]]|[[zoology]]}} {{hlist|[[physics]]|[[metaphysics]]}}', ['biology', 'zoology', 'physics', 'metaphysics']),
-        #Marriage environment
-        ('{{Unbulleted list|class=nowrap |{{marriage|Maria Nys|()=smaller|1919|1955}} |{{marriage|[[Laura Huxley]]|()=smaller|1956|1963}}}}', ['Maria Nys (m. 1919-1955)', 'Laura Huxley (m. 1956-1963)']),
-    ]
-
+        ('{{startplainlist|classnowrap}}* {{hlist |Medicine |Aromatherapy}}* Philosophy and logic* ''Kalam'' (Islamic theology)* {{hlist |Science |Poetry}}{{endplainlist}}', ['Medicine', 'Aromatherapy', 'Philosophy and logic', 'Kalam (Islamic theology)', 'Science', 'Poetry']),
+        #Misc.
+        ('{{c.|980}} [[Common Era|CE]]','c. 980 CE')
+        ]
     attributeValueParser = AttributeValueParser()
-    
+   
     print "Testing",
     print "attribute_value_parser.AttributeValueParser.parseAttributeValue()"
     
