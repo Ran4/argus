@@ -11,7 +11,7 @@ public class java_key_cleaner{
 	public static int ignore_occurance = 100; //number of attributes with less than this occurances will be ignored
 	public boolean outputStats = true; //output statistics
 	
-	String infile = "../debug/attribute_keys_cleaned.txt";
+	String infile = "../debug/attribute_keys_raw.txt";
 	String outfile = "../debug/correct_attributes.txt";
 	
 	/*
@@ -58,13 +58,13 @@ public class java_key_cleaner{
 		LinkedList<String> vocabulary = new LinkedList<String>();
 		LinkedList<Integer> num_of_occurences = new LinkedList<Integer>();
 		
-		int wordNum = 0;
-		int ignore = 0;
-		String voc[] = null;
-		String orgVoc[] = null;
-		int numOcc[] = null;
+		int wordNum = 0;		// number of unique words
+		int ignore = 0;			// number of words to not run spell check on 
+		String voc[] = null;	// String array containing all the words we are working on
+		String orgVoc[] = null;	// String array containing the original words
+		int numOcc[] = null;	// Int array containing the number of occurances of a word in the JSON file
 		
-		long timer = System.currentTimeMillis();
+		long timer = System.currentTimeMillis();	//for logging time
 		
 		try{
 			FileReader fr = new FileReader(infile);
@@ -72,10 +72,14 @@ public class java_key_cleaner{
 			BufferedReader in = new BufferedReader(fr);
 			
 			String line = null;
+			
+			// get all words
 			while((line = in.readLine()) != null) {
+				// check if the line conatins a tab (it should not!)
 				if(line.indexOf('\t')!=-1){
 					System.out.println("Warning \""+line+"\" contains a tab");
 				}
+				// remove the information regarding the number of times the word occur in the JSON file
 				String mult[] = line.split("\\s+");
 				line = "";
 				for(int i=1;i<mult.length-1;i++){
@@ -86,20 +90,11 @@ public class java_key_cleaner{
 					ignore++;
 				}
 				
-				
-				
-				
-				//Pattern p = Pattern.compile("\t+");
-				
-				//Matcher m = p.matcher(line);
-				
+				// add the word to the list
 				vocabulary.add(line);
 				num_of_occurences.add(Integer.parseInt(mult[0]));
-				//System.out.println(line);
 			}
-			//System.out.println("ignore terms: "+ignore);
-			
-			//System.out.println("number of attributes: "+vocabulary.size());
+			//set the number of words in our dictionary
 			wordNum = vocabulary.size();
 			
 			voc = new String[wordNum];
@@ -108,7 +103,7 @@ public class java_key_cleaner{
 			
 			in.close();
 		}
-		catch(Exception e){
+		catch(Exception e){	//this is just for errors
 			System.err.println(e);
 			System.exit(1);
 		}
@@ -130,12 +125,11 @@ public class java_key_cleaner{
 			att = att.replace("'"," ");
 			att = att.replace("|"," ");
 			
-			//remove "of"
+			//remove "of" so "date of birth" -> "birth date"
 			Pattern p = Pattern.compile("(.+) of (.+)");
 			
 			Matcher m = p.matcher(att);
 			if(m.find()){
-				//System.out.println(att);
 				String tmp[] = att.split("\\s+");
 				for(int j = 0;j < tmp.length;j++){
 					if(j>0 && tmp[j].equals("of") && (j+1) < tmp.length){
@@ -149,16 +143,13 @@ public class java_key_cleaner{
 				for(int j=0;j<tmp.length;j++){
 					att+=tmp[j];
 				}
-				//System.out.println(voc[i]);
 			}
 			//add result
 			voc[i] = att;
-			//System.out.println(att);
-			//vocabulary.add(att);
 			vocabulary.removeFirst();
 		}
 		
-		//removee any whitespaces remaining
+		//remove any white spaces remaining
 		for(int i = 0;i < wordNum;i++){
 			String att = voc[i];
 			String mult[] = att.split("\\s+");
@@ -374,10 +365,7 @@ public class java_key_cleaner{
 	public static void main(String[] args){
 		java_key_cleaner a;
 		if(args.length == 2){
-			//System.out.println("got arguments");
 			a = new java_key_cleaner(args[0],args[1]);
-			//infile = args[0];
-			//outfile = args[1];
 		}
 		else if(args.length == 3){
 			a = new java_key_cleaner(args[0],args[1]);
